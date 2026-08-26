@@ -1,0 +1,281 @@
+:root {
+  --background: #f4f5f7;
+  --surface: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #111827;
+  --primary-hover: #374151;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --success: #15803d;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  color: var(--text);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.container {
+  width: min(1200px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 50px 0;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 30px;
+  margin-bottom: 35px;
+}
+
+.eyebrow {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+}
+
+.stats {
+  display: flex;
+  gap: 15px;
+}
+
+.stat-card {
+  min-width: 120px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.stat-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 5px;
+}
+
+.stat-card strong {
+  font-size: 1.5rem;
+}
+
+.stat-card.warning strong {
+  color: var(--warning);
+}
+
+.form-section,
+.inventory-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.form-section h2 {
+  margin-bottom: 20px;
+}
+
+.perfume-form {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 15px;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.field input,
+.inventory-header input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+}
+
+.field input:focus,
+.inventory-header input:focus {
+  border-color: var(--primary);
+}
+
+.primary-button {
+  width: 100%;
+  min-height: 44px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.primary-button:hover {
+  background: var(--primary-hover);
+}
+
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.inventory-header input {
+  max-width: 300px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.stock {
+  display: inline-flex;
+  min-width: 36px;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.stock.ok {
+  background: #dcfce7;
+  color: var(--success);
+}
+
+.stock.low {
+  background: #ffedd5;
+  color: var(--warning);
+}
+
+.stock.empty {
+  background: #fee2e2;
+  color: var(--danger);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-button {
+  border: none;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-weight: 700;
+}
+
+.increase {
+  background: #dcfce7;
+  color: var(--success);
+}
+
+.decrease {
+  background: #fef3c7;
+  color: var(--warning);
+}
+
+.delete {
+  background: #fee2e2;
+  color: var(--danger);
+}
+
+.empty-message {
+  display: none;
+  color: var(--muted);
+  text-align: center;
+  padding: 30px 0 10px;
+}
+
+@media (max-width: 950px) {
+  .page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .perfume-form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .container {
+    width: min(100% - 24px, 1200px);
+    padding: 25px 0;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .stat-card {
+    min-width: 0;
+  }
+
+  .perfume-form {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inventory-header input {
+    max-width: none;
+  }
+}

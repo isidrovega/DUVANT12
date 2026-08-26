@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventario de Perfumes</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <main class="container">
+
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Panel de control</p>
+        <h1>Inventario de Perfumes</h1>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <span>Productos</span>
+          <strong id="totalProducts">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Unidades</span>
+          <strong id="totalUnits">0</strong>
+        </div>
+
+        <div class="stat-card warning">
+          <span>Bajo stock</span>
+          <strong id="lowStock">0</strong>
+        </div>
+      </div>
+    </header>
+
+
+    <section class="form-section">
+      <h2>Agregar perfume</h2>
+
+      <form id="perfumeForm" class="perfume-form">
+
+        <div class="field">
+          <label for="name">Nombre</label>
+          <input
+            type="text"
+            id="name"
+            placeholder="Ej. Sauvage"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label for="brand">Marca</label>
+          <input
+            type="text"
+            id="brand"
+            placeholder="Ej. Dior"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label for="size">Tamaño</label>
+          <input
+            type="text"
+            id="size"
+            placeholder="Ej. 100 ml"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label for="quantity">Cantidad</label>
+          <input
+            type="number"
+            id="quantity"
+            min="0"
+            value="1"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label for="price">Precio</label>
+          <input
+            type="number"
+            id="price"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            required
+          />
+        </div>
+
+        <div class="field button-field">
+          <button type="submit" class="primary-button">
+            Agregar
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+
+    <section class="inventory-section">
+
+      <div class="inventory-header">
+        <h2>Productos</h2>
+
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Buscar perfume..."
+        />
+      </div>
+
+
+      <div class="table-wrapper">
+
+        <table>
+          <thead>
+            <tr>
+              <th>Perfume</th>
+              <th>Marca</th>
+              <th>Tamaño</th>
+              <th>Precio</th>
+              <th>Existencia</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody id="inventoryBody"></tbody>
+        </table>
+
+      </div>
+
+      <p id="emptyMessage" class="empty-message">
+        No hay perfumes registrados.
+      </p>
+
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

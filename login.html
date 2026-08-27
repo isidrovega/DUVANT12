@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Duvant 12 | Iniciar sesión</title>
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
+</head>
+
+<body class="login-page">
+
+  <main class="login-wrapper">
+
+    <section class="login-card">
+
+      <div class="login-brand">
+
+        <img
+          src="logo.png"
+          alt="Duvant 12"
+          class="login-logo"
+        >
+
+        <span class="login-eyebrow">
+          Fragrances House
+        </span>
+
+        <h1>
+          Duvant 12
+        </h1>
+
+        <p>
+          Sistema de administración
+        </p>
+
+      </div>
+
+
+      <form
+        id="loginForm"
+        class="login-form"
+      >
+
+        <div class="field">
+
+          <label for="loginEmail">
+            Correo electrónico
+          </label>
+
+          <input
+            id="loginEmail"
+            type="email"
+            placeholder="correo@duvant12.com"
+            autocomplete="email"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="loginPassword">
+            Contraseña
+          </label>
+
+          <div class="password-field">
+
+            <input
+              id="loginPassword"
+              type="password"
+              placeholder="Ingresa tu contraseña"
+              autocomplete="current-password"
+              required
+            >
+
+            <button
+              id="togglePassword"
+              class="password-toggle"
+              type="button"
+            >
+              Ver
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <p
+          id="loginError"
+          class="login-error"
+        ></p>
+
+
+        <button
+          id="loginButton"
+          type="submit"
+          class="login-button"
+        >
+          Iniciar sesión
+        </button>
+
+      </form>
+
+    </section>
+
+  </main>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>

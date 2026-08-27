@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Duvant 12 | Inventario</title>
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+
+  <script>
+    try {
+      const cachedProfile =
+        JSON.parse(
+          sessionStorage.getItem(
+            "duvant12_profile"
+          )
+        );
+
+      if (cachedProfile?.role) {
+        document.documentElement.dataset.role =
+          cachedProfile.role;
+      }
+    } catch (error) {
+      console.error(
+        "No se pudo leer el perfil almacenado:",
+        error
+      );
+    }
+  </script>
+
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
+</head>
+
+<body data-page="admin">
+
+  <div class="app">
+
+    <aside class="sidebar">
+
+      <div class="brand">
+
+        <img
+          src="logo.png"
+          alt="Logo Duvant 12"
+          class="brand-logo"
+        >
+
+        <div class="brand-text">
+          <strong>Duvant 12</strong>
+          <span>Fragrances House</span>
+        </div>
+
+      </div>
+
+
+      <nav class="sidebar-nav">
+
+        <a
+          href="index.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Dashboard</span>
+        </a>
+
+        <a
+          href="inventario.html"
+          class="nav-link active admin-only"
+        >
+          <span class="nav-icon">▣</span>
+          <span>Inventario</span>
+        </a>
+
+        <a
+          href="vendedores.html"
+          class="nav-link"
+        >
+          <span class="nav-icon">◇</span>
+          <span>Vendedores</span>
+        </a>
+
+        <a
+          href="usuarios.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">♙</span>
+          <span>Usuarios</span>
+        </a>
+
+      </nav>
+
+
+      <div class="sidebar-bottom">
+
+        <div class="quote-card">
+
+          <strong data-current-user>
+            Administrador
+          </strong>
+
+          <span data-current-role>
+            Administrador
+          </span>
+
+          <div class="quote-divider"></div>
+
+          <button
+            class="logout-button"
+            data-logout
+            type="button"
+          >
+            Cerrar sesión
+          </button>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <main class="main-content">
+
+      <header class="topbar">
+
+        <div>
+
+          <span class="topbar-label">
+            Gestión de productos
+          </span>
+
+          <h1>
+            Inventario
+          </h1>
+
+          <p>
+            Agrega, edita e importa perfumes desde Excel.
+          </p>
+
+        </div>
+
+
+        <div class="admin-profile">
+
+          <div class="admin-logo">
+            D12
+          </div>
+
+          <div class="admin-info">
+
+            <strong data-current-user>
+              Administrador
+            </strong>
+
+            <span>
+              Duvant 12
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+
+      <!-- =====================================
+           FORMULARIO MANUAL
+      ====================================== -->
+
+      <section class="panel add-panel">
+
+        <div class="panel-heading">
+
+          <div>
+
+            <span class="section-eyebrow">
+              Nuevo producto
+            </span>
+
+            <h2>
+              Agregar perfume
+            </h2>
+
+          </div>
+
+          <span class="heading-line"></span>
+
+        </div>
+
+
+        <form
+          id="perfumeForm"
+          class="perfume-form"
+        >
+
+          <input
+            id="editingId"
+            type="hidden"
+          >
+
+
+          <div class="field">
+
+            <label for="name">
+              Nombre
+            </label>
+
+            <input
+              id="name"
+              type="text"
+              placeholder="Ej. Sauvage Elixir"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="brand">
+              Marca
+            </label>
+
+            <input
+              id="brand"
+              type="text"
+              placeholder="Ej. Dior"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="category">
+              Categoría
+            </label>
+
+            <select
+              id="category"
+              required
+            >
+
+              <option value="">
+                Seleccionar
+              </option>
+
+              <option value="Hombre">
+                Hombre
+              </option>
+
+              <option value="Mujer">
+                Mujer
+              </option>
+
+              <option value="Unisex">
+                Unisex
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="size">
+              Tamaño
+            </label>
+
+            <input
+              id="size"
+              type="text"
+              placeholder="Ej. 100 ml"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="purchasePrice">
+              Precio de compra
+            </label>
+
+            <input
+              id="purchasePrice"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="price">
+              Precio de venta
+            </label>
+
+            <input
+              id="price"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="quantity">
+              Stock
+            </label>
+
+            <input
+              id="quantity"
+              type="number"
+              min="0"
+              value="1"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="code">
+              Código
+            </label>
+
+            <input
+              id="code"
+              type="text"
+              placeholder="Ej. D12-001"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-actions">
+
+            <button
+              id="cancelEditButton"
+              class="secondary-button hidden"
+              type="button"
+            >
+              Cancelar
+            </button>
+
+            <button
+              id="submitButton"
+              class="primary-button"
+              type="submit"
+            >
+              + Agregar perfume
+            </button>
+
+          </div>
+
+        </form>
+
+      </section>
+
+
+      <!-- =====================================
+           EXCEL
+      ====================================== -->
+
+      <section class="panel excel-panel">
+
+        <div class="panel-heading">
+
+          <div>
+
+            <span class="section-eyebrow">
+              Importación masiva
+            </span>
+
+            <h2>
+              Pedidos por Excel
+            </h2>
+
+            <p class="excel-description">
+              Descarga una plantilla sin precios para enviarla a tu
+              distribuidor. Cuando la recibas, impórtala y completa
+              los precios de forma privada.
+            </p>
+
+          </div>
+
+          <span class="heading-line"></span>
+
+        </div>
+
+
+        <div class="excel-actions">
+
+          <button
+            id="downloadExcelTemplateButton"
+            class="outline-button excel-action-button"
+            type="button"
+          >
+            ↓ Descargar plantilla
+          </button>
+
+
+          <button
+            id="importExcelButton"
+            class="primary-button excel-action-button"
+            type="button"
+          >
+            ↑ Importar Excel
+          </button>
+
+
+          <input
+            id="excelFileInput"
+            class="hidden"
+            type="file"
+            accept=".xlsx,.xls"
+          >
+
+        </div>
+
+
+        <div class="excel-columns-info">
+
+          <span>
+            La plantilla contiene únicamente:
+          </span>
+
+          <strong>
+            Código · Nombre · Marca · Categoría · Tamaño · Cantidad
+          </strong>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================
+           INVENTARIO
+      ====================================== -->
+
+      <section class="panel inventory-panel">
+
+        <div class="inventory-toolbar">
+
+          <div class="search-box">
+
+            <span>
+              ⌕
+            </span>
+
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="Buscar perfume, marca o código..."
+            >
+
+          </div>
+
+
+          <div class="toolbar-actions">
+
+            <select
+              id="categoryFilter"
+              class="filter-select"
+            >
+
+              <option value="Todos">
+                Todas las categorías
+              </option>
+
+              <option value="Hombre">
+                Hombre
+              </option>
+
+              <option value="Mujer">
+                Mujer
+              </option>
+
+              <option value="Unisex">
+                Unisex
+              </option>
+
+            </select>
+
+
+            <button
+              id="exportButton"
+              class="outline-button"
+              type="button"
+            >
+              ↓ Exportar CSV
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="table-container">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Producto</th>
+                <th>Marca</th>
+                <th>Categoría</th>
+                <th>Tamaño</th>
+                <th>Stock</th>
+                <th>Compra</th>
+                <th>Venta</th>
+                <th>Valor</th>
+                <th>Acciones</th>
+              </tr>
+
+            </thead>
+
+            <tbody id="inventoryBody"></tbody>
+
+          </table>
+
+        </div>
+
+
+        <div
+          id="emptyMessage"
+          class="empty-state"
+        >
+
+          <div class="empty-icon">
+            ◇
+          </div>
+
+          <h3>
+            No hay perfumes registrados
+          </h3>
+
+          <p>
+            Agrega un perfume manualmente o importa un Excel.
+          </p>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================
+       MODAL IMPORTACIÓN EXCEL
+  ====================================== -->
+
+  <div
+    id="excelImportModal"
+    class="excel-modal hidden"
+    aria-hidden="true"
+  >
+
+    <div
+      class="excel-modal-backdrop"
+      data-close-excel-modal
+    ></div>
+
+
+    <section
+      class="excel-modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="excelModalTitle"
+    >
+
+      <header class="excel-modal-header">
+
+        <div>
+
+          <span class="section-eyebrow">
+            Importación
+          </span>
+
+          <h2 id="excelModalTitle">
+            Revisar pedido
+          </h2>
+
+          <p>
+            Revisa los productos y completa los precios antes de
+            guardarlos.
+          </p>
+
+        </div>
+
+
+        <button
+          class="excel-modal-close"
+          data-close-excel-modal
+          type="button"
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+
+      </header>
+
+
+      <div
+        id="excelImportSummary"
+        class="excel-import-summary"
+      ></div>
+
+
+      <div class="excel-preview-container">
+
+        <table class="excel-preview-table">
+
+          <thead>
+
+            <tr>
+              <th>Fila</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Estado</th>
+              <th>Acción</th>
+              <th>Precio compra</th>
+              <th>Precio venta</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="excelPreviewBody"></tbody>
+
+        </table>
+
+      </div>
+
+
+      <footer class="excel-modal-footer">
+
+        <button
+          class="secondary-button"
+          data-close-excel-modal
+          type="button"
+        >
+          Cancelar
+        </button>
+
+
+        <button
+          id="confirmExcelImportButton"
+          class="primary-button"
+          type="button"
+        >
+          Importar productos
+        </button>
+
+      </footer>
+
+    </section>
+
+  </div>
+
+
+  <!-- TOAST -->
+
+  <div
+    id="toast"
+    class="toast"
+  >
+    <span id="toastMessage"></span>
+  </div>
+
+
+  <!-- SUPABASE -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="supabase-config.js"></script>
+
+
+  <!-- EXCEL / SHEETJS -->
+
+  <script
+    src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"
+  ></script>
+
+
+  <!-- APP -->
+
+  <script src="script.js"></script>
+
+</body>
+</html>

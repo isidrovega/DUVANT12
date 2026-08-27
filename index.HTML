@@ -1,148 +1,442 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inventario de Perfumes</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Duvant 12 | Dashboard</title>
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+
+  <script>
+    try {
+      const cachedProfile =
+        JSON.parse(
+          sessionStorage.getItem(
+            "duvant12_profile"
+          )
+        );
+
+      if (cachedProfile?.role) {
+        document.documentElement.dataset.role =
+          cachedProfile.role;
+      }
+    } catch (error) {
+      console.error(
+        "No se pudo leer el perfil almacenado:",
+        error
+      );
+    }
+  </script>
+
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
 </head>
 
-<body>
-  <main class="container">
+<body data-page="admin">
 
-    <header class="page-header">
-      <div>
-        <p class="eyebrow">Panel de control</p>
-        <h1>Inventario de Perfumes</h1>
+  <div class="app">
+
+    <aside class="sidebar">
+
+      <div class="brand">
+
+        <img
+          src="logo.png"
+          alt="Logo Duvant 12"
+          class="brand-logo"
+        >
+
+        <div class="brand-text">
+          <strong>Duvant 12</strong>
+          <span>Fragrances House</span>
+        </div>
+
       </div>
 
-      <div class="stats">
-        <div class="stat-card">
-          <span>Productos</span>
-          <strong id="totalProducts">0</strong>
-        </div>
 
-        <div class="stat-card">
-          <span>Unidades</span>
-          <strong id="totalUnits">0</strong>
-        </div>
+      <nav class="sidebar-nav">
 
-        <div class="stat-card warning">
-          <span>Bajo stock</span>
-          <strong id="lowStock">0</strong>
-        </div>
-      </div>
-    </header>
+        <a
+          href="index.html"
+          class="nav-link active admin-only"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Dashboard</span>
+        </a>
+
+        <a
+          href="inventario.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">▣</span>
+          <span>Inventario</span>
+        </a>
+
+        <a
+          href="vendedores.html"
+          class="nav-link"
+        >
+          <span class="nav-icon">◇</span>
+          <span>Vendedores</span>
+        </a>
+
+        <a
+          href="usuarios.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">♙</span>
+          <span>Usuarios</span>
+        </a>
+
+      </nav>
 
 
-    <section class="form-section">
-      <h2>Agregar perfume</h2>
+      <div class="sidebar-bottom">
 
-      <form id="perfumeForm" class="perfume-form">
+        <div class="quote-card">
 
-        <div class="field">
-          <label for="name">Nombre</label>
-          <input
-            type="text"
-            id="name"
-            placeholder="Ej. Sauvage"
-            required
-          />
-        </div>
+          <strong data-current-user>
+            Administrador
+          </strong>
 
-        <div class="field">
-          <label for="brand">Marca</label>
-          <input
-            type="text"
-            id="brand"
-            placeholder="Ej. Dior"
-            required
-          />
-        </div>
+          <span data-current-role>
+            Administrador
+          </span>
 
-        <div class="field">
-          <label for="size">Tamaño</label>
-          <input
-            type="text"
-            id="size"
-            placeholder="Ej. 100 ml"
-            required
-          />
-        </div>
+          <div class="quote-divider"></div>
 
-        <div class="field">
-          <label for="quantity">Cantidad</label>
-          <input
-            type="number"
-            id="quantity"
-            min="0"
-            value="1"
-            required
-          />
-        </div>
-
-        <div class="field">
-          <label for="price">Precio</label>
-          <input
-            type="number"
-            id="price"
-            min="0"
-            step="0.01"
-            placeholder="0.00"
-            required
-          />
-        </div>
-
-        <div class="field button-field">
-          <button type="submit" class="primary-button">
-            Agregar
+          <button
+            class="logout-button"
+            data-logout
+            type="button"
+          >
+            Cerrar sesión
           </button>
+
         </div>
 
-      </form>
-    </section>
-
-
-    <section class="inventory-section">
-
-      <div class="inventory-header">
-        <h2>Productos</h2>
-
-        <input
-          type="search"
-          id="searchInput"
-          placeholder="Buscar perfume..."
-        />
       </div>
 
+    </aside>
 
-      <div class="table-wrapper">
 
-        <table>
-          <thead>
-            <tr>
-              <th>Perfume</th>
-              <th>Marca</th>
-              <th>Tamaño</th>
-              <th>Precio</th>
-              <th>Existencia</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
+    <main class="main-content">
 
-          <tbody id="inventoryBody"></tbody>
-        </table>
+      <header class="topbar">
 
-      </div>
+        <div>
 
-      <p id="emptyMessage" class="empty-message">
-        No hay perfumes registrados.
-      </p>
+          <span class="topbar-label">
+            Panel de administración
+          </span>
 
-    </section>
+          <h1>
+            Dashboard
+          </h1>
 
-  </main>
+          <p>
+            Resumen general del inventario de perfumes.
+          </p>
 
+        </div>
+
+
+        <div class="admin-profile">
+
+          <div class="admin-logo">
+            D12
+          </div>
+
+          <div class="admin-info">
+
+            <strong data-current-user>
+              Administrador
+            </strong>
+
+            <span>
+              Duvant 12
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+
+      <section class="dashboard">
+
+        <div class="stats-grid">
+
+          <article class="stat-card">
+
+            <div class="stat-icon">
+              ◇
+            </div>
+
+            <div>
+
+              <span class="stat-label">
+                Total perfumes
+              </span>
+
+              <strong
+                id="totalProducts"
+                class="stat-number"
+              >
+                0
+              </strong>
+
+              <small>
+                Productos registrados
+              </small>
+
+            </div>
+
+          </article>
+
+
+          <article class="stat-card">
+
+            <div class="stat-icon">
+              □
+            </div>
+
+            <div>
+
+              <span class="stat-label">
+                Unidades totales
+              </span>
+
+              <strong
+                id="totalUnits"
+                class="stat-number"
+              >
+                0
+              </strong>
+
+              <small>
+                Existencias disponibles
+              </small>
+
+            </div>
+
+          </article>
+
+
+          <article class="stat-card">
+
+            <div class="stat-icon warning-icon">
+              !
+            </div>
+
+            <div>
+
+              <span class="stat-label">
+                Bajo stock
+              </span>
+
+              <strong
+                id="lowStock"
+                class="stat-number"
+              >
+                0
+              </strong>
+
+              <small>
+                3 unidades o menos
+              </small>
+
+            </div>
+
+          </article>
+
+
+          <article class="stat-card">
+
+            <div class="stat-icon">
+              $
+            </div>
+
+            <div>
+
+              <span class="stat-label">
+                Valor del inventario
+              </span>
+
+              <strong
+                id="inventoryValue"
+                class="stat-number money"
+              >
+                $0
+              </strong>
+
+              <small>
+                Según precio de venta
+              </small>
+
+            </div>
+
+          </article>
+
+
+          <article class="stat-card">
+
+            <div class="stat-icon">
+              $
+            </div>
+
+            <div>
+
+              <span class="stat-label">
+                Costo del inventario
+              </span>
+
+              <strong
+                id="inventoryCost"
+                class="stat-number money"
+              >
+                $0
+              </strong>
+
+              <small>
+                Según precio de compra
+              </small>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <section class="panel dashboard-summary">
+
+        <div class="panel-heading">
+
+          <div>
+
+            <span class="section-eyebrow">
+              Resumen
+            </span>
+
+            <h2>
+              Estado del inventario
+            </h2>
+
+          </div>
+
+          <span class="heading-line"></span>
+
+        </div>
+
+
+        <div class="summary-grid">
+
+          <article class="summary-card">
+
+            <span>
+              Stock disponible
+            </span>
+
+            <strong id="summaryUnits">
+              0
+            </strong>
+
+            <p>
+              Unidades registradas actualmente.
+            </p>
+
+          </article>
+
+
+          <article class="summary-card">
+
+            <span>
+              Productos con poco stock
+            </span>
+
+            <strong id="summaryLowStock">
+              0
+            </strong>
+
+            <p>
+              Perfumes con 3 unidades o menos.
+            </p>
+
+          </article>
+
+
+          <article class="summary-card">
+
+            <span>
+              Valor total
+            </span>
+
+            <strong id="summaryValue">
+              $0
+            </strong>
+
+            <p>
+              Valor calculado usando precio de venta.
+            </p>
+
+          </article>
+
+
+          <article class="summary-card">
+
+            <span>
+              Costo total
+            </span>
+
+            <strong id="summaryCost">
+              $0
+            </strong>
+
+            <p>
+              Lo que has pagado por el inventario disponible.
+            </p>
+
+          </article>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script src="script.js"></script>
+
 </body>
 </html>

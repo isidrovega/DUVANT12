@@ -3359,3 +3359,104 @@ body.modal-open {
     color: #ffffff;
   }
 }
+.logout-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.04);
+  color: #f3f3f3;
+
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.logout-button:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 768px) {
+  .logout-button {
+    display: flex;
+    width: 100%;
+    min-height: 48px;
+    margin-top: 10px;
+  }
+}
+/* =========================================
+   FIX CERRAR SESIÓN EN MÓVIL
+========================================= */
+
+@media (max-width: 768px) {
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-bottom {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    margin-top: auto;
+    padding: 12px;
+  }
+
+  .quote-card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 100%;
+  }
+
+  .logout-button {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 48px;
+    margin-top: 12px;
+    padding: 12px 16px;
+
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+
+    position: relative;
+    z-index: 9999;
+
+    cursor: pointer;
+  }
+
+}

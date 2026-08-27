@@ -3292,3 +3292,70 @@ body.modal-open {
   }
 
 }
+/* =========================================
+   BOTÓN CERRAR SESIÓN - ESCRITORIO
+========================================= */
+
+.logout-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 44px;
+  padding: 10px 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.03);
+  color: #f2f2f2;
+
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.logout-button:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================================
+   BOTÓN CERRAR SESIÓN - MÓVIL
+========================================= */
+
+@media (max-width: 768px) {
+  .logout-button {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: calc(100% - 24px);
+    min-height: 48px;
+
+    margin: 12px;
+    padding: 12px 16px;
+
+    position: relative;
+    z-index: 9999;
+
+    pointer-events: auto !important;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+}

@@ -26,7 +26,6 @@
     rel="stylesheet"
   >
 
-
   <script>
     try {
       const cachedProfile =
@@ -48,7 +47,6 @@
     }
   </script>
 
-
   <link
     rel="stylesheet"
     href="styles.css"
@@ -58,6 +56,10 @@
 <body data-page="admin">
 
   <div class="app">
+
+    <!-- =====================================
+         SIDEBAR
+    ====================================== -->
 
     <aside class="sidebar">
 
@@ -114,6 +116,8 @@
       </nav>
 
 
+      <!-- CIERRE DE SESIÓN ESCRITORIO -->
+
       <div class="sidebar-bottom">
 
         <div class="quote-card">
@@ -142,6 +146,10 @@
 
     </aside>
 
+
+    <!-- =====================================
+         CONTENIDO PRINCIPAL
+    ====================================== -->
 
     <main class="main-content">
 
@@ -583,6 +591,36 @@
 
       </section>
 
+
+      <!-- =====================================
+           CERRAR SESIÓN MÓVIL
+           APARECE AL FINAL DE LA PÁGINA
+      ====================================== -->
+
+      <div class="mobile-logout">
+
+        <div class="mobile-user-info">
+
+          <strong data-current-user>
+            Administrador
+          </strong>
+
+          <span data-current-role>
+            Administrador
+          </span>
+
+        </div>
+
+        <button
+          class="logout-button mobile-logout-button"
+          data-logout
+          type="button"
+        >
+          Cerrar sesión
+        </button>
+
+      </div>
+
     </main>
 
   </div>
@@ -700,7 +738,9 @@
   </div>
 
 
-  <!-- TOAST -->
+  <!-- =====================================
+       TOAST
+  ====================================== -->
 
   <div
     id="toast"
@@ -710,21 +750,27 @@
   </div>
 
 
-  <!-- SUPABASE -->
+  <!-- =====================================
+       SUPABASE
+  ====================================== -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script src="supabase-config.js"></script>
 
 
-  <!-- EXCEL / SHEETJS -->
+  <!-- =====================================
+       EXCEL / SHEETJS
+  ====================================== -->
 
   <script
     src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"
   ></script>
 
 
-  <!-- APP -->
+  <!-- =====================================
+       APP
+  ====================================== -->
 
   <script src="script.js"></script>
 

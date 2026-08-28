@@ -4327,6 +4327,406 @@ function initializeSellerPage() {
    USUARIOS
 ====================================== */
 
+/* ======================================
+   USUARIOS - ADMINISTRACIÓN
+====================================== */
+
+let sellerUsers = [];
+let latestSellerCredentials = null;
+let selectedSellerForPassword = null;
+
+
+/* ======================================
+   EDGE FUNCTION VENDEDORES
+====================================== */
+
+async function invokeSellerManager(
+  action,
+  payload = {}
+) {
+  const {
+    data: sessionData,
+    error: sessionError
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+
+  if (
+    sessionError ||
+    !sessionData.session
+  ) {
+    throw new Error(
+      "Tu sesión ha expirado. Inicia sesión nuevamente."
+    );
+  }
+
+
+  const accessToken =
+    sessionData.session
+      .access_token;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .functions
+      .invoke(
+        "clever-function",
+        {
+          body: {
+            action,
+            ...payload
+          },
+
+          headers: {
+            Authorization:
+              `Bearer ${accessToken}`
+          }
+        }
+      );
+
+
+  if (error) {
+    console.error(
+      "Error Edge Function:",
+      error
+    );
+
+
+    let message =
+      error.message ||
+      "No se pudo completar la operación.";
+
+
+    /*
+     * Supabase FunctionsHttpError
+     * puede traer el mensaje real dentro
+     * de la respuesta HTTP.
+     */
+    try {
+      if (
+        error.context &&
+        typeof error.context.json ===
+          "function"
+      ) {
+        const errorBody =
+          await error.context.json();
+
+
+        if (
+          errorBody?.error
+        ) {
+          message =
+            errorBody.error;
+        } else if (
+          errorBody?.message
+        ) {
+          message =
+            errorBody.message;
+        }
+      }
+    } catch (
+      contextError
+    ) {
+      console.error(
+        "No se pudo leer el error de la función:",
+        contextError
+      );
+    }
+
+
+    throw new Error(
+      message
+    );
+  }
+
+
+  if (
+    data?.ok === false
+  ) {
+    throw new Error(
+      data.error ||
+      "No se pudo completar la operación."
+    );
+  }
+
+
+  return data;
+}
+
+
+/* ======================================
+   GENERAR CONTRASEÑA
+====================================== */
+
+function generateSellerPassword(
+  length = 14
+) {
+  const lowercase =
+    "abcdefghijkmnopqrstuvwxyz";
+
+  const uppercase =
+    "ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+  const numbers =
+    "23456789";
+
+  const symbols =
+    "!@#$%*-_";
+
+  const allCharacters =
+    lowercase +
+    uppercase +
+    numbers +
+    symbols;
+
+
+  const randomIndex = (
+    max
+  ) => {
+    const values =
+      new Uint32Array(1);
+
+
+    crypto.getRandomValues(
+      values
+    );
+
+
+    return (
+      values[0] %
+      max
+    );
+  };
+
+
+  const passwordCharacters = [
+    lowercase[
+      randomIndex(
+        lowercase.length
+      )
+    ],
+
+    uppercase[
+      randomIndex(
+        uppercase.length
+      )
+    ],
+
+    numbers[
+      randomIndex(
+        numbers.length
+      )
+    ],
+
+    symbols[
+      randomIndex(
+        symbols.length
+      )
+    ]
+  ];
+
+
+  while (
+    passwordCharacters.length <
+    length
+  ) {
+    passwordCharacters.push(
+      allCharacters[
+        randomIndex(
+          allCharacters.length
+        )
+      ]
+    );
+  }
+
+
+  /*
+   * Mezclamos los caracteres
+   * para que los cuatro obligatorios
+   * no estén siempre al principio.
+   */
+  for (
+    let index =
+      passwordCharacters.length - 1;
+
+    index > 0;
+
+    index--
+  ) {
+    const randomPosition =
+      randomIndex(
+        index + 1
+      );
+
+
+    [
+      passwordCharacters[index],
+      passwordCharacters[
+        randomPosition
+      ]
+    ] = [
+      passwordCharacters[
+        randomPosition
+      ],
+      passwordCharacters[index]
+    ];
+  }
+
+
+  return passwordCharacters.join(
+    ""
+  );
+}
+
+
+/* ======================================
+   COPIAR TEXTO
+====================================== */
+
+async function copyTextToClipboard(
+  text
+) {
+  if (
+    navigator.clipboard &&
+    window.isSecureContext
+  ) {
+    await navigator
+      .clipboard
+      .writeText(
+        text
+      );
+
+
+    return;
+  }
+
+
+  const textarea =
+    document.createElement(
+      "textarea"
+    );
+
+
+  textarea.value =
+    text;
+
+
+  textarea.style.position =
+    "fixed";
+
+  textarea.style.opacity =
+    "0";
+
+  textarea.style.pointerEvents =
+    "none";
+
+
+  document.body.appendChild(
+    textarea
+  );
+
+
+  textarea.focus();
+
+  textarea.select();
+
+
+  const successful =
+    document.execCommand(
+      "copy"
+    );
+
+
+  textarea.remove();
+
+
+  if (!successful) {
+    throw new Error(
+      "No se pudo copiar."
+    );
+  }
+}
+
+
+/* ======================================
+   FECHAS USUARIOS
+====================================== */
+
+function formatUserDate(
+  value
+) {
+  if (!value) {
+    return "—";
+  }
+
+
+  const date =
+    new Date(
+      value
+    );
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "—";
+  }
+
+
+  return new Intl
+    .DateTimeFormat(
+      "es-MX",
+      {
+        day:
+          "2-digit",
+
+        month:
+          "short",
+
+        year:
+          "numeric"
+      }
+    )
+    .format(
+      date
+    );
+}
+
+
+/* ======================================
+   CARGAR VENDEDORES
+====================================== */
+
+async function loadSellerUsers() {
+  const result =
+    await invokeSellerManager(
+      "list"
+    );
+
+
+  sellerUsers =
+    Array.isArray(
+      result?.sellers
+    )
+      ? result.sellers
+      : [];
+
+
+  return sellerUsers;
+}
+
+
+/* ======================================
+   PÁGINA USUARIOS
+====================================== */
+
 function initializeUsersPage() {
   const form =
     document.getElementById(
@@ -4339,6 +4739,24 @@ function initializeUsersPage() {
   }
 
 
+  const fullNameInput =
+    document.getElementById(
+      "sellerFullName"
+    );
+
+
+  const emailInput =
+    document.getElementById(
+      "sellerEmail"
+    );
+
+
+  const passwordInput =
+    document.getElementById(
+      "sellerPassword"
+    );
+
+
   const generateButton =
     document.getElementById(
       "generateCredentialsButton"
@@ -4346,23 +4764,1188 @@ function initializeUsersPage() {
 
 
   const submitButton =
-    form.querySelector(
-      'button[type="submit"]'
+    document.getElementById(
+      "createSellerButton"
     );
 
 
-  if (generateButton) {
-    generateButton.disabled =
-      true;
+  const credentialsPanel =
+    document.getElementById(
+      "credentialsPanel"
+    );
+
+
+  const credentialsEyebrow =
+    document.getElementById(
+      "credentialsEyebrow"
+    );
+
+
+  const credentialsTitle =
+    document.getElementById(
+      "credentialsTitle"
+    );
+
+
+  const createdSellerName =
+    document.getElementById(
+      "createdSellerName"
+    );
+
+
+  const createdSellerEmail =
+    document.getElementById(
+      "createdSellerEmail"
+    );
+
+
+  const createdSellerPassword =
+    document.getElementById(
+      "createdSellerPassword"
+    );
+
+
+  const copyCredentialsButton =
+    document.getElementById(
+      "copyCredentialsButton"
+    );
+
+
+  const searchInput =
+    document.getElementById(
+      "userSearchInput"
+    );
+
+
+  const tableBody =
+    document.getElementById(
+      "usersTableBody"
+    );
+
+
+  const emptyState =
+    document.getElementById(
+      "usersEmptyState"
+    );
+
+
+  const passwordModal =
+    document.getElementById(
+      "sellerPasswordModal"
+    );
+
+
+  const passwordSellerName =
+    document.getElementById(
+      "passwordSellerName"
+    );
+
+
+  const passwordSellerEmail =
+    document.getElementById(
+      "passwordSellerEmail"
+    );
+
+
+  const newPasswordInput =
+    document.getElementById(
+      "newSellerPassword"
+    );
+
+
+  const generateNewPasswordButton =
+    document.getElementById(
+      "generateNewPasswordButton"
+    );
+
+
+  const savePasswordButton =
+    document.getElementById(
+      "saveSellerPasswordButton"
+    );
+
+
+  /*
+   * ====================================
+   * CREDENCIALES
+   * ====================================
+   */
+
+  function showCredentials(
+    seller,
+    password,
+    mode = "created"
+  ) {
+    latestSellerCredentials = {
+      fullName:
+        seller.fullName,
+
+      email:
+        seller.email,
+
+      password
+    };
+
+
+    if (
+      credentialsEyebrow
+    ) {
+      credentialsEyebrow.textContent =
+        mode === "updated"
+          ? "Contraseña actualizada"
+          : "Credenciales";
+    }
+
+
+    if (
+      credentialsTitle
+    ) {
+      credentialsTitle.textContent =
+        mode === "updated"
+          ? "Nuevo acceso del vendedor"
+          : "Acceso del vendedor";
+    }
+
+
+    if (
+      createdSellerName
+    ) {
+      createdSellerName.textContent =
+        seller.fullName;
+    }
+
+
+    if (
+      createdSellerEmail
+    ) {
+      createdSellerEmail.textContent =
+        seller.email;
+    }
+
+
+    if (
+      createdSellerPassword
+    ) {
+      createdSellerPassword.textContent =
+        password;
+    }
+
+
+    credentialsPanel
+      ?.classList
+      .remove(
+        "hidden"
+      );
   }
 
 
-  if (submitButton) {
-    submitButton.disabled =
-      true;
+  /*
+   * ====================================
+   * FILTRAR VENDEDORES
+   * ====================================
+   */
+
+  function filteredUsers() {
+    const query =
+      normalizeText(
+        searchInput?.value ||
+        ""
+      );
+
+
+    return sellerUsers.filter(
+      (seller) => {
+        const searchableText =
+          normalizeText(
+            [
+              seller.fullName,
+              seller.email
+            ].join(
+              " "
+            )
+          );
+
+
+        return searchableText.includes(
+          query
+        );
+      }
+    );
   }
+
+
+  /*
+   * ====================================
+   * RENDER TABLA
+   * ====================================
+   */
+
+  function renderUsers() {
+    if (!tableBody) {
+      return;
+    }
+
+
+    tableBody.innerHTML =
+      "";
+
+
+    const users =
+      filteredUsers();
+
+
+    if (
+      emptyState
+    ) {
+      emptyState.style.display =
+        users.length === 0
+          ? "block"
+          : "none";
+    }
+
+
+    users.forEach(
+      (seller) => {
+        const row =
+          document.createElement(
+            "tr"
+          );
+
+
+        const active =
+          seller.active ===
+          true;
+
+
+        row.innerHTML = `
+          <td>
+
+            <div class="user-person-cell">
+
+              <strong>
+                ${escapeHTML(
+                  seller.fullName ||
+                  "Sin nombre"
+                )}
+              </strong>
+
+              <small>
+                Vendedor
+              </small>
+
+            </div>
+
+          </td>
+
+
+          <td>
+
+            <span class="user-email">
+              ${escapeHTML(
+                seller.email ||
+                "—"
+              )}
+            </span>
+
+          </td>
+
+
+          <td>
+
+            <span
+              class="
+                user-status-badge
+                ${
+                  active
+                    ? "user-status-active"
+                    : "user-status-inactive"
+                }
+              "
+            >
+              <span class="user-status-dot"></span>
+
+              ${
+                active
+                  ? "Activo"
+                  : "Desactivado"
+              }
+            </span>
+
+          </td>
+
+
+          <td>
+            ${escapeHTML(
+              formatUserDate(
+                seller.createdAt
+              )
+            )}
+          </td>
+
+
+          <td>
+
+            <div class="user-actions">
+
+              <button
+                class="action-button user-password-button"
+                data-user-action="password"
+                data-user-id="${escapeHTML(
+                  seller.id
+                )}"
+                type="button"
+              >
+                Contraseña
+              </button>
+
+
+              <button
+                class="
+                  action-button
+                  ${
+                    active
+                      ? "user-disable-button"
+                      : "user-enable-button"
+                  }
+                "
+                data-user-action="toggle-active"
+                data-user-id="${escapeHTML(
+                  seller.id
+                )}"
+                type="button"
+              >
+                ${
+                  active
+                    ? "Desactivar"
+                    : "Reactivar"
+                }
+              </button>
+
+            </div>
+
+          </td>
+        `;
+
+
+        tableBody.appendChild(
+          row
+        );
+      }
+    );
+  }
+
+
+  /*
+   * ====================================
+   * GENERAR CONTRASEÑA NUEVO USUARIO
+   * ====================================
+   */
+
+  generateButton
+    ?.addEventListener(
+      "click",
+      () => {
+        passwordInput.value =
+          generateSellerPassword();
+
+
+        passwordInput.focus();
+
+        passwordInput.select();
+
+
+        showToast(
+          "Contraseña segura generada."
+        );
+      }
+    );
+
+
+  /*
+   * ====================================
+   * CREAR VENDEDOR
+   * ====================================
+   */
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
+
+
+      const fullName =
+        fullNameInput.value
+          .trim()
+          .replace(
+            /\s+/g,
+            " "
+          );
+
+
+      const email =
+        emailInput.value
+          .trim()
+          .toLowerCase();
+
+
+      const password =
+        passwordInput.value;
+
+
+      if (
+        fullName.length < 2
+      ) {
+        showToast(
+          "Escribe el nombre del vendedor."
+        );
+
+
+        fullNameInput.focus();
+
+        return;
+      }
+
+
+      if (
+        !emailInput.checkValidity()
+      ) {
+        showToast(
+          "Escribe un correo electrónico válido."
+        );
+
+
+        emailInput.focus();
+
+        return;
+      }
+
+
+      if (
+        password.length < 8
+      ) {
+        showToast(
+          "La contraseña debe tener al menos 8 caracteres."
+        );
+
+
+        passwordInput.focus();
+
+        return;
+      }
+
+
+      submitButton.disabled =
+        true;
+
+
+      submitButton.textContent =
+        "Creando vendedor...";
+
+
+      if (generateButton) {
+        generateButton.disabled =
+          true;
+      }
+
+
+      try {
+        const result =
+          await invokeSellerManager(
+            "create",
+            {
+              fullName,
+              email,
+              password
+            }
+          );
+
+
+        const createdSeller = {
+          id:
+            result.seller.id,
+
+          fullName:
+            result.seller
+              .fullName ||
+            fullName,
+
+          email:
+            result.seller
+              .email ||
+            email,
+
+          active:
+            true
+        };
+
+
+        showCredentials(
+          createdSeller,
+          password,
+          "created"
+        );
+
+
+        form.reset();
+
+
+        await loadSellerUsers();
+
+
+        renderUsers();
+
+
+        showToast(
+          "Vendedor creado correctamente."
+        );
+
+
+        credentialsPanel
+          ?.scrollIntoView({
+            behavior:
+              "smooth",
+
+            block:
+              "nearest"
+          });
+
+      } catch (error) {
+        console.error(
+          "Error creando vendedor:",
+          error
+        );
+
+
+        showToast(
+          error.message ||
+          "No se pudo crear el vendedor."
+        );
+
+      } finally {
+        submitButton.disabled =
+          false;
+
+
+        submitButton.textContent =
+          "+ Crear vendedor";
+
+
+        if (generateButton) {
+          generateButton.disabled =
+            false;
+        }
+      }
+    }
+  );
+
+
+  /*
+   * ====================================
+   * COPIAR CREDENCIALES
+   * ====================================
+   */
+
+  copyCredentialsButton
+    ?.addEventListener(
+      "click",
+      async () => {
+        if (
+          !latestSellerCredentials
+        ) {
+          showToast(
+            "No hay credenciales para copiar."
+          );
+
+
+          return;
+        }
+
+
+        const loginUrl =
+  new URL(
+    "login.html",
+    window.location.href
+  ).href;
+
+
+const text = [
+  "DUVANT12",
+  "",
+  `Vendedor: ${latestSellerCredentials.fullName}`,
+  `Correo: ${latestSellerCredentials.email}`,
+  `Contraseña: ${latestSellerCredentials.password}`,
+  "",
+  `Acceso: ${loginUrl}`
+].join(
+  "\n"
+);
+
+        try {
+          await copyTextToClipboard(
+            text
+          );
+
+
+          showToast(
+            "Credenciales copiadas."
+          );
+
+        } catch (error) {
+          console.error(
+            error
+          );
+
+
+          showToast(
+            "No se pudieron copiar las credenciales."
+          );
+        }
+      }
+    );
+
+
+  /*
+   * ====================================
+   * MODAL CONTRASEÑA
+   * ====================================
+   */
+
+  function openPasswordModal(
+    seller
+  ) {
+    selectedSellerForPassword =
+      seller;
+
+
+    if (
+      passwordSellerName
+    ) {
+      passwordSellerName.textContent =
+        seller.fullName;
+    }
+
+
+    if (
+      passwordSellerEmail
+    ) {
+      passwordSellerEmail.textContent =
+        seller.email;
+    }
+
+
+    if (
+      newPasswordInput
+    ) {
+      newPasswordInput.value =
+        "";
+    }
+
+
+    passwordModal
+      ?.classList
+      .remove(
+        "hidden"
+      );
+
+
+    passwordModal
+      ?.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+
+
+    document.body.classList.add(
+      "modal-open"
+    );
+
+
+    setTimeout(
+      () => {
+        newPasswordInput?.focus();
+      },
+      50
+    );
+  }
+
+
+  function closePasswordModal() {
+    passwordModal
+      ?.classList
+      .add(
+        "hidden"
+      );
+
+
+    passwordModal
+      ?.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+
+    document.body.classList.remove(
+      "modal-open"
+    );
+
+
+    selectedSellerForPassword =
+      null;
+
+
+    if (
+      newPasswordInput
+    ) {
+      newPasswordInput.value =
+        "";
+    }
+  }
+
+
+  document
+    .querySelectorAll(
+      "[data-close-seller-password-modal]"
+    )
+    .forEach(
+      (element) => {
+        element.addEventListener(
+          "click",
+          closePasswordModal
+        );
+      }
+    );
+
+
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        event.key === "Escape" &&
+        passwordModal &&
+        !passwordModal
+          .classList
+          .contains(
+            "hidden"
+          )
+      ) {
+        closePasswordModal();
+      }
+    }
+  );
+
+
+  generateNewPasswordButton
+    ?.addEventListener(
+      "click",
+      () => {
+        if (
+          !newPasswordInput
+        ) {
+          return;
+        }
+
+
+        newPasswordInput.value =
+          generateSellerPassword();
+
+
+        newPasswordInput.focus();
+
+        newPasswordInput.select();
+
+
+        showToast(
+          "Nueva contraseña generada."
+        );
+      }
+    );
+
+
+  /*
+   * ====================================
+   * GUARDAR NUEVA CONTRASEÑA
+   * ====================================
+   */
+
+  savePasswordButton
+    ?.addEventListener(
+      "click",
+      async () => {
+        if (
+          !selectedSellerForPassword
+        ) {
+          return;
+        }
+
+
+        const password =
+          newPasswordInput.value;
+
+
+        if (
+          password.length < 8
+        ) {
+          showToast(
+            "La contraseña debe tener al menos 8 caracteres."
+          );
+
+
+          newPasswordInput.focus();
+
+          return;
+        }
+
+
+        const seller = {
+          ...selectedSellerForPassword
+        };
+
+
+        savePasswordButton.disabled =
+          true;
+
+
+        savePasswordButton.textContent =
+          "Guardando...";
+
+
+        if (
+          generateNewPasswordButton
+        ) {
+          generateNewPasswordButton.disabled =
+            true;
+        }
+
+
+        try {
+          await invokeSellerManager(
+            "change-password",
+            {
+              sellerId:
+                seller.id,
+
+              password
+            }
+          );
+
+
+          closePasswordModal();
+
+
+          showCredentials(
+            seller,
+            password,
+            "updated"
+          );
+
+
+          showToast(
+            "Contraseña actualizada correctamente."
+          );
+
+
+          credentialsPanel
+            ?.scrollIntoView({
+              behavior:
+                "smooth",
+
+              block:
+                "nearest"
+            });
+
+        } catch (error) {
+          console.error(
+            "Error cambiando contraseña:",
+            error
+          );
+
+
+          showToast(
+            error.message ||
+            "No se pudo cambiar la contraseña."
+          );
+
+        } finally {
+          savePasswordButton.disabled =
+            false;
+
+
+          savePasswordButton.textContent =
+            "Guardar contraseña";
+
+
+          if (
+            generateNewPasswordButton
+          ) {
+            generateNewPasswordButton.disabled =
+              false;
+          }
+        }
+      }
+    );
+
+
+  /*
+   * ====================================
+   * ACCIONES TABLA
+   * ====================================
+   */
+
+  tableBody
+    ?.addEventListener(
+      "click",
+      async (event) => {
+        const button =
+          event.target.closest(
+            "[data-user-action]"
+          );
+
+
+        if (!button) {
+          return;
+        }
+
+
+        const seller =
+          sellerUsers.find(
+            (item) =>
+              String(
+                item.id
+              ) ===
+              String(
+                button.dataset
+                  .userId
+              )
+          );
+
+
+        if (!seller) {
+          showToast(
+            "No se encontró al vendedor."
+          );
+
+
+          return;
+        }
+
+
+        const action =
+          button.dataset
+            .userAction;
+
+
+        /*
+         * CAMBIAR CONTRASEÑA
+         */
+        if (
+          action ===
+          "password"
+        ) {
+          openPasswordModal(
+            seller
+          );
+
+
+          return;
+        }
+
+
+        /*
+         * ACTIVAR / DESACTIVAR
+         */
+        if (
+          action ===
+          "toggle-active"
+        ) {
+          const newActiveState =
+            !seller.active;
+
+
+          const message =
+            newActiveState
+              ? `¿Reactivar el acceso de "${seller.fullName}"?`
+              : `¿Desactivar el acceso de "${seller.fullName}"?`;
+
+
+          const confirmed =
+            window.confirm(
+              message
+            );
+
+
+          if (!confirmed) {
+            return;
+          }
+
+
+          button.disabled =
+            true;
+
+
+          const originalText =
+            button.textContent;
+
+
+          button.textContent =
+            newActiveState
+              ? "Reactivando..."
+              : "Desactivando...";
+
+
+          try {
+            await invokeSellerManager(
+              "set-active",
+              {
+                sellerId:
+                  seller.id,
+
+                active:
+                  newActiveState
+              }
+            );
+
+
+            seller.active =
+              newActiveState;
+
+
+            renderUsers();
+
+
+            showToast(
+              newActiveState
+                ? "Acceso reactivado."
+                : "Acceso desactivado."
+            );
+
+          } catch (error) {
+            console.error(
+              "Error cambiando acceso:",
+              error
+            );
+
+
+            button.disabled =
+              false;
+
+
+            button.textContent =
+              originalText;
+
+
+            showToast(
+              error.message ||
+              "No se pudo cambiar el acceso."
+            );
+          }
+        }
+      }
+    );
+
+
+  /*
+   * ====================================
+   * BUSCADOR
+   * ====================================
+   */
+
+  searchInput
+    ?.addEventListener(
+      "input",
+      renderUsers
+    );
+
+
+  /*
+   * ====================================
+   * CARGA INICIAL
+   * ====================================
+   */
+
+  async function loadUsersPage() {
+    if (tableBody) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="5">
+            <div class="users-loading">
+              Cargando vendedores...
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+
+    if (
+      emptyState
+    ) {
+      emptyState.style.display =
+        "none";
+    }
+
+
+    try {
+      await loadSellerUsers();
+
+
+      renderUsers();
+
+    } catch (error) {
+      console.error(
+        "Error cargando vendedores:",
+        error
+      );
+
+
+      if (tableBody) {
+        tableBody.innerHTML =
+          "";
+      }
+
+
+      if (
+        emptyState
+      ) {
+        emptyState.style.display =
+          "block";
+
+
+        const title =
+          emptyState.querySelector(
+            "h3"
+          );
+
+
+        const paragraph =
+          emptyState.querySelector(
+            "p"
+          );
+
+
+        if (title) {
+          title.textContent =
+            "No se pudieron cargar los vendedores";
+        }
+
+
+        if (paragraph) {
+          paragraph.textContent =
+            error.message ||
+            "Verifica la conexión e intenta nuevamente.";
+        }
+      }
+
+
+      showToast(
+        error.message ||
+        "No se pudieron cargar los vendedores."
+      );
+    }
+  }
+
+
+  loadUsersPage();
 }
-
 
 /* ======================================
    APP

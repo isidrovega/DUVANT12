@@ -112,8 +112,6 @@
       </nav>
 
 
-      <!-- CIERRE DE SESIÓN ESCRITORIO -->
-
       <div class="sidebar-bottom">
 
         <div class="quote-card">
@@ -187,6 +185,10 @@
       </header>
 
 
+      <!-- =====================================
+           CREAR VENDEDOR
+      ====================================== -->
+
       <section class="panel add-panel">
 
         <div class="panel-heading">
@@ -198,7 +200,7 @@
             </span>
 
             <h2>
-              Generar acceso
+              Crear acceso
             </h2>
 
           </div>
@@ -222,6 +224,7 @@
             <input
               id="sellerFullName"
               type="text"
+              autocomplete="off"
               placeholder="Ej. Carlos Martínez"
               required
             >
@@ -231,14 +234,16 @@
 
           <div class="field">
 
-            <label for="sellerUsername">
-              Usuario
+            <label for="sellerEmail">
+              Correo electrónico
             </label>
 
             <input
-              id="sellerUsername"
-              type="text"
-              placeholder="Se generará automáticamente"
+              id="sellerEmail"
+              type="email"
+              autocomplete="off"
+              placeholder="Ej. carlos@duvant12.com"
+              required
             >
 
           </div>
@@ -253,7 +258,10 @@
             <input
               id="sellerPassword"
               type="text"
-              placeholder="Se generará automáticamente"
+              autocomplete="new-password"
+              minlength="8"
+              placeholder="Escribe o genera una contraseña"
+              required
             >
 
           </div>
@@ -262,7 +270,7 @@
           <div class="field">
 
             <label>
-              Credenciales
+              Generador
             </label>
 
             <button
@@ -270,7 +278,7 @@
               class="outline-button"
               type="button"
             >
-              Generar usuario y contraseña
+              Generar contraseña
             </button>
 
           </div>
@@ -279,6 +287,7 @@
           <div class="form-actions">
 
             <button
+              id="createSellerButton"
               class="primary-button"
               type="submit"
             >
@@ -292,6 +301,10 @@
       </section>
 
 
+      <!-- =====================================
+           CREDENCIALES RECIENTES
+      ====================================== -->
+
       <section
         id="credentialsPanel"
         class="panel dashboard-summary hidden"
@@ -301,11 +314,14 @@
 
           <div>
 
-            <span class="section-eyebrow">
+            <span
+              id="credentialsEyebrow"
+              class="section-eyebrow"
+            >
               Credenciales
             </span>
 
-            <h2>
+            <h2 id="credentialsTitle">
               Acceso del vendedor
             </h2>
 
@@ -334,10 +350,13 @@
           <article class="summary-card">
 
             <span>
-              Usuario
+              Correo
             </span>
 
-            <strong id="createdSellerUsername">
+            <strong
+              id="createdSellerEmail"
+              class="credential-value"
+            >
               -
             </strong>
 
@@ -350,7 +369,10 @@
               Contraseña
             </span>
 
-            <strong id="createdSellerPassword">
+            <strong
+              id="createdSellerPassword"
+              class="credential-value"
+            >
               -
             </strong>
 
@@ -375,8 +397,18 @@
 
         </div>
 
+
+        <p class="credentials-warning">
+          Guarda o comparte esta contraseña ahora.
+          Por seguridad no se almacena para volver a mostrarla después.
+        </p>
+
       </section>
 
+
+      <!-- =====================================
+           VENDEDORES REGISTRADOS
+      ====================================== -->
 
       <section class="panel inventory-panel">
 
@@ -414,13 +446,13 @@
 
         <div class="table-container">
 
-          <table>
+          <table class="users-table">
 
             <thead>
 
               <tr>
                 <th>Vendedor</th>
-                <th>Usuario</th>
+                <th>Correo</th>
                 <th>Estado</th>
                 <th>Creado</th>
                 <th>Acciones</th>
@@ -459,7 +491,6 @@
 
       <!-- =====================================
            CERRAR SESIÓN MÓVIL
-           APARECE HASTA EL FINAL
       ====================================== -->
 
       <div class="mobile-logout">
@@ -487,6 +518,115 @@
       </div>
 
     </main>
+
+  </div>
+
+
+  <!-- =====================================
+       MODAL CAMBIAR CONTRASEÑA
+  ====================================== -->
+
+  <div
+    id="sellerPasswordModal"
+    class="seller-user-modal hidden"
+    aria-hidden="true"
+  >
+
+    <div
+      class="seller-user-modal-backdrop"
+      data-close-seller-password-modal
+    ></div>
+
+
+    <div
+      class="seller-user-modal-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="sellerPasswordModalTitle"
+    >
+
+      <div class="seller-user-modal-header">
+
+        <div>
+
+          <span class="section-eyebrow">
+            Seguridad
+          </span>
+
+          <h2 id="sellerPasswordModalTitle">
+            Cambiar contraseña
+          </h2>
+
+        </div>
+
+
+        <button
+          class="seller-user-modal-close"
+          data-close-seller-password-modal
+          type="button"
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="seller-password-user">
+
+        <span>
+          Vendedor
+        </span>
+
+        <strong id="passwordSellerName">
+          -
+        </strong>
+
+        <small id="passwordSellerEmail">
+          -
+        </small>
+
+      </div>
+
+
+      <div class="field">
+
+        <label for="newSellerPassword">
+          Nueva contraseña
+        </label>
+
+        <input
+          id="newSellerPassword"
+          type="text"
+          autocomplete="new-password"
+          minlength="8"
+          placeholder="Mínimo 8 caracteres"
+        >
+
+      </div>
+
+
+      <div class="seller-password-actions">
+
+        <button
+          id="generateNewPasswordButton"
+          class="outline-button"
+          type="button"
+        >
+          Generar contraseña
+        </button>
+
+        <button
+          id="saveSellerPasswordButton"
+          class="primary-button"
+          type="button"
+        >
+          Guardar contraseña
+        </button>
+
+      </div>
+
+    </div>
 
   </div>
 

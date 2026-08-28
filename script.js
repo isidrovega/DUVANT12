@@ -4322,13 +4322,8 @@ function initializeSellerPage() {
   load();
 }
 
-
 /* ======================================
    USUARIOS
-====================================== */
-
-/* ======================================
-   USUARIOS - ADMINISTRACIÓN
 ====================================== */
 
 let sellerUsers = [];
@@ -4402,11 +4397,6 @@ async function invokeSellerManager(
       "No se pudo completar la operación.";
 
 
-    /*
-     * Supabase FunctionsHttpError
-     * puede traer el mensaje real dentro
-     * de la respuesta HTTP.
-     */
     try {
       if (
         error.context &&
@@ -4414,14 +4404,14 @@ async function invokeSellerManager(
           "function"
       ) {
         const errorBody =
-          await error.context.json();
+          await error.context
+            .json();
 
 
-        if (
-          errorBody?.error
-        ) {
+        if (errorBody?.error) {
           message =
             errorBody.error;
+
         } else if (
           errorBody?.message
         ) {
@@ -4429,6 +4419,7 @@ async function invokeSellerManager(
             errorBody.message;
         }
       }
+
     } catch (
       contextError
     ) {
@@ -4485,9 +4476,7 @@ function generateSellerPassword(
     symbols;
 
 
-  const randomIndex = (
-    max
-  ) => {
+  function randomIndex(max) {
     const values =
       new Uint32Array(1);
 
@@ -4501,10 +4490,10 @@ function generateSellerPassword(
       values[0] %
       max
     );
-  };
+  }
 
 
-  const passwordCharacters = [
+  const characters = [
     lowercase[
       randomIndex(
         lowercase.length
@@ -4532,10 +4521,10 @@ function generateSellerPassword(
 
 
   while (
-    passwordCharacters.length <
+    characters.length <
     length
   ) {
-    passwordCharacters.push(
+    characters.push(
       allCharacters[
         randomIndex(
           allCharacters.length
@@ -4545,40 +4534,31 @@ function generateSellerPassword(
   }
 
 
-  /*
-   * Mezclamos los caracteres
-   * para que los cuatro obligatorios
-   * no estén siempre al principio.
-   */
   for (
     let index =
-      passwordCharacters.length - 1;
+      characters.length - 1;
 
     index > 0;
 
     index--
   ) {
-    const randomPosition =
+    const position =
       randomIndex(
         index + 1
       );
 
 
     [
-      passwordCharacters[index],
-      passwordCharacters[
-        randomPosition
-      ]
+      characters[index],
+      characters[position]
     ] = [
-      passwordCharacters[
-        randomPosition
-      ],
-      passwordCharacters[index]
+      characters[position],
+      characters[index]
     ];
   }
 
 
-  return passwordCharacters.join(
+  return characters.join(
     ""
   );
 }
@@ -4601,7 +4581,6 @@ async function copyTextToClipboard(
         text
       );
 
-
     return;
   }
 
@@ -4614,7 +4593,6 @@ async function copyTextToClipboard(
 
   textarea.value =
     text;
-
 
   textarea.style.position =
     "fixed";
@@ -4654,7 +4632,7 @@ async function copyTextToClipboard(
 
 
 /* ======================================
-   FECHAS USUARIOS
+   FORMATEAR FECHA
 ====================================== */
 
 function formatUserDate(
@@ -4865,11 +4843,9 @@ function initializeUsersPage() {
     );
 
 
-  /*
-   * ====================================
-   * CREDENCIALES
-   * ====================================
-   */
+  /* ====================================
+     MOSTRAR CREDENCIALES
+  ==================================== */
 
   function showCredentials(
     seller,
@@ -4892,8 +4868,8 @@ function initializeUsersPage() {
     ) {
       credentialsEyebrow.textContent =
         mode === "updated"
-          ? "Contraseña actualizada"
-          : "Credenciales";
+          ? "CONTRASEÑA ACTUALIZADA"
+          : "CREDENCIALES";
     }
 
 
@@ -4911,7 +4887,8 @@ function initializeUsersPage() {
       createdSellerName
     ) {
       createdSellerName.textContent =
-        seller.fullName;
+        seller.fullName ||
+        "—";
     }
 
 
@@ -4919,7 +4896,8 @@ function initializeUsersPage() {
       createdSellerEmail
     ) {
       createdSellerEmail.textContent =
-        seller.email;
+        seller.email ||
+        "—";
     }
 
 
@@ -4939,11 +4917,9 @@ function initializeUsersPage() {
   }
 
 
-  /*
-   * ====================================
-   * FILTRAR VENDEDORES
-   * ====================================
-   */
+  /* ====================================
+     FILTRAR
+  ==================================== */
 
   function filteredUsers() {
     const query =
@@ -4955,7 +4931,7 @@ function initializeUsersPage() {
 
     return sellerUsers.filter(
       (seller) => {
-        const searchableText =
+        const text =
           normalizeText(
             [
               seller.fullName,
@@ -4966,7 +4942,7 @@ function initializeUsersPage() {
           );
 
 
-        return searchableText.includes(
+        return text.includes(
           query
         );
       }
@@ -4974,11 +4950,9 @@ function initializeUsersPage() {
   }
 
 
-  /*
-   * ====================================
-   * RENDER TABLA
-   * ====================================
-   */
+  /* ====================================
+     RENDER
+  ==================================== */
 
   function renderUsers() {
     if (!tableBody) {
@@ -4994,9 +4968,7 @@ function initializeUsersPage() {
       filteredUsers();
 
 
-    if (
-      emptyState
-    ) {
+    if (emptyState) {
       emptyState.style.display =
         users.length === 0
           ? "block"
@@ -5006,20 +4978,19 @@ function initializeUsersPage() {
 
     users.forEach(
       (seller) => {
+        const active =
+          seller.active ===
+          true;
+
+
         const row =
           document.createElement(
             "tr"
           );
 
 
-        const active =
-          seller.active ===
-          true;
-
-
         row.innerHTML = `
           <td>
-
             <div class="user-person-cell">
 
               <strong>
@@ -5034,24 +5005,20 @@ function initializeUsersPage() {
               </small>
 
             </div>
-
           </td>
 
 
           <td>
-
             <span class="user-email">
               ${escapeHTML(
                 seller.email ||
                 "—"
               )}
             </span>
-
           </td>
 
 
           <td>
-
             <span
               class="
                 user-status-badge
@@ -5062,7 +5029,9 @@ function initializeUsersPage() {
                 }
               "
             >
-              <span class="user-status-dot"></span>
+              <span
+                class="user-status-dot"
+              ></span>
 
               ${
                 active
@@ -5070,7 +5039,6 @@ function initializeUsersPage() {
                   : "Desactivado"
               }
             </span>
-
           </td>
 
 
@@ -5084,11 +5052,13 @@ function initializeUsersPage() {
 
 
           <td>
-
             <div class="user-actions">
 
               <button
-                class="action-button user-password-button"
+                class="
+                  action-button
+                  user-password-button
+                "
                 data-user-action="password"
                 data-user-id="${escapeHTML(
                   seller.id
@@ -5122,7 +5092,6 @@ function initializeUsersPage() {
               </button>
 
             </div>
-
           </td>
         `;
 
@@ -5135,11 +5104,9 @@ function initializeUsersPage() {
   }
 
 
-  /*
-   * ====================================
-   * GENERAR CONTRASEÑA NUEVO USUARIO
-   * ====================================
-   */
+  /* ====================================
+     GENERAR CONTRASEÑA
+  ==================================== */
 
   generateButton
     ?.addEventListener(
@@ -5161,11 +5128,9 @@ function initializeUsersPage() {
     );
 
 
-  /*
-   * ====================================
-   * CREAR VENDEDOR
-   * ====================================
-   */
+  /* ====================================
+     CREAR VENDEDOR
+  ==================================== */
 
   form.addEventListener(
     "submit",
@@ -5199,7 +5164,6 @@ function initializeUsersPage() {
           "Escribe el nombre del vendedor."
         );
 
-
         fullNameInput.focus();
 
         return;
@@ -5213,7 +5177,6 @@ function initializeUsersPage() {
           "Escribe un correo electrónico válido."
         );
 
-
         emailInput.focus();
 
         return;
@@ -5226,7 +5189,6 @@ function initializeUsersPage() {
         showToast(
           "La contraseña debe tener al menos 8 caracteres."
         );
-
 
         passwordInput.focus();
 
@@ -5275,7 +5237,13 @@ function initializeUsersPage() {
             email,
 
           active:
-            true
+            true,
+
+          createdAt:
+            result.seller
+              .createdAt ||
+            new Date()
+              .toISOString()
         };
 
 
@@ -5339,11 +5307,9 @@ function initializeUsersPage() {
   );
 
 
-  /*
-   * ====================================
-   * COPIAR CREDENCIALES
-   * ====================================
-   */
+  /* ====================================
+     COPIAR CREDENCIALES
+  ==================================== */
 
   copyCredentialsButton
     ?.addEventListener(
@@ -5356,29 +5322,29 @@ function initializeUsersPage() {
             "No hay credenciales para copiar."
           );
 
-
           return;
         }
 
 
         const loginUrl =
-  new URL(
-    "login.html",
-    window.location.href
-  ).href;
+          new URL(
+            "login.html",
+            window.location.href
+          ).href;
 
 
-const text = [
-  "DUVANT12",
-  "",
-  `Vendedor: ${latestSellerCredentials.fullName}`,
-  `Correo: ${latestSellerCredentials.email}`,
-  `Contraseña: ${latestSellerCredentials.password}`,
-  "",
-  `Acceso: ${loginUrl}`
-].join(
-  "\n"
-);
+        const text = [
+          "DUVANT12",
+          "",
+          `Vendedor: ${latestSellerCredentials.fullName}`,
+          `Correo: ${latestSellerCredentials.email}`,
+          `Contraseña: ${latestSellerCredentials.password}`,
+          "",
+          `Acceso: ${loginUrl}`
+        ].join(
+          "\n"
+        );
+
 
         try {
           await copyTextToClipboard(
@@ -5404,11 +5370,9 @@ const text = [
     );
 
 
-  /*
-   * ====================================
-   * MODAL CONTRASEÑA
-   * ====================================
-   */
+  /* ====================================
+     MODAL CONTRASEÑA
+  ==================================== */
 
   function openPasswordModal(
     seller
@@ -5421,7 +5385,8 @@ const text = [
       passwordSellerName
     ) {
       passwordSellerName.textContent =
-        seller.fullName;
+        seller.fullName ||
+        "Vendedor";
     }
 
 
@@ -5429,7 +5394,8 @@ const text = [
       passwordSellerEmail
     ) {
       passwordSellerEmail.textContent =
-        seller.email;
+        seller.email ||
+        "—";
     }
 
 
@@ -5462,7 +5428,8 @@ const text = [
 
     setTimeout(
       () => {
-        newPasswordInput?.focus();
+        newPasswordInput
+          ?.focus();
       },
       50
     );
@@ -5520,7 +5487,8 @@ const text = [
     "keydown",
     (event) => {
       if (
-        event.key === "Escape" &&
+        event.key ===
+          "Escape" &&
         passwordModal &&
         !passwordModal
           .classList
@@ -5561,18 +5529,17 @@ const text = [
     );
 
 
-  /*
-   * ====================================
-   * GUARDAR NUEVA CONTRASEÑA
-   * ====================================
-   */
+  /* ====================================
+     GUARDAR NUEVA CONTRASEÑA
+  ==================================== */
 
   savePasswordButton
     ?.addEventListener(
       "click",
       async () => {
         if (
-          !selectedSellerForPassword
+          !selectedSellerForPassword ||
+          !newPasswordInput
         ) {
           return;
         }
@@ -5685,11 +5652,9 @@ const text = [
     );
 
 
-  /*
-   * ====================================
-   * ACCIONES TABLA
-   * ====================================
-   */
+  /* ====================================
+     ACCIONES TABLA
+  ==================================== */
 
   tableBody
     ?.addEventListener(
@@ -5724,7 +5689,6 @@ const text = [
             "No se encontró al vendedor."
           );
 
-
           return;
         }
 
@@ -5734,9 +5698,6 @@ const text = [
             .userAction;
 
 
-        /*
-         * CAMBIAR CONTRASEÑA
-         */
         if (
           action ===
           "password"
@@ -5745,14 +5706,10 @@ const text = [
             seller
           );
 
-
           return;
         }
 
 
-        /*
-         * ACTIVAR / DESACTIVAR
-         */
         if (
           action ===
           "toggle-active"
@@ -5843,11 +5800,9 @@ const text = [
     );
 
 
-  /*
-   * ====================================
-   * BUSCADOR
-   * ====================================
-   */
+  /* ====================================
+     BUSCADOR
+  ==================================== */
 
   searchInput
     ?.addEventListener(
@@ -5856,11 +5811,9 @@ const text = [
     );
 
 
-  /*
-   * ====================================
-   * CARGA INICIAL
-   * ====================================
-   */
+  /* ====================================
+     CARGA INICIAL
+  ==================================== */
 
   async function loadUsersPage() {
     if (tableBody) {
@@ -5876,9 +5829,7 @@ const text = [
     }
 
 
-    if (
-      emptyState
-    ) {
+    if (emptyState) {
       emptyState.style.display =
         "none";
     }
@@ -5903,9 +5854,7 @@ const text = [
       }
 
 
-      if (
-        emptyState
-      ) {
+      if (emptyState) {
         emptyState.style.display =
           "block";
 

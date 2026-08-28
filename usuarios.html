@@ -8,7 +8,9 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Duvant 12 | Usuarios</title>
+  <title>
+    Usuarios | DUVANT12
+  </title>
 
   <link
     rel="preconnect"
@@ -26,27 +28,6 @@
     rel="stylesheet"
   >
 
-  <script>
-    try {
-      const cachedProfile =
-        JSON.parse(
-          sessionStorage.getItem(
-            "duvant12_profile"
-          )
-        );
-
-      if (cachedProfile?.role) {
-        document.documentElement.dataset.role =
-          cachedProfile.role;
-      }
-    } catch (error) {
-      console.error(
-        "No se pudo leer el perfil almacenado:",
-        error
-      );
-    }
-  </script>
-
   <link
     rel="stylesheet"
     href="styles.css"
@@ -55,100 +36,100 @@
 
 <body data-page="admin">
 
-  <div class="app">
+  <div class="app-shell">
+
+    <!-- SIDEBAR -->
 
     <aside class="sidebar">
 
-      <div class="brand">
+      <div class="sidebar-top">
 
-        <img
-          src="logo.png"
-          alt="Logo Duvant 12"
-          class="brand-logo"
+        <a
+          class="brand"
+          href="index.html"
         >
+          <span class="brand-name">
+            DUVANT12
+          </span>
 
-        <div class="brand-text">
-          <strong>Duvant 12</strong>
-          <span>Fragrances House</span>
-        </div>
+          <span class="brand-subtitle">
+            INVENTARIO
+          </span>
+        </a>
+
+
+        <nav class="sidebar-nav">
+
+          <a
+            class="nav-link admin-only"
+            href="index.html"
+          >
+            Dashboard
+          </a>
+
+          <a
+            class="nav-link admin-only"
+            href="inventario.html"
+          >
+            Inventario
+          </a>
+
+          <a
+            class="nav-link"
+            href="vendedores.html"
+          >
+            Vendedores
+          </a>
+
+          <a
+            class="nav-link admin-only active"
+            href="usuarios.html"
+          >
+            Usuarios
+          </a>
+
+        </nav>
 
       </div>
 
 
-      <nav class="sidebar-nav">
-
-        <a
-          href="index.html"
-          class="nav-link admin-only"
-        >
-          <span class="nav-icon">⌂</span>
-          <span>Dashboard</span>
-        </a>
-
-        <a
-          href="inventario.html"
-          class="nav-link admin-only"
-        >
-          <span class="nav-icon">▣</span>
-          <span>Inventario</span>
-        </a>
-
-        <a
-          href="vendedores.html"
-          class="nav-link"
-        >
-          <span class="nav-icon">◇</span>
-          <span>Vendedores</span>
-        </a>
-
-        <a
-          href="usuarios.html"
-          class="nav-link active admin-only"
-        >
-          <span class="nav-icon">♙</span>
-          <span>Usuarios</span>
-        </a>
-
-      </nav>
-
-
       <div class="sidebar-bottom">
 
-        <div class="quote-card">
+        <div class="sidebar-user">
 
           <strong data-current-user>
-            Administrador
+            Usuario
           </strong>
 
           <span data-current-role>
             Administrador
           </span>
 
-          <div class="quote-divider"></div>
-
-          <button
-            class="logout-button"
-            data-logout
-            type="button"
-          >
-            Cerrar sesión
-          </button>
-
         </div>
+
+        <button
+          class="logout-button"
+          data-logout
+          type="button"
+        >
+          Cerrar sesión
+        </button>
 
       </div>
 
     </aside>
 
 
+    <!-- CONTENIDO -->
+
     <main class="main-content">
 
-      <header class="topbar">
+      <header class="page-header">
 
         <div>
 
-          <span class="topbar-label">
-            Administración
+          <span class="eyebrow">
+            ADMINISTRACIÓN
           </span>
 
           <h1>
@@ -156,56 +137,32 @@
           </h1>
 
           <p>
-            Crea y administra las cuentas de vendedores.
+            Crea vendedores, administra sus contraseñas
+            y controla el acceso al sistema.
           </p>
-
-        </div>
-
-
-        <div class="admin-profile">
-
-          <div class="admin-logo">
-            D12
-          </div>
-
-          <div class="admin-info">
-
-            <strong data-current-user>
-              Administrador
-            </strong>
-
-            <span>
-              Administrador
-            </span>
-
-          </div>
 
         </div>
 
       </header>
 
 
-      <!-- =====================================
-           CREAR VENDEDOR
-      ====================================== -->
+      <!-- CREAR VENDEDOR -->
 
-      <section class="panel add-panel">
+      <section class="panel">
 
-        <div class="panel-heading">
+        <div class="section-heading">
 
           <div>
 
-            <span class="section-eyebrow">
-              Nuevo vendedor
+            <span class="eyebrow">
+              NUEVO USUARIO
             </span>
 
             <h2>
-              Crear acceso
+              Crear vendedor
             </h2>
 
           </div>
-
-          <span class="heading-line"></span>
 
         </div>
 
@@ -215,24 +172,25 @@
           class="perfume-form"
         >
 
-          <div class="field">
+          <div class="form-group">
 
             <label for="sellerFullName">
-              Nombre del vendedor
+              Nombre completo
             </label>
 
             <input
               id="sellerFullName"
               type="text"
               autocomplete="off"
-              placeholder="Ej. Carlos Martínez"
+              placeholder="Ej. Juan Pérez"
+              minlength="2"
               required
             >
 
           </div>
 
 
-          <div class="field">
+          <div class="form-group">
 
             <label for="sellerEmail">
               Correo electrónico
@@ -242,14 +200,14 @@
               id="sellerEmail"
               type="email"
               autocomplete="off"
-              placeholder="Ej. carlos@duvant12.com"
+              placeholder="vendedor@duvant12.com"
               required
             >
 
           </div>
 
 
-          <div class="field">
+          <div class="form-group">
 
             <label for="sellerPassword">
               Contraseña
@@ -259,32 +217,23 @@
               id="sellerPassword"
               type="text"
               autocomplete="new-password"
+              placeholder="Mínimo 8 caracteres"
               minlength="8"
-              placeholder="Escribe o genera una contraseña"
               required
             >
 
           </div>
 
 
-          <div class="field">
-
-            <label>
-              Generador
-            </label>
+          <div class="form-actions">
 
             <button
               id="generateCredentialsButton"
-              class="outline-button"
+              class="secondary-button"
               type="button"
             >
               Generar contraseña
             </button>
-
-          </div>
-
-
-          <div class="form-actions">
 
             <button
               id="createSellerButton"
@@ -301,24 +250,22 @@
       </section>
 
 
-      <!-- =====================================
-           CREDENCIALES RECIENTES
-      ====================================== -->
+      <!-- CREDENCIALES -->
 
       <section
         id="credentialsPanel"
-        class="panel dashboard-summary hidden"
+        class="panel hidden"
       >
 
-        <div class="panel-heading">
+        <div class="section-heading">
 
           <div>
 
             <span
               id="credentialsEyebrow"
-              class="section-eyebrow"
+              class="eyebrow"
             >
-              Credenciales
+              CREDENCIALES
             </span>
 
             <h2 id="credentialsTitle">
@@ -327,27 +274,28 @@
 
           </div>
 
-          <span class="heading-line"></span>
-
         </div>
 
 
-        <div class="summary-grid">
+        <div class="credentials-grid">
 
-          <article class="summary-card">
+          <div>
 
             <span>
-              Nombre
+              Vendedor
             </span>
 
-            <strong id="createdSellerName">
-              -
+            <strong
+              id="createdSellerName"
+              class="credential-value"
+            >
+              —
             </strong>
 
-          </article>
+          </div>
 
 
-          <article class="summary-card">
+          <div>
 
             <span>
               Correo
@@ -357,13 +305,13 @@
               id="createdSellerEmail"
               class="credential-value"
             >
-              -
+              —
             </strong>
 
-          </article>
+          </div>
 
 
-          <article class="summary-card">
+          <div>
 
             <span>
               Contraseña
@@ -373,70 +321,58 @@
               id="createdSellerPassword"
               class="credential-value"
             >
-              -
+              —
             </strong>
 
-          </article>
-
-
-          <article class="summary-card">
-
-            <span>
-              Acción
-            </span>
-
-            <button
-              id="copyCredentialsButton"
-              class="outline-button"
-              type="button"
-            >
-              Copiar credenciales
-            </button>
-
-          </article>
+          </div>
 
         </div>
 
 
         <p class="credentials-warning">
           Guarda o comparte esta contraseña ahora.
-          Por seguridad no se almacena para volver a mostrarla después.
+          Por seguridad, la contraseña actual no puede
+          consultarse posteriormente desde Supabase.
         </p>
+
+
+        <button
+          id="copyCredentialsButton"
+          class="secondary-button"
+          type="button"
+        >
+          Copiar credenciales
+        </button>
 
       </section>
 
 
-      <!-- =====================================
-           VENDEDORES REGISTRADOS
-      ====================================== -->
+      <!-- LISTA -->
 
-      <section class="panel inventory-panel">
+      <section class="panel">
 
-        <div class="inventory-toolbar">
+        <div class="section-heading">
 
           <div>
 
-            <span class="section-eyebrow">
-              Personal
+            <span class="eyebrow">
+              VENDEDORES
             </span>
 
             <h2>
-              Vendedores registrados
+              Usuarios registrados
             </h2>
 
           </div>
 
 
-          <div class="search-box">
-
-            <span>
-              ⌕
-            </span>
+          <div class="table-tools">
 
             <input
               id="userSearchInput"
               type="search"
               placeholder="Buscar vendedor..."
+              autocomplete="off"
             >
 
           </div>
@@ -444,9 +380,9 @@
         </div>
 
 
-        <div class="table-container">
+        <div class="table-wrapper">
 
-          <table class="users-table">
+          <table>
 
             <thead>
 
@@ -460,7 +396,9 @@
 
             </thead>
 
-            <tbody id="usersTableBody"></tbody>
+
+            <tbody id="usersTableBody">
+            </tbody>
 
           </table>
 
@@ -470,18 +408,15 @@
         <div
           id="usersEmptyState"
           class="empty-state"
+          style="display: none;"
         >
 
-          <div class="empty-icon">
-            ◇
-          </div>
-
           <h3>
-            No hay vendedores registrados
+            No hay vendedores
           </h3>
 
           <p>
-            Los vendedores aparecerán aquí.
+            Crea tu primer vendedor para comenzar.
           </p>
 
         </div>
@@ -489,16 +424,14 @@
       </section>
 
 
-      <!-- =====================================
-           CERRAR SESIÓN MÓVIL
-      ====================================== -->
+      <!-- LOGOUT MÓVIL -->
 
-      <div class="mobile-logout">
+      <section class="mobile-logout">
 
         <div class="mobile-user-info">
 
           <strong data-current-user>
-            Administrador
+            Usuario
           </strong>
 
           <span data-current-role>
@@ -508,23 +441,21 @@
         </div>
 
         <button
-          class="logout-button mobile-logout-button"
+          class="mobile-logout-button"
           data-logout
           type="button"
         >
           Cerrar sesión
         </button>
 
-      </div>
+      </section>
 
     </main>
 
   </div>
 
 
-  <!-- =====================================
-       MODAL CAMBIAR CONTRASEÑA
-  ====================================== -->
+  <!-- MODAL CAMBIAR CONTRASEÑA -->
 
   <div
     id="sellerPasswordModal"
@@ -538,7 +469,7 @@
     ></div>
 
 
-    <div
+    <section
       class="seller-user-modal-card"
       role="dialog"
       aria-modal="true"
@@ -549,8 +480,8 @@
 
         <div>
 
-          <span class="section-eyebrow">
-            Seguridad
+          <span class="eyebrow">
+            SEGURIDAD
           </span>
 
           <h2 id="sellerPasswordModalTitle">
@@ -574,22 +505,18 @@
 
       <div class="seller-password-user">
 
-        <span>
-          Vendedor
-        </span>
-
         <strong id="passwordSellerName">
-          -
+          —
         </strong>
 
-        <small id="passwordSellerEmail">
-          -
-        </small>
+        <span id="passwordSellerEmail">
+          —
+        </span>
 
       </div>
 
 
-      <div class="field">
+      <div class="form-group">
 
         <label for="newSellerPassword">
           Nueva contraseña
@@ -610,7 +537,7 @@
 
         <button
           id="generateNewPasswordButton"
-          class="outline-button"
+          class="secondary-button"
           type="button"
         >
           Generar contraseña
@@ -626,10 +553,12 @@
 
       </div>
 
-    </div>
+    </section>
 
   </div>
 
+
+  <!-- TOAST -->
 
   <div
     id="toast"
@@ -639,8 +568,12 @@
   </div>
 
 
+  <!-- SUPABASE -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="supabase-config.js"></script>
+
   <script src="script.js"></script>
 
 </body>

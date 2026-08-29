@@ -3792,22 +3792,14 @@ function initializeExcelImport(
     }
   );
 }
-
-
 /* ======================================
    VENDEDORES - SUPABASE
 ====================================== */
 
 async function loadSellerCatalog() {
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .rpc(
-        "get_seller_catalog"
-      );
-
+  const { data, error } = await supabaseClient.rpc(
+    "get_seller_catalog"
+  );
 
   if (error) {
     console.error(
@@ -3815,50 +3807,26 @@ async function loadSellerCatalog() {
       error
     );
 
-
     throw error;
   }
 
-
-  sellerCatalog =
-    (data || [])
-      .map(
-        (perfume) => ({
-          id:
-            perfume.id,
-
-          name:
-            perfume.name,
-
-          brand:
-            perfume.brand,
-
-          category:
-            perfume.category,
-
-          size:
-            perfume.size,
-
-          price:
-            Number(
-              perfume.price
-            ) || 0,
-
-          code:
-            perfume.code,
-
-          availability:
-            perfume.availability
-        })
+  sellerCatalog = (data || [])
+    .map((perfume) => ({
+      id: perfume.id,
+      name: perfume.name,
+      brand: perfume.brand,
+      category: perfume.category,
+      size: perfume.size,
+      price: Number(perfume.price) || 0,
+      code: perfume.code,
+      availability: perfume.availability
+    }))
+    .sort((a, b) =>
+      compareCodes(
+        a.code,
+        b.code
       )
-      .sort(
-        (a, b) =>
-          compareCodes(
-            a.code,
-            b.code
-          )
-      );
-
+    );
 
   return sellerCatalog;
 }
@@ -3871,110 +3839,11 @@ async function loadSellerCatalog() {
 async function registerSellerSale(
   perfumeId
 ) {
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .rpc(
-        "register_sale",
-        {
-          p_perfume_id:
-            perfumeId
-        }
-      );
-
-
-  if (error) {
-    throw error;
-  }
-
-
-  return data;
-}
-
-
-/* ======================================
-   VENDEDORES - SUPABASE
-====================================== */
-
-async function loadSellerCatalog() {
-  const {
-    data,
-    error
-  } =
-    await supabaseClient.rpc(
-      "get_seller_catalog"
-    );
-
-  if (error) {
-    console.error(
-      "Error cargando catálogo:",
-      error
-    );
-
-    throw error;
-  }
-
-  sellerCatalog =
-    (data || [])
-      .map(
-        (perfume) => ({
-          id:
-            perfume.id,
-
-          name:
-            perfume.name,
-
-          brand:
-            perfume.brand,
-
-          category:
-            perfume.category,
-
-          size:
-            perfume.size,
-
-          price:
-            Number(
-              perfume.price
-            ) || 0,
-
-          code:
-            perfume.code,
-
-          availability:
-            perfume.availability
-        })
-      )
-      .sort(
-        (a, b) =>
-          compareCodes(
-            a.code,
-            b.code
-          )
-      );
-
-  return sellerCatalog;
-}
-
-
-/* ======================================
-   REGISTRAR VENTA
-====================================== */
-
-async function registerSellerSale(
-  perfumeId
-) {
-  const {
-    data,
-    error
-  } =
+  const { data, error } =
     await supabaseClient.rpc(
       "register_sale",
       {
-        p_perfume_id:
-          perfumeId
+        p_perfume_id: perfumeId
       }
     );
 
@@ -3982,17 +3851,10 @@ async function registerSellerSale(
     console.error(
       "Error RPC register_sale:",
       {
-        message:
-          error.message,
-
-        details:
-          error.details,
-
-        hint:
-          error.hint,
-
-        code:
-          error.code
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
       }
     );
 
@@ -4007,6 +3869,761 @@ async function registerSellerSale(
 }
 
 
+/* ======================================
+   PÁGINA VENDEDORES
+====================================== */
+
+function initializeSellerPage() {
+  const grid =
+    document.getElementById(
+      "sellerProductsGrid"
+    );
+
+  if (!grid) {
+    return;
+  }
+
+  const search =
+    document.getElementById(
+      "sellerSearchInput"
+    );
+
+  const category =
+    document.getElementById(
+      "sellerCategoryFilter"
+    );
+
+  const availabilityFilter =
+    document.getElementById(
+      "sellerAvailabilityFilter"
+    );
+
+  const empty =
+    document.getElementById(
+      "sellerEmptyState"
+    );
+
+  const modal =
+    document.getElementById(
+      "saleConfirmationModal"
+    );
+
+  const modalBrand =
+    document.getElementById(
+      "saleModalBrand"
+    );
+
+  const modalName =
+    document.getElementById(
+      "saleModalName"
+    );
+
+  const modalSize =
+    document.getElementById(
+      "saleModalSize"
+    );
+
+  const modalCode =
+    document.getElementById(
+      "saleModalCode"
+    );
+
+  const modalPrice =
+    document.getElementById(
+      "saleModalPrice"
+    );
+
+  const cancelButton =
+    document.getElementById(
+      "cancelSaleButton"
+    );
+
+  const confirmButton =
+    document.getElementById(
+      "confirmSaleButton"
+    );
+
+  let selectedPerfume = null;
+  let registeringSale = false;
+
+
+  /* ====================================
+     DISPONIBILIDAD
+  ==================================== */
+
+  function availabilityClass(
+    state
+  ) {
+    if (state === "Agotado") {
+      return "availability-out";
+    }
+
+    if (
+      state ===
+      "Unidad única"
+    ) {
+      return "availability-last";
+    }
+
+    if (
+      state ===
+      "Pocas unidades"
+    ) {
+      return "availability-low";
+    }
+
+    return "availability-available";
+  }
+
+
+  /* ====================================
+     FILTRAR
+  ==================================== */
+
+  function filtered() {
+    const query =
+      normalizeText(
+        search?.value || ""
+      );
+
+    return sellerCatalog
+      .filter((perfume) => {
+        const text =
+          normalizeText(
+            [
+              perfume.name,
+              perfume.brand,
+              perfume.code,
+              perfume.size
+            ].join(" ")
+          );
+
+        const matchesSearch =
+          text.includes(query);
+
+        const matchesCategory =
+          !category ||
+          category.value ===
+            "Todos" ||
+          perfume.category ===
+            category.value;
+
+        const matchesAvailability =
+          !availabilityFilter ||
+          availabilityFilter.value ===
+            "Todos" ||
+          perfume.availability ===
+            availabilityFilter.value;
+
+        return (
+          matchesSearch &&
+          matchesCategory &&
+          matchesAvailability
+        );
+      })
+      .sort((a, b) =>
+        compareCodes(
+          a.code,
+          b.code
+        )
+      );
+  }
+
+
+  /* ====================================
+     RENDER CATÁLOGO
+  ==================================== */
+
+  function render() {
+    grid.innerHTML = "";
+
+    const items =
+      filtered();
+
+    if (empty) {
+      empty.style.display =
+        items.length === 0
+          ? "block"
+          : "none";
+    }
+
+    items.forEach(
+      (perfume) => {
+        const soldOut =
+          perfume.availability ===
+          "Agotado";
+
+        const card =
+          document.createElement(
+            "article"
+          );
+
+        card.className =
+          "seller-product-card";
+
+        if (soldOut) {
+          card.classList.add(
+            "sold-out"
+          );
+        }
+
+        card.innerHTML = `
+          <div class="seller-card-top">
+
+            <span class="seller-brand">
+              ${escapeHTML(
+                perfume.brand
+              )}
+            </span>
+
+            <span class="seller-category">
+              ${escapeHTML(
+                perfume.category
+              )}
+            </span>
+
+          </div>
+
+
+          <div class="seller-card-body">
+
+            <h3>
+              ${escapeHTML(
+                perfume.name
+              )}
+            </h3>
+
+
+            <div class="seller-product-meta">
+
+              <span>
+                ${escapeHTML(
+                  perfume.size
+                )}
+              </span>
+
+              <span>•</span>
+
+              <span>
+                ${escapeHTML(
+                  perfume.code
+                )}
+              </span>
+
+            </div>
+
+
+            <strong class="seller-product-price">
+              ${formatCurrency(
+                perfume.price
+              )}
+            </strong>
+
+
+            <span
+              class="
+                availability-status
+                ${availabilityClass(
+                  perfume.availability
+                )}
+              "
+            >
+              ${escapeHTML(
+                perfume.availability
+              )}
+            </span>
+
+
+            <div class="seller-sale-action">
+
+              <button
+                class="seller-sale-button"
+                data-sale-id="${escapeHTML(
+                  perfume.id
+                )}"
+                type="button"
+                ${
+                  soldOut
+                    ? "disabled"
+                    : ""
+                }
+              >
+                ${
+                  soldOut
+                    ? "Producto agotado"
+                    : "Registrar venta"
+                }
+              </button>
+
+            </div>
+
+          </div>
+        `;
+
+        grid.appendChild(
+          card
+        );
+      }
+    );
+  }
+
+
+  /* ====================================
+     ABRIR MODAL
+  ==================================== */
+
+  function openSaleModal(
+    perfume
+  ) {
+    if (
+      !modal ||
+      !perfume
+    ) {
+      return;
+    }
+
+    selectedPerfume =
+      perfume;
+
+    if (modalBrand) {
+      modalBrand.textContent =
+        perfume.brand || "—";
+    }
+
+    if (modalName) {
+      modalName.textContent =
+        perfume.name || "—";
+    }
+
+    if (modalSize) {
+      modalSize.textContent =
+        perfume.size || "—";
+    }
+
+    if (modalCode) {
+      modalCode.textContent =
+        perfume.code || "—";
+    }
+
+    if (modalPrice) {
+      modalPrice.textContent =
+        formatCurrency(
+          perfume.price
+        );
+    }
+
+    if (confirmButton) {
+      confirmButton.disabled =
+        false;
+
+      confirmButton.textContent =
+        "Confirmar venta";
+    }
+
+    modal.classList.remove(
+      "hidden"
+    );
+
+    modal.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    document.body.classList.add(
+      "modal-open"
+    );
+  }
+
+
+  /* ====================================
+     CERRAR MODAL
+  ==================================== */
+
+  function closeSaleModal(
+    force = false
+  ) {
+    if (
+      registeringSale &&
+      !force
+    ) {
+      return;
+    }
+
+    if (modal) {
+      modal.classList.add(
+        "hidden"
+      );
+
+      modal.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+    }
+
+    document.body.classList.remove(
+      "modal-open"
+    );
+
+    selectedPerfume = null;
+  }
+
+
+  /* ====================================
+     ABRIR CONFIRMACIÓN DESDE PRODUCTO
+  ==================================== */
+
+  grid.addEventListener(
+    "click",
+    (event) => {
+      const button =
+        event.target.closest(
+          "[data-sale-id]"
+        );
+
+      if (!button) {
+        return;
+      }
+
+      const perfume =
+        sellerCatalog.find(
+          (item) =>
+            String(item.id) ===
+            String(
+              button.dataset.saleId
+            )
+        );
+
+      if (!perfume) {
+        showToast(
+          "No se encontró el perfume."
+        );
+
+        return;
+      }
+
+      if (
+        perfume.availability ===
+        "Agotado"
+      ) {
+        showToast(
+          "Este perfume está agotado."
+        );
+
+        return;
+      }
+
+      openSaleModal(
+        perfume
+      );
+    }
+  );
+
+
+  /* ====================================
+     CERRAR CON X / FONDO
+  ==================================== */
+
+  document
+    .querySelectorAll(
+      "[data-close-sale-modal]"
+    )
+    .forEach(
+      (element) => {
+        element.addEventListener(
+          "click",
+          () => {
+            closeSaleModal();
+          }
+        );
+      }
+    );
+
+
+  /* ====================================
+     CANCELAR
+  ==================================== */
+
+  cancelButton
+    ?.addEventListener(
+      "click",
+      () => {
+        closeSaleModal();
+      }
+    );
+
+
+  /* ====================================
+     ESC
+  ==================================== */
+
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        event.key ===
+          "Escape" &&
+        modal &&
+        !modal.classList.contains(
+          "hidden"
+        )
+      ) {
+        closeSaleModal();
+      }
+    }
+  );
+
+
+  /* ====================================
+     CONFIRMAR VENTA
+  ==================================== */
+
+  confirmButton
+    ?.addEventListener(
+      "click",
+      async () => {
+        if (
+          registeringSale ||
+          !selectedPerfume
+        ) {
+          return;
+        }
+
+        const perfume = {
+          ...selectedPerfume
+        };
+
+        registeringSale =
+          true;
+
+        confirmButton.disabled =
+          true;
+
+        confirmButton.textContent =
+          "Registrando...";
+
+        try {
+          const result =
+            await registerSellerSale(
+              perfume.id
+            );
+
+          console.log(
+            "Venta registrada:",
+            result
+          );
+
+          /*
+           * Recargamos el catálogo porque
+           * register_sale ya descontó una
+           * unidad en Supabase.
+           */
+          await loadSellerCatalog();
+
+          render();
+
+          /*
+           * Cerramos únicamente después de
+           * que la operación terminó bien.
+           */
+          registeringSale =
+            false;
+
+          closeSaleModal(
+            true
+          );
+
+          showToast(
+            `Venta registrada: ${perfume.name}`
+          );
+
+        } catch (error) {
+          console.error(
+            "Error registrando venta:",
+            error
+          );
+
+          const message =
+            String(
+              error?.message ||
+              ""
+            );
+
+          const normalizedMessage =
+            normalizeForComparison(
+              message
+            );
+
+          if (
+            normalizedMessage.includes(
+              "agotado"
+            )
+          ) {
+            showToast(
+              "El perfume ya está agotado."
+            );
+
+          } else if (
+            normalizedMessage.includes(
+              "desactivada"
+            )
+          ) {
+            showToast(
+              "Tu cuenta está desactivada."
+            );
+
+          } else if (
+            normalizedMessage.includes(
+              "solo los vendedores"
+            )
+          ) {
+            showToast(
+              "Solo los vendedores pueden registrar ventas."
+            );
+
+          } else if (
+            normalizedMessage.includes(
+              "iniciar sesion"
+            )
+          ) {
+            showToast(
+              "Tu sesión expiró. Inicia sesión nuevamente."
+            );
+
+          } else {
+            /*
+             * Mostramos el error real para
+             * poder diagnosticar Supabase
+             * si algo falla.
+             */
+            showToast(
+              message ||
+              "No se pudo registrar la venta."
+            );
+          }
+
+          /*
+           * Volvemos a consultar el catálogo
+           * por seguridad.
+           */
+          try {
+            await loadSellerCatalog();
+
+            render();
+
+          } catch (
+            refreshError
+          ) {
+            console.error(
+              "Error actualizando catálogo:",
+              refreshError
+            );
+          }
+
+        } finally {
+          registeringSale =
+            false;
+
+          if (
+            confirmButton &&
+            selectedPerfume
+          ) {
+            confirmButton.disabled =
+              false;
+
+            confirmButton.textContent =
+              "Confirmar venta";
+          }
+        }
+      }
+    );
+
+
+  /* ====================================
+     FILTROS
+  ==================================== */
+
+  search?.addEventListener(
+    "input",
+    render
+  );
+
+  category?.addEventListener(
+    "change",
+    render
+  );
+
+  availabilityFilter
+    ?.addEventListener(
+      "change",
+      render
+    );
+
+
+  /* ====================================
+     CARGA INICIAL
+  ==================================== */
+
+  async function load() {
+    grid.innerHTML = `
+      <div class="seller-catalog-loading">
+        Cargando catálogo...
+      </div>
+    `;
+
+    if (empty) {
+      empty.style.display =
+        "none";
+    }
+
+    try {
+      await loadSellerCatalog();
+
+      render();
+
+    } catch (error) {
+      console.error(
+        "No se pudo cargar el catálogo:",
+        error
+      );
+
+      grid.innerHTML = "";
+
+      if (empty) {
+        empty.style.display =
+          "block";
+
+        const title =
+          empty.querySelector(
+            "h3"
+          );
+
+        const paragraph =
+          empty.querySelector(
+            "p"
+          );
+
+        if (title) {
+          title.textContent =
+            "No se pudo cargar el catálogo";
+        }
+
+        if (paragraph) {
+          paragraph.textContent =
+            error.message ||
+            "Verifica tu conexión e intenta nuevamente.";
+        }
+      }
+
+      showToast(
+        error.message ||
+        "No se pudo cargar el catálogo."
+      );
+    }
+  }
+
+
+  load();
+}
 /* ======================================
    VENTAS - ADMIN
 ====================================== */

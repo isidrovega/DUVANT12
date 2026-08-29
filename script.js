@@ -3895,112 +3895,57 @@ async function registerSellerSale(
 
 
 /* ======================================
-   PÁGINA VENDEDORES
+   VENDEDORES - SUPABASE
 ====================================== */
 
-function initializeSellerPage() {
-  const grid =
-    document.getElementById(
-      "sellerProductsGrid"
+async function loadSellerCatalog() {
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "get_seller_catalog"
     );
 
+  if (error) {
+    console.error(
+      "Error cargando catálogo:",
+      error
+    );
 
-  if (!grid) {
-    return;
+    throw error;
   }
 
+  sellerCatalog =
+    (data || [])
+      .map(
+        (perfume) => ({
+          id:
+            perfume.id,
 
-  const search =
-    document.getElementById(
-      "sellerSearchInput"
-    );
+          name:
+            perfume.name,
 
+          brand:
+            perfume.brand,
 
-  const category =
-    document.getElementById(
-      "sellerCategoryFilter"
-    );
+          category:
+            perfume.category,
 
+          size:
+            perfume.size,
 
-  const availabilityFilter =
-    document.getElementById(
-      "sellerAvailabilityFilter"
-    );
+          price:
+            Number(
+              perfume.price
+            ) || 0,
 
+          code:
+            perfume.code,
 
-  const empty =
-    document.getElementById(
-      "sellerEmptyState"
-    );
-
-
-  function availabilityClass(state) {
-    if (
-      state === "Agotado"
-    ) {
-      return "availability-out";
-    }
-
-
-    if (
-      state === "Unidad única"
-    ) {
-      return "availability-last";
-    }
-
-
-    if (
-      state === "Pocas unidades"
-    ) {
-      return "availability-low";
-    }
-
-
-    return "availability-available";
-  }
-
-
-  function filtered() {
-    const query =
-      normalizeText(
-        search?.value || ""
-      );
-
-
-    return sellerCatalog
-      .filter(
-        (perfume) => {
-          const text =
-            normalizeText(
-              [
-                perfume.name,
-                perfume.brand,
-                perfume.code,
-                perfume.size
-              ].join(" ")
-            );
-
-
-          return (
-            text.includes(
-              query
-            ) &&
-            (
-              !category ||
-              category.value ===
-                "Todos" ||
-              perfume.category ===
-                category.value
-            ) &&
-            (
-              !availabilityFilter ||
-              availabilityFilter.value ===
-                "Todos" ||
-              perfume.availability ===
-                availabilityFilter.value
-            )
-          );
-        }
+          availability:
+            perfume.availability
+        })
       )
       .sort(
         (a, b) =>
@@ -4009,312 +3954,802 @@ function initializeSellerPage() {
             b.code
           )
       );
+
+  return sellerCatalog;
+}
+
+
+/* ======================================
+   REGISTRAR VENTA
+====================================== */
+
+async function registerSellerSale(
+  perfumeId
+) {
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "register_sale",
+      {
+        p_perfume_id:
+          perfumeId
+      }
+    );
+
+  if (error) {
+    console.error(
+      "Error RPC register_sale:",
+      {
+        message:
+          error.message,
+
+        details:
+          error.details,
+
+        hint:
+          error.hint,
+
+        code:
+          error.code
+      }
+    );
+
+    throw new Error(
+      error.message ||
+      error.details ||
+      "No se pudo registrar la venta."
+    );
+  }
+
+  return data;
+}
+
+
+/* ======================================
+   VENTAS - ADMIN
+====================================== */
+
+let adminSales = [];
+
+
+/* ======================================
+   CARGAR VENTAS
+====================================== */
+
+async function loadAdminSales() {
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "get_admin_sales"
+    );
+
+
+  if (error) {
+    console.error(
+      "Error get_admin_sales:",
+      error
+    );
+
+    throw new Error(
+      error.message ||
+      "No se pudieron cargar las ventas."
+    );
   }
 
 
-  function render() {
-    grid.innerHTML = "";
+  adminSales =
+    (data || []).map(
+      (sale) => ({
+        id:
+          sale.id,
+
+        perfumeId:
+          sale.perfume_id,
+
+        perfumeName:
+          sale.perfume_name ||
+          "",
+
+        perfumeBrand:
+          sale.perfume_brand ||
+          "",
+
+        perfumeSize:
+          sale.perfume_size ||
+          "",
+
+        perfumeCode:
+          sale.perfume_code ||
+          "",
+
+        salePrice:
+          Number(
+            sale.sale_price
+          ) || 0,
+
+        sellerId:
+          sale.seller_id,
+
+        sellerName:
+          sale.seller_name ||
+          "Vendedor",
+
+        sellerEmail:
+          sale.seller_email ||
+          "",
+
+        createdAt:
+          sale.created_at
+      })
+    );
 
 
-    const items =
-      filtered();
+  return adminSales;
+}
 
 
-    if (empty) {
-      empty.style.display =
-        items.length === 0
+/* ======================================
+   UTILIDADES FECHA VENTAS
+====================================== */
+
+function getLocalDateKey(
+  value
+) {
+  const date =
+    value instanceof Date
+      ? value
+      : new Date(
+          value
+        );
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "";
+  }
+
+
+  const year =
+    date.getFullYear();
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  return `${year}-${month}-${day}`;
+}
+
+
+function formatSaleDate(
+  value
+) {
+  const date =
+    new Date(
+      value
+    );
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "—";
+  }
+
+
+  return new Intl
+    .DateTimeFormat(
+      "es-MX",
+      {
+        day:
+          "2-digit",
+
+        month:
+          "short",
+
+        year:
+          "numeric"
+      }
+    )
+    .format(
+      date
+    );
+}
+
+
+function formatSaleTime(
+  value
+) {
+  const date =
+    new Date(
+      value
+    );
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "—";
+  }
+
+
+  return new Intl
+    .DateTimeFormat(
+      "es-MX",
+      {
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit"
+      }
+    )
+    .format(
+      date
+    );
+}
+
+
+/* ======================================
+   PÁGINA VENTAS
+====================================== */
+
+function initializeSalesPage() {
+  const tableBody =
+    document.getElementById(
+      "salesTableBody"
+    );
+
+
+  if (!tableBody) {
+    return;
+  }
+
+
+  const searchInput =
+    document.getElementById(
+      "salesSearchInput"
+    );
+
+  const sellerFilter =
+    document.getElementById(
+      "salesSellerFilter"
+    );
+
+  const dateFilter =
+    document.getElementById(
+      "salesDateFilter"
+    );
+
+  const clearButton =
+    document.getElementById(
+      "clearSalesFiltersButton"
+    );
+
+  const emptyState =
+    document.getElementById(
+      "salesEmptyState"
+    );
+
+  const salesToday =
+    document.getElementById(
+      "salesToday"
+    );
+
+  const revenueToday =
+    document.getElementById(
+      "revenueToday"
+    );
+
+  const salesMonth =
+    document.getElementById(
+      "salesMonth"
+    );
+
+  const revenueMonth =
+    document.getElementById(
+      "revenueMonth"
+    );
+
+
+  function updateStatistics() {
+    const now =
+      new Date();
+
+    const todayKey =
+      getLocalDateKey(
+        now
+      );
+
+    const currentYear =
+      now.getFullYear();
+
+    const currentMonth =
+      now.getMonth();
+
+
+    const todaySales =
+      adminSales.filter(
+        (sale) =>
+          getLocalDateKey(
+            sale.createdAt
+          ) ===
+          todayKey
+      );
+
+
+    const monthSales =
+      adminSales.filter(
+        (sale) => {
+          const date =
+            new Date(
+              sale.createdAt
+            );
+
+          return (
+            !Number.isNaN(
+              date.getTime()
+            ) &&
+            date.getFullYear() ===
+              currentYear &&
+            date.getMonth() ===
+              currentMonth
+          );
+        }
+      );
+
+
+    const todayRevenue =
+      todaySales.reduce(
+        (total, sale) =>
+          total +
+          sale.salePrice,
+        0
+      );
+
+
+    const monthRevenue =
+      monthSales.reduce(
+        (total, sale) =>
+          total +
+          sale.salePrice,
+        0
+      );
+
+
+    setText(
+      "salesToday",
+      todaySales.length
+    );
+
+    setText(
+      "revenueToday",
+      formatCurrency(
+        todayRevenue
+      )
+    );
+
+    setText(
+      "salesMonth",
+      monthSales.length
+    );
+
+    setText(
+      "revenueMonth",
+      formatCurrency(
+        monthRevenue
+      )
+    );
+  }
+
+
+  function populateSellerFilter() {
+    if (!sellerFilter) {
+      return;
+    }
+
+
+    const currentValue =
+      sellerFilter.value;
+
+
+    const sellers =
+      new Map();
+
+
+    adminSales.forEach(
+      (sale) => {
+        if (
+          !sale.sellerId
+        ) {
+          return;
+        }
+
+        sellers.set(
+          String(
+            sale.sellerId
+          ),
+          sale.sellerName ||
+          "Vendedor"
+        );
+      }
+    );
+
+
+    const sorted =
+      [...sellers.entries()]
+        .sort(
+          (a, b) =>
+            a[1].localeCompare(
+              b[1],
+              "es",
+              {
+                sensitivity:
+                  "base"
+              }
+            )
+        );
+
+
+    sellerFilter.innerHTML = `
+      <option value="Todos">
+        Todos los vendedores
+      </option>
+
+      ${sorted
+        .map(
+          ([id, name]) => `
+            <option
+              value="${escapeHTML(
+                id
+              )}"
+            >
+              ${escapeHTML(
+                name
+              )}
+            </option>
+          `
+        )
+        .join("")}
+    `;
+
+
+    if (
+      [...sellerFilter.options]
+        .some(
+          (option) =>
+            option.value ===
+            currentValue
+        )
+    ) {
+      sellerFilter.value =
+        currentValue;
+    }
+  }
+
+
+  function filteredSales() {
+    const query =
+      normalizeText(
+        searchInput?.value ||
+        ""
+      );
+
+    const sellerId =
+      sellerFilter?.value ||
+      "Todos";
+
+    const selectedDate =
+      dateFilter?.value ||
+      "";
+
+
+    return adminSales.filter(
+      (sale) => {
+        const searchable =
+          normalizeText(
+            [
+              sale.perfumeName,
+              sale.perfumeBrand,
+              sale.perfumeSize,
+              sale.perfumeCode,
+              sale.sellerName,
+              sale.sellerEmail
+            ].join(
+              " "
+            )
+          );
+
+
+        const matchesSearch =
+          searchable.includes(
+            query
+          );
+
+
+        const matchesSeller =
+          sellerId ===
+            "Todos" ||
+          String(
+            sale.sellerId
+          ) ===
+            sellerId;
+
+
+        const matchesDate =
+          !selectedDate ||
+          getLocalDateKey(
+            sale.createdAt
+          ) ===
+            selectedDate;
+
+
+        return (
+          matchesSearch &&
+          matchesSeller &&
+          matchesDate
+        );
+      }
+    );
+  }
+
+
+  function renderSales() {
+    const sales =
+      filteredSales();
+
+
+    tableBody.innerHTML =
+      "";
+
+
+    if (emptyState) {
+      emptyState.style.display =
+        sales.length === 0
           ? "block"
           : "none";
     }
 
 
-    items.forEach(
-      (perfume) => {
-        const soldOut =
-          perfume.availability ===
-          "Agotado";
-
-
-        const card =
+    sales.forEach(
+      (sale) => {
+        const row =
           document.createElement(
-            "article"
+            "tr"
           );
 
 
-        card.className =
-          "seller-product-card";
+        row.innerHTML = `
+          <td>
 
+            <div class="sales-product-cell">
 
-        if (soldOut) {
-          card.classList.add(
-            "sold-out"
-          );
-        }
-
-
-        card.innerHTML = `
-          <div class="seller-card-top">
-
-            <span class="seller-brand">
-              ${escapeHTML(
-                perfume.brand
-              )}
-            </span>
-
-            <span class="seller-category">
-              ${escapeHTML(
-                perfume.category
-              )}
-            </span>
-
-          </div>
-
-
-          <div class="seller-card-body">
-
-            <h3>
-              ${escapeHTML(
-                perfume.name
-              )}
-            </h3>
-
-
-            <div class="seller-product-meta">
+              <strong>
+                ${escapeHTML(
+                  sale.perfumeName
+                )}
+              </strong>
 
               <span>
                 ${escapeHTML(
-                  perfume.size
+                  sale.perfumeBrand
+                )}
+                ·
+                ${escapeHTML(
+                  sale.perfumeSize
                 )}
               </span>
 
-              <span>
-                •
-              </span>
+              <small>
+                ${escapeHTML(
+                  sale.perfumeCode
+                )}
+              </small>
+
+            </div>
+
+          </td>
+
+
+          <td>
+
+            <div class="sales-seller-cell">
+
+              <strong>
+                ${escapeHTML(
+                  sale.sellerName
+                )}
+              </strong>
 
               <span>
                 ${escapeHTML(
-                  perfume.code
+                  sale.sellerEmail ||
+                  "—"
                 )}
               </span>
 
             </div>
 
+          </td>
 
-            <strong class="seller-product-price">
+
+          <td>
+
+            <strong class="sales-price">
               ${formatCurrency(
-                perfume.price
+                sale.salePrice
               )}
             </strong>
 
-
-            <span
-              class="
-                availability-status
-                ${availabilityClass(
-                  perfume.availability
-                )}
-              "
-            >
-              ${escapeHTML(
-                perfume.availability
-              )}
-            </span>
+          </td>
 
 
-            <div class="seller-sale-action">
+          <td>
+            ${escapeHTML(
+              formatSaleDate(
+                sale.createdAt
+              )
+            )}
+          </td>
 
-              <button
-                class="seller-sale-button"
-                data-sale-id="${perfume.id}"
-                type="button"
-                ${soldOut ? "disabled" : ""}
-              >
-                ${
-                  soldOut
-                    ? "Producto agotado"
-                    : "Registrar venta"
-                }
-              </button>
 
-            </div>
-
-          </div>
+          <td>
+            ${escapeHTML(
+              formatSaleTime(
+                sale.createdAt
+              )
+            )}
+          </td>
         `;
 
 
-        grid.appendChild(
-          card
+        tableBody.appendChild(
+          row
         );
       }
     );
   }
 
 
-  grid.addEventListener(
-    "click",
-    async (event) => {
-      const button =
-        event.target.closest(
-          "[data-sale-id]"
-        );
+  function renderEverything() {
+    updateStatistics();
+
+    populateSellerFilter();
+
+    renderSales();
+  }
 
 
-      if (!button) {
-        return;
-      }
+  searchInput
+    ?.addEventListener(
+      "input",
+      renderSales
+    );
 
 
-      const perfume =
-        sellerCatalog.find(
-          (item) =>
-            String(item.id) ===
-            String(
-              button.dataset.saleId
-            )
-        );
-
-
-      if (
-        !perfume ||
-        perfume.availability ===
-          "Agotado"
-      ) {
-        return;
-      }
-
-
-      const confirmed =
-        window.confirm(
-          `¿Registrar venta de "${perfume.name}" por ${formatCurrency(
-            perfume.price
-          )}?`
-        );
-
-
-      if (!confirmed) {
-        return;
-      }
-
-
-      button.disabled =
-        true;
-
-
-      button.textContent =
-        "Registrando...";
-
-
-      try {
-        await registerSellerSale(
-          perfume.id
-        );
-
-
-        await loadSellerCatalog();
-
-
-        render();
-
-
-        showToast(
-          `Venta registrada: ${perfume.name}`
-        );
-
-      } catch (error) {
-        console.error(
-          "Error registrando venta:",
-          error
-        );
-
-
-        showToast(
-          error.message
-            ?.toLowerCase()
-            .includes(
-              "agotado"
-            )
-            ? "El perfume ya está agotado."
-            : "No se pudo registrar la venta."
-        );
-
-
-        try {
-          await loadSellerCatalog();
-
-          render();
-
-        } catch (
-          refreshError
-        ) {
-          console.error(
-            refreshError
-          );
-        }
-      }
-    }
-  );
-
-
-  search?.addEventListener(
-    "input",
-    render
-  );
-
-
-  category?.addEventListener(
-    "change",
-    render
-  );
-
-
-  availabilityFilter
+  sellerFilter
     ?.addEventListener(
       "change",
-      render
+      renderSales
+    );
+
+
+  dateFilter
+    ?.addEventListener(
+      "change",
+      renderSales
+    );
+
+
+  clearButton
+    ?.addEventListener(
+      "click",
+      () => {
+        if (searchInput) {
+          searchInput.value =
+            "";
+        }
+
+        if (sellerFilter) {
+          sellerFilter.value =
+            "Todos";
+        }
+
+        if (dateFilter) {
+          dateFilter.value =
+            "";
+        }
+
+        renderSales();
+      }
     );
 
 
   async function load() {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="5">
+          <div class="sales-loading">
+            Cargando ventas...
+          </div>
+        </td>
+      </tr>
+    `;
+
+
+    if (emptyState) {
+      emptyState.style.display =
+        "none";
+    }
+
+
     try {
-      await loadSellerCatalog();
+      await loadAdminSales();
 
-
-      render();
+      renderEverything();
 
     } catch (error) {
       console.error(
+        "Error cargando ventas:",
         error
       );
 
+      tableBody.innerHTML =
+        "";
 
-      if (empty) {
-        empty.style.display =
+      if (emptyState) {
+        emptyState.style.display =
           "block";
 
-
         const title =
-          empty.querySelector(
+          emptyState.querySelector(
             "h3"
           );
 
-
         const paragraph =
-          empty.querySelector(
+          emptyState.querySelector(
             "p"
           );
 
-
         if (title) {
           title.textContent =
-            "No se pudo cargar el catálogo";
+            "No se pudieron cargar las ventas";
         }
-
 
         if (paragraph) {
           paragraph.textContent =
-            "Verifica tu conexión e intenta nuevamente.";
+            error.message ||
+            "Intenta nuevamente.";
         }
       }
+
+      showToast(
+        error.message ||
+        "No se pudieron cargar las ventas."
+      );
     }
   }
 
@@ -5950,6 +6385,14 @@ async function initializeApp() {
     );
 
 
+  const isSalesPage =
+    Boolean(
+      document.getElementById(
+        "salesTableBody"
+      )
+    );
+
+
   const isUsersPage =
     Boolean(
       document.getElementById(
@@ -5975,7 +6418,6 @@ async function initializeApp() {
         error
       );
 
-
       showToast(
         "No se pudo cargar el inventario."
       );
@@ -5999,6 +6441,15 @@ async function initializeApp() {
 
   if (isSellerPage) {
     initializeSellerPage();
+  }
+
+
+  if (
+    isSalesPage &&
+    auth.profile.role ===
+      "admin"
+  ) {
+    initializeSalesPage();
   }
 
 

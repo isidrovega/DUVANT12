@@ -3810,3 +3810,544 @@ body.modal-open {
   }
 
 }
+/* =========================================
+   MODAL CONFIRMAR VENTA
+========================================= */
+
+.sale-confirmation-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+}
+
+.sale-confirmation-modal.hidden {
+  display: none !important;
+}
+
+.sale-confirmation-backdrop {
+  position: absolute;
+  inset: 0;
+
+  background:
+    rgba(0, 0, 0, 0.8);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.sale-confirmation-card {
+  position: relative;
+  z-index: 1;
+
+  width: min(100%, 520px);
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.14);
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #15171a,
+      #0c0d0f
+    );
+
+  box-shadow:
+    0 30px 90px
+    rgba(0, 0, 0, 0.7);
+}
+
+.sale-confirmation-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 25px;
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+}
+
+.sale-confirmation-eyebrow {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #8f949b;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  letter-spacing: 0.15em;
+}
+
+.sale-confirmation-header h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 1.4rem;
+}
+
+.sale-confirmation-close {
+  width: 40px;
+  height: 40px;
+
+  flex: 0 0 40px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.12);
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color: #ffffff;
+
+  font-size: 1.4rem;
+}
+
+.sale-confirmation-product {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding: 26px;
+}
+
+.sale-confirmation-brand {
+  color: #94999f;
+
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.sale-confirmation-product > strong {
+  color: #ffffff;
+
+  font-size:
+    clamp(
+      1.35rem,
+      4vw,
+      1.8rem
+    );
+}
+
+.sale-confirmation-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  color: #92979d;
+
+  font-size: 0.86rem;
+}
+
+.sale-confirmation-price {
+  margin-top: 10px;
+
+  color: #e3e5e7;
+
+  font-size:
+    clamp(
+      1.8rem,
+      5vw,
+      2.3rem
+    );
+
+  font-weight: 700;
+}
+
+.sale-confirmation-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  margin:
+    0 26px 24px;
+
+  padding: 14px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.1);
+
+  border-radius: 11px;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+}
+
+.sale-warning-icon {
+  width: 26px;
+  height: 26px;
+
+  flex: 0 0 26px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 255, 255, 0.1);
+
+  color: #ffffff;
+
+  font-weight: 800;
+}
+
+.sale-confirmation-warning p {
+  margin: 1px 0 0;
+
+  color: #a3a8ae;
+
+  font-size: 0.84rem;
+
+  line-height: 1.5;
+}
+
+.sale-confirmation-actions {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 12px;
+
+  padding: 20px 26px 26px;
+
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+}
+
+.sale-cancel-button,
+.sale-confirm-button {
+  min-height: 50px;
+
+  padding: 12px 18px;
+
+  border-radius: 10px;
+
+  font-family: inherit;
+  font-weight: 700;
+}
+
+.sale-cancel-button {
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.14);
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color: #d5d7da;
+}
+
+.sale-confirm-button {
+  border:
+    1px solid #e6e7e9;
+
+  background: #e6e7e9;
+
+  color: #101113;
+}
+
+.sale-confirm-button:hover:not(:disabled) {
+  background: #ffffff;
+}
+
+.sale-confirm-button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+
+/* =========================================
+   PÁGINA VENTAS
+========================================= */
+
+.sales-stats-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
+  gap: 16px;
+
+  margin-bottom: 22px;
+}
+
+.sales-stat-card {
+  min-width: 0;
+
+  padding: 22px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    var(--radius);
+
+  background:
+    linear-gradient(
+      145deg,
+      #151618,
+      #0d0e10
+    );
+}
+
+.sales-stat-card span {
+  display: block;
+
+  color:
+    var(--silver-dark);
+
+  font-size: 0.7rem;
+  font-weight: 600;
+
+  letter-spacing: 0.06em;
+
+  text-transform: uppercase;
+}
+
+.sales-stat-card strong {
+  display: block;
+
+  margin: 9px 0 6px;
+
+  color: #ffffff;
+
+  font-size:
+    clamp(
+      1.35rem,
+      2vw,
+      1.8rem
+    );
+
+  overflow-wrap: anywhere;
+}
+
+.sales-stat-card small {
+  color: var(--muted);
+
+  font-size: 0.72rem;
+}
+
+.sales-panel-heading {
+  padding: 22px 20px 0;
+}
+
+.sales-panel-heading h2 {
+  margin-top: 5px;
+
+  font-size: 1.35rem;
+}
+
+.sales-toolbar {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 20px;
+
+  border-bottom:
+    1px solid
+    var(--border);
+}
+
+.sales-filters {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.sales-date-filter {
+  min-height: 46px;
+
+  padding: 0 13px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 8px;
+
+  background: #0b0c0e;
+
+  color: var(--text);
+
+  color-scheme: dark;
+
+  outline: none;
+}
+
+.sales-table {
+  min-width: 900px;
+}
+
+.sales-product-cell,
+.sales-seller-cell {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.sales-product-cell strong,
+.sales-seller-cell strong {
+  color: #ffffff;
+
+  font-size: 0.9rem;
+}
+
+.sales-product-cell span,
+.sales-seller-cell span {
+  color: #999da3;
+
+  font-size: 0.76rem;
+}
+
+.sales-product-cell small {
+  color: #73787e;
+
+  font-size: 0.7rem;
+}
+
+.sales-price {
+  color: #e0e2e4;
+
+  font-size: 0.95rem;
+}
+
+.sales-loading {
+  padding: 30px;
+
+  color: #8f949b;
+
+  text-align: center;
+}
+
+
+/* =========================================
+   RESPONSIVE VENTAS / MODAL
+========================================= */
+
+@media (max-width: 1000px) {
+  .sales-stats-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .sales-toolbar {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .sales-toolbar .search-box {
+    width: 100%;
+  }
+
+  .sales-filters {
+    width: 100%;
+  }
+
+  .sales-filters > * {
+    flex: 1;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .sale-confirmation-modal {
+    align-items: flex-end;
+
+    padding: 0;
+  }
+
+  .sale-confirmation-card {
+    width: 100%;
+
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+
+    border-radius:
+      22px 22px 0 0;
+  }
+
+  .sale-confirmation-actions {
+    grid-template-columns:
+      1fr;
+
+    padding-bottom:
+      calc(
+        22px +
+        env(
+          safe-area-inset-bottom
+        )
+      );
+  }
+
+  .sale-confirm-button {
+    order: 1;
+  }
+
+  .sale-cancel-button {
+    order: 2;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .sales-stats-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .sales-filters {
+    flex-direction: column;
+  }
+
+  .sales-filters > * {
+    width: 100%;
+  }
+}

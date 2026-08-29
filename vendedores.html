@@ -102,6 +102,14 @@
         </a>
 
         <a
+          href="ventas.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">$</span>
+          <span>Ventas</span>
+        </a>
+
+        <a
           href="usuarios.html"
           class="nav-link admin-only"
         >
@@ -111,8 +119,6 @@
 
       </nav>
 
-
-      <!-- CIERRE DE SESIÓN ESCRITORIO -->
 
       <div class="sidebar-bottom">
 
@@ -170,9 +176,7 @@
 
         <div class="search-box seller-search">
 
-          <span>
-            ⌕
-          </span>
+          <span>⌕</span>
 
           <input
             id="sellerSearchInput"
@@ -189,7 +193,6 @@
             id="sellerCategoryFilter"
             class="filter-select"
           >
-
             <option value="Todos">
               Todas las categorías
             </option>
@@ -205,7 +208,6 @@
             <option value="Unisex">
               Unisex
             </option>
-
           </select>
 
 
@@ -213,7 +215,6 @@
             id="sellerAvailabilityFilter"
             class="filter-select"
           >
-
             <option value="Todos">
               Toda disponibilidad
             </option>
@@ -233,7 +234,6 @@
             <option value="Agotado">
               Agotado
             </option>
-
           </select>
 
         </div>
@@ -267,11 +267,6 @@
       </div>
 
 
-      <!-- =====================================
-           CERRAR SESIÓN MÓVIL
-           APARECE HASTA EL FINAL
-      ====================================== -->
-
       <div class="mobile-logout">
 
         <div class="mobile-user-info">
@@ -297,6 +292,134 @@
       </div>
 
     </main>
+
+  </div>
+
+
+  <!-- =====================================
+       CONFIRMAR VENTA
+  ====================================== -->
+
+  <div
+    id="saleConfirmationModal"
+    class="sale-confirmation-modal hidden"
+    aria-hidden="true"
+  >
+
+    <div
+      class="sale-confirmation-backdrop"
+      data-close-sale-modal
+    ></div>
+
+
+    <section
+      class="sale-confirmation-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="saleConfirmationTitle"
+    >
+
+      <div class="sale-confirmation-header">
+
+        <div>
+
+          <span class="sale-confirmation-eyebrow">
+            CONFIRMAR VENTA
+          </span>
+
+          <h2 id="saleConfirmationTitle">
+            ¿Registrar esta venta?
+          </h2>
+
+        </div>
+
+
+        <button
+          class="sale-confirmation-close"
+          data-close-sale-modal
+          type="button"
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="sale-confirmation-product">
+
+        <span
+          id="saleModalBrand"
+          class="sale-confirmation-brand"
+        >
+          —
+        </span>
+
+        <strong id="saleModalName">
+          —
+        </strong>
+
+
+        <div class="sale-confirmation-meta">
+
+          <span id="saleModalSize">
+            —
+          </span>
+
+          <span>•</span>
+
+          <span id="saleModalCode">
+            —
+          </span>
+
+        </div>
+
+
+        <span
+          id="saleModalPrice"
+          class="sale-confirmation-price"
+        >
+          $0.00
+        </span>
+
+      </div>
+
+
+      <div class="sale-confirmation-warning">
+
+        <span class="sale-warning-icon">
+          !
+        </span>
+
+        <p>
+          Esta acción descontará una unidad del inventario
+          y la venta quedará registrada a tu nombre.
+        </p>
+
+      </div>
+
+
+      <div class="sale-confirmation-actions">
+
+        <button
+          id="cancelSaleButton"
+          class="sale-cancel-button"
+          type="button"
+        >
+          Cancelar
+        </button>
+
+        <button
+          id="confirmSaleButton"
+          class="sale-confirm-button"
+          type="button"
+        >
+          Confirmar venta
+        </button>
+
+      </div>
+
+    </section>
 
   </div>
 

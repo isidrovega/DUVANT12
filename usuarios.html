@@ -8,9 +8,7 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>
-    Usuarios | DUVANT12
-  </title>
+  <title>Duvant 12 | Usuarios</title>
 
   <link
     rel="preconnect"
@@ -28,6 +26,27 @@
     rel="stylesheet"
   >
 
+  <script>
+    try {
+      const cachedProfile =
+        JSON.parse(
+          sessionStorage.getItem(
+            "duvant12_profile"
+          )
+        );
+
+      if (cachedProfile?.role) {
+        document.documentElement.dataset.role =
+          cachedProfile.role;
+      }
+    } catch (error) {
+      console.error(
+        "No se pudo leer el perfil almacenado:",
+        error
+      );
+    }
+  </script>
+
   <link
     rel="stylesheet"
     href="styles.css"
@@ -36,107 +55,118 @@
 
 <body data-page="admin">
 
-  <div class="app-shell">
+  <div class="app">
 
-    <!-- SIDEBAR -->
+    <!-- =====================================
+         SIDEBAR
+    ====================================== -->
 
     <aside class="sidebar">
 
-      <div class="sidebar-top">
+      <div class="brand">
 
-        <a
-          class="brand"
-          href="index.html"
+        <img
+          src="logo.png"
+          alt="Logo Duvant 12"
+          class="brand-logo"
         >
-          <span class="brand-name">
-            DUVANT12
-          </span>
 
-          <span class="brand-subtitle">
-            INVENTARIO
-          </span>
-        </a>
-
-
-        <nav class="sidebar-nav">
-
-          <a
-            class="nav-link admin-only"
-            href="index.html"
-          >
-            Dashboard
-          </a>
-
-          <a
-            class="nav-link admin-only"
-            href="inventario.html"
-          >
-            Inventario
-          </a>
-
-          <a
-            class="nav-link"
-            href="vendedores.html"
-          >
-            Vendedores
-          </a>
-          \<a
-  href="ventas.html"
-  class="nav-link admin-only"
->
-  <span class="nav-icon">$</span>
-  <span>Ventas</span>
-</a>
-
-          <a
-            class="nav-link admin-only active"
-            href="usuarios.html"
-          >
-            Usuarios
-          </a>
-
-        </nav>
+        <div class="brand-text">
+          <strong>Duvant 12</strong>
+          <span>Fragrances House</span>
+        </div>
 
       </div>
 
 
+      <nav class="sidebar-nav">
+
+        <a
+          href="index.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Dashboard</span>
+        </a>
+
+        <a
+          href="inventario.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">▣</span>
+          <span>Inventario</span>
+        </a>
+
+        <a
+          href="vendedores.html"
+          class="nav-link"
+        >
+          <span class="nav-icon">◇</span>
+          <span>Vendedores</span>
+        </a>
+
+        <a
+          href="ventas.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">$</span>
+          <span>Ventas</span>
+        </a>
+
+        <a
+          href="usuarios.html"
+          class="nav-link active admin-only"
+        >
+          <span class="nav-icon">♙</span>
+          <span>Usuarios</span>
+        </a>
+
+      </nav>
+
+
+      <!-- CIERRE DE SESIÓN ESCRITORIO -->
+
       <div class="sidebar-bottom">
 
-        <div class="sidebar-user">
+        <div class="quote-card">
 
           <strong data-current-user>
-            Usuario
+            Administrador
           </strong>
 
           <span data-current-role>
             Administrador
           </span>
 
-        </div>
+          <div class="quote-divider"></div>
 
-        <button
-          class="logout-button"
-          data-logout
-          type="button"
-        >
-          Cerrar sesión
-        </button>
+          <button
+            class="logout-button"
+            data-logout
+            type="button"
+          >
+            Cerrar sesión
+          </button>
+
+        </div>
 
       </div>
 
     </aside>
 
 
-    <!-- CONTENIDO -->
+    <!-- =====================================
+         CONTENIDO PRINCIPAL
+    ====================================== -->
 
     <main class="main-content">
 
-      <header class="page-header">
+      <header class="topbar">
 
         <div>
 
-          <span class="eyebrow">
-            ADMINISTRACIÓN
+          <span class="topbar-label">
+            Administración
           </span>
 
           <h1>
@@ -150,19 +180,42 @@
 
         </div>
 
+
+        <div class="admin-profile">
+
+          <div class="admin-logo">
+            D12
+          </div>
+
+          <div class="admin-info">
+
+            <strong data-current-user>
+              Administrador
+            </strong>
+
+            <span>
+              Duvant 12
+            </span>
+
+          </div>
+
+        </div>
+
       </header>
 
 
-      <!-- CREAR VENDEDOR -->
+      <!-- =====================================
+           CREAR VENDEDOR
+      ====================================== -->
 
-      <section class="panel">
+      <section class="panel add-panel">
 
-        <div class="section-heading">
+        <div class="panel-heading">
 
           <div>
 
-            <span class="eyebrow">
-              NUEVO USUARIO
+            <span class="section-eyebrow">
+              Nuevo usuario
             </span>
 
             <h2>
@@ -170,6 +223,8 @@
             </h2>
 
           </div>
+
+          <span class="heading-line"></span>
 
         </div>
 
@@ -179,7 +234,7 @@
           class="perfume-form"
         >
 
-          <div class="form-group">
+          <div class="field">
 
             <label for="sellerFullName">
               Nombre completo
@@ -197,7 +252,7 @@
           </div>
 
 
-          <div class="form-group">
+          <div class="field">
 
             <label for="sellerEmail">
               Correo electrónico
@@ -214,7 +269,7 @@
           </div>
 
 
-          <div class="form-group">
+          <div class="field">
 
             <label for="sellerPassword">
               Contraseña
@@ -257,22 +312,24 @@
       </section>
 
 
-      <!-- CREDENCIALES -->
+      <!-- =====================================
+           CREDENCIALES
+      ====================================== -->
 
       <section
         id="credentialsPanel"
         class="panel hidden"
       >
 
-        <div class="section-heading">
+        <div class="panel-heading">
 
           <div>
 
             <span
               id="credentialsEyebrow"
-              class="eyebrow"
+              class="section-eyebrow"
             >
-              CREDENCIALES
+              Credenciales
             </span>
 
             <h2 id="credentialsTitle">
@@ -280,6 +337,8 @@
             </h2>
 
           </div>
+
+          <span class="heading-line"></span>
 
         </div>
 
@@ -354,16 +413,18 @@
       </section>
 
 
-      <!-- LISTA -->
+      <!-- =====================================
+           USUARIOS REGISTRADOS
+      ====================================== -->
 
-      <section class="panel">
+      <section class="panel inventory-panel">
 
-        <div class="section-heading">
+        <div class="panel-heading">
 
           <div>
 
-            <span class="eyebrow">
-              VENDEDORES
+            <span class="section-eyebrow">
+              Vendedores
             </span>
 
             <h2>
@@ -372,8 +433,18 @@
 
           </div>
 
+          <span class="heading-line"></span>
 
-          <div class="table-tools">
+        </div>
+
+
+        <div class="inventory-toolbar">
+
+          <div class="search-box">
+
+            <span>
+              ⌕
+            </span>
 
             <input
               id="userSearchInput"
@@ -387,7 +458,7 @@
         </div>
 
 
-        <div class="table-wrapper">
+        <div class="table-container">
 
           <table>
 
@@ -403,9 +474,7 @@
 
             </thead>
 
-
-            <tbody id="usersTableBody">
-            </tbody>
+            <tbody id="usersTableBody"></tbody>
 
           </table>
 
@@ -417,6 +486,10 @@
           class="empty-state"
           style="display: none;"
         >
+
+          <div class="empty-icon">
+            ♙
+          </div>
 
           <h3>
             No hay vendedores
@@ -431,14 +504,16 @@
       </section>
 
 
-      <!-- LOGOUT MÓVIL -->
+      <!-- =====================================
+           CERRAR SESIÓN MÓVIL
+      ====================================== -->
 
-      <section class="mobile-logout">
+      <div class="mobile-logout">
 
         <div class="mobile-user-info">
 
           <strong data-current-user>
-            Usuario
+            Administrador
           </strong>
 
           <span data-current-role>
@@ -448,21 +523,23 @@
         </div>
 
         <button
-          class="mobile-logout-button"
+          class="logout-button mobile-logout-button"
           data-logout
           type="button"
         >
           Cerrar sesión
         </button>
 
-      </section>
+      </div>
 
     </main>
 
   </div>
 
 
-  <!-- MODAL CAMBIAR CONTRASEÑA -->
+  <!-- =====================================
+       MODAL CAMBIAR CONTRASEÑA
+  ====================================== -->
 
   <div
     id="sellerPasswordModal"
@@ -487,8 +564,8 @@
 
         <div>
 
-          <span class="eyebrow">
-            SEGURIDAD
+          <span class="section-eyebrow">
+            Seguridad
           </span>
 
           <h2 id="sellerPasswordModalTitle">
@@ -523,7 +600,7 @@
       </div>
 
 
-      <div class="form-group">
+      <div class="field">
 
         <label for="newSellerPassword">
           Nueva contraseña
@@ -565,7 +642,9 @@
   </div>
 
 
-  <!-- TOAST -->
+  <!-- =====================================
+       TOAST
+  ====================================== -->
 
   <div
     id="toast"
@@ -575,7 +654,9 @@
   </div>
 
 
-  <!-- SUPABASE -->
+  <!-- =====================================
+       SUPABASE
+  ====================================== -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 

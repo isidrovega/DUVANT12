@@ -4374,169 +4374,169 @@ function initializeSellerPage() {
 
 
   /* ====================================
-     CONFIRMAR VENTA
-  ==================================== */
+   CONFIRMAR VENTA
+==================================== */
 
-  confirmButton
-    ?.addEventListener(
-      "click",
-      async () => {
-        if (
-          registeringSale ||
-          !selectedPerfume
-        ) {
-          return;
-        }
+confirmButton
+  ?.addEventListener(
+    "click",
+    async () => {
+      if (
+        registeringSale ||
+        !selectedPerfume
+      ) {
+        return;
+      }
 
-        const perfume = {
-          ...selectedPerfume
-        };
+      /*
+       * Guardamos el perfume antes de cerrar
+       * el modal, porque closeSaleModal()
+       * limpia selectedPerfume.
+       */
+      const perfume = {
+        ...selectedPerfume
+      };
 
-        registeringSale =
-          true;
+      registeringSale = true;
 
-        confirmButton.disabled =
-          true;
+      confirmButton.disabled = true;
+      confirmButton.textContent =
+        "Registrando...";
 
-        confirmButton.textContent =
-          "Registrando...";
 
-        try {
-          const result =
-            await registerSellerSale(
-              perfume.id
-            );
+      /*
+       * Cerramos el modal INMEDIATAMENTE
+       * después de confirmar.
+       */
+      closeSaleModal(true);
 
-          console.log(
-            "Venta registrada:",
-            result
+
+      /*
+       * Avisamos al vendedor que la operación
+       * comenzó.
+       */
+      showToast(
+        "Registrando venta..."
+      );
+
+
+      try {
+        const result =
+          await registerSellerSale(
+            perfume.id
           );
 
-          /*
-           * Recargamos el catálogo porque
-           * register_sale ya descontó una
-           * unidad en Supabase.
-           */
+        console.log(
+          "Venta registrada:",
+          result
+        );
+
+
+        /*
+         * Actualizamos el catálogo después
+         * de descontar la unidad.
+         */
+        await loadSellerCatalog();
+
+        render();
+
+
+        showToast(
+          `Venta registrada: ${perfume.name}`
+        );
+
+      } catch (error) {
+        console.error(
+          "Error registrando venta:",
+          error
+        );
+
+        const message =
+          String(
+            error?.message ||
+            ""
+          );
+
+        const normalizedMessage =
+          normalizeForComparison(
+            message
+          );
+
+
+        if (
+          normalizedMessage.includes(
+            "agotado"
+          )
+        ) {
+          showToast(
+            "El perfume ya está agotado."
+          );
+
+        } else if (
+          normalizedMessage.includes(
+            "desactivada"
+          )
+        ) {
+          showToast(
+            "Tu cuenta está desactivada."
+          );
+
+        } else if (
+          normalizedMessage.includes(
+            "solo los vendedores"
+          )
+        ) {
+          showToast(
+            "Solo los vendedores pueden registrar ventas."
+          );
+
+        } else if (
+          normalizedMessage.includes(
+            "iniciar sesion"
+          )
+        ) {
+          showToast(
+            "Tu sesión expiró. Inicia sesión nuevamente."
+          );
+
+        } else {
+          showToast(
+            message ||
+            "No se pudo registrar la venta."
+          );
+        }
+
+
+        /*
+         * Aunque haya error, volvemos a
+         * consultar el catálogo para mantener
+         * la pantalla sincronizada.
+         */
+        try {
           await loadSellerCatalog();
 
           render();
 
-          /*
-           * Cerramos únicamente después de
-           * que la operación terminó bien.
-           */
-          registeringSale =
-            false;
-
-          closeSaleModal(
-            true
-          );
-
-          showToast(
-            `Venta registrada: ${perfume.name}`
-          );
-
-        } catch (error) {
+        } catch (refreshError) {
           console.error(
-            "Error registrando venta:",
-            error
-          );
-
-          const message =
-            String(
-              error?.message ||
-              ""
-            );
-
-          const normalizedMessage =
-            normalizeForComparison(
-              message
-            );
-
-          if (
-            normalizedMessage.includes(
-              "agotado"
-            )
-          ) {
-            showToast(
-              "El perfume ya está agotado."
-            );
-
-          } else if (
-            normalizedMessage.includes(
-              "desactivada"
-            )
-          ) {
-            showToast(
-              "Tu cuenta está desactivada."
-            );
-
-          } else if (
-            normalizedMessage.includes(
-              "solo los vendedores"
-            )
-          ) {
-            showToast(
-              "Solo los vendedores pueden registrar ventas."
-            );
-
-          } else if (
-            normalizedMessage.includes(
-              "iniciar sesion"
-            )
-          ) {
-            showToast(
-              "Tu sesión expiró. Inicia sesión nuevamente."
-            );
-
-          } else {
-            /*
-             * Mostramos el error real para
-             * poder diagnosticar Supabase
-             * si algo falla.
-             */
-            showToast(
-              message ||
-              "No se pudo registrar la venta."
-            );
-          }
-
-          /*
-           * Volvemos a consultar el catálogo
-           * por seguridad.
-           */
-          try {
-            await loadSellerCatalog();
-
-            render();
-
-          } catch (
+            "Error actualizando catálogo:",
             refreshError
-          ) {
-            console.error(
-              "Error actualizando catálogo:",
-              refreshError
-            );
-          }
+          );
+        }
 
-        } finally {
-          registeringSale =
+      } finally {
+        registeringSale = false;
+
+        if (confirmButton) {
+          confirmButton.disabled =
             false;
 
-          if (
-            confirmButton &&
-            selectedPerfume
-          ) {
-            confirmButton.disabled =
-              false;
-
-            confirmButton.textContent =
-              "Confirmar venta";
-          }
+          confirmButton.textContent =
+            "Confirmar venta";
         }
       }
-    );
-
+    }
+  );
 
   /* ====================================
      FILTROS

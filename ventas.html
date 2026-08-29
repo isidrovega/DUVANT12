@@ -1,126 +1,1811 @@
-create or replace function public.delete_sale(
-  p_sale_id uuid
-)
-returns jsonb
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_user_id uuid;
-  v_profile public.profiles%rowtype;
-  v_sale public.sales%rowtype;
-  v_restored_quantity integer;
-begin
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
 
-  /* =====================================
-     USUARIO AUTENTICADO
-  ===================================== */
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  v_user_id := auth.uid();
+  <title>Duvant 12 | Ventas</title>
 
-  if v_user_id is null then
-    raise exception
-      'Debes iniciar sesión.';
-  end if;
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
 
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
-  /* =====================================
-     VALIDAR ADMINISTRADOR
-  ===================================== */
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
 
-  select *
-  into v_profile
-  from public.profiles
-  where id = v_user_id;
+  <script>
+    try {
+      const cachedProfile =
+        JSON.parse(
+          sessionStorage.getItem(
+            "duvant12_profile"
+          )
+        );
 
+      if (cachedProfile?.role) {
+        document.documentElement.dataset.role =
+          cachedProfile.role;
+      }
+    } catch (error) {
+      console.error(
+        "No se pudo leer el perfil almacenado:",
+        error
+      );
+    }
+  </script>
 
-  if not found then
-    raise exception
-      'No se encontró el perfil del usuario.';
-  end if;
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
 
+  <style>
+    /* =====================================
+       ELIMINAR VENTA
+    ====================================== */
 
-  if v_profile.active is not true then
-    raise exception
-      'Tu cuenta está desactivada.';
-  end if;
+    .sales-delete-button {
+      min-height: 38px;
+      padding: 8px 14px;
+      border: 1px solid rgba(220, 82, 82, 0.3);
+      border-radius: 8px;
+      background: rgba(180, 45, 45, 0.08);
+      color: #d6a0a0;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+    }
 
+    .sales-delete-button:hover {
+      background: rgba(190, 50, 50, 0.15);
+      border-color: rgba(220, 82, 82, 0.5);
+      color: #f0b6b6;
+    }
 
-  if v_profile.role <> 'admin' then
-    raise exception
-      'Solo los administradores pueden eliminar ventas.';
-  end if;
-
-
-  /* =====================================
-     OBTENER Y BLOQUEAR LA VENTA
-  ===================================== */
-
-  select *
-  into v_sale
-  from public.sales
-  where id = p_sale_id
-  for update;
-
-
-  if not found then
-    raise exception
-      'La venta no existe o ya fue eliminada.';
-  end if;
-
-
-  /* =====================================
-     DEVOLVER UNIDAD AL INVENTARIO
-  ===================================== */
-
-  update public.perfumes
-  set
-    quantity = quantity + 1,
-    updated_at = now()
-  where id = v_sale.perfume_id
-  returning quantity
-  into v_restored_quantity;
-
-
-  if not found then
-    raise exception
-      'No se encontró el perfume asociado a esta venta.';
-  end if;
+    .sales-delete-button:disabled {
+      cursor: wait;
+      opacity: 0.5;
+    }
 
 
-  /* =====================================
-     ELIMINAR VENTA
-  ===================================== */
+    /* =====================================
+       MODAL
+    ====================================== */
 
-  delete from public.sales
-  where id = p_sale_id;
+    .delete-sale-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 12000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .delete-sale-modal.hidden {
+      display: none !important;
+    }
+
+    .delete-sale-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .delete-sale-card {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 520px);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      background:
+        linear-gradient(
+          145deg,
+          #15171a,
+          #0c0d0f
+        );
+      box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.7);
+    }
+
+    .delete-sale-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 25px;
+      border-bottom:
+        1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .delete-sale-eyebrow {
+      display: block;
+      margin-bottom: 6px;
+      color: #b07777;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+    }
+
+    .delete-sale-header h2 {
+      margin: 0;
+      color: #fff;
+      font-size: 1.4rem;
+    }
+
+    .delete-sale-close {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border:
+        1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      background:
+        rgba(255, 255, 255, 0.04);
+      color: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    .delete-sale-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 26px;
+    }
+
+    .delete-sale-brand {
+      color: #94999f;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .delete-sale-details > strong {
+      color: #fff;
+      font-size: 1.5rem;
+    }
+
+    .delete-sale-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: #92979d;
+      font-size: 0.86rem;
+    }
+
+    .delete-sale-price {
+      margin-top: 8px;
+      color: #e3e5e7;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .delete-sale-seller {
+      margin-top: 8px;
+      color: #a5a9ae;
+      font-size: 0.85rem;
+    }
+
+    .delete-sale-warning {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 0 26px 24px;
+      padding: 14px;
+      border:
+        1px solid rgba(210, 75, 75, 0.22);
+      border-radius: 11px;
+      background:
+        rgba(180, 50, 50, 0.06);
+    }
+
+    .delete-sale-warning-icon {
+      width: 26px;
+      height: 26px;
+      flex: 0 0 26px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background:
+        rgba(190, 60, 60, 0.15);
+      color: #e1abab;
+      font-weight: 800;
+    }
+
+    .delete-sale-warning p {
+      margin: 1px 0 0;
+      color: #aaaeb3;
+      font-size: 0.84rem;
+      line-height: 1.5;
+    }
+
+    .delete-sale-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 20px 26px 26px;
+      border-top:
+        1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .delete-sale-cancel,
+    .delete-sale-confirm {
+      min-height: 50px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .delete-sale-cancel {
+      border:
+        1px solid rgba(255, 255, 255, 0.14);
+      background:
+        rgba(255, 255, 255, 0.04);
+      color: #d5d7da;
+    }
+
+    .delete-sale-confirm {
+      border:
+        1px solid rgba(210, 70, 70, 0.45);
+      background: #7e3030;
+      color: #fff;
+    }
+
+    .delete-sale-confirm:hover:not(:disabled) {
+      background: #984040;
+    }
+
+    .delete-sale-confirm:disabled {
+      cursor: wait;
+      opacity: 0.55;
+    }
+
+    @media (max-width: 768px) {
+      .delete-sale-modal {
+        align-items: flex-end;
+        padding: 0;
+      }
+
+      .delete-sale-card {
+        width: 100%;
+        border-right: 0;
+        border-bottom: 0;
+        border-left: 0;
+        border-radius:
+          22px 22px 0 0;
+      }
+
+      .delete-sale-actions {
+        grid-template-columns: 1fr;
+        padding-bottom:
+          calc(
+            22px +
+            env(safe-area-inset-bottom)
+          );
+      }
+
+      .delete-sale-confirm {
+        order: 1;
+      }
+
+      .delete-sale-cancel {
+        order: 2;
+      }
+    }
+  </style>
+</head>
+
+<body data-page="admin">
+
+  <div class="app">
+
+    <!-- =====================================
+         SIDEBAR
+    ====================================== -->
+
+    <aside class="sidebar">
+
+      <div class="brand">
+
+        <img
+          src="logo.png"
+          alt="Logo Duvant 12"
+          class="brand-logo"
+        >
+
+        <div class="brand-text">
+          <strong>Duvant 12</strong>
+          <span>Fragrances House</span>
+        </div>
+
+      </div>
 
 
-  /* =====================================
-     RESPUESTA
-  ===================================== */
+      <nav class="sidebar-nav">
 
-  return jsonb_build_object(
-    'success', true,
-    'saleId', v_sale.id,
-    'perfumeId', v_sale.perfume_id,
-    'perfumeName', v_sale.perfume_name,
-    'restoredQuantity', v_restored_quantity
-  );
+        <a
+          href="index.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Dashboard</span>
+        </a>
 
-end;
-$$;
+        <a
+          href="inventario.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">▣</span>
+          <span>Inventario</span>
+        </a>
+
+        <a
+          href="vendedores.html"
+          class="nav-link"
+        >
+          <span class="nav-icon">◇</span>
+          <span>Vendedores</span>
+        </a>
+
+        <a
+          href="ventas.html"
+          class="nav-link active admin-only"
+        >
+          <span class="nav-icon">$</span>
+          <span>Ventas</span>
+        </a>
+
+        <a
+          href="usuarios.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">♙</span>
+          <span>Usuarios</span>
+        </a>
+
+      </nav>
 
 
-/* =====================================
-   PERMISOS
-===================================== */
+      <div class="sidebar-bottom">
 
-revoke all
-on function public.delete_sale(uuid)
-from public;
+        <div class="quote-card">
 
-grant execute
-on function public.delete_sale(uuid)
-to authenticated;
+          <strong data-current-user>
+            Administrador
+          </strong>
+
+          <span data-current-role>
+            Administrador
+          </span>
+
+          <div class="quote-divider"></div>
+
+          <button
+            class="logout-button"
+            data-logout
+            type="button"
+          >
+            Cerrar sesión
+          </button>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =====================================
+         CONTENIDO
+    ====================================== -->
+
+    <main class="main-content">
+
+      <header class="topbar">
+
+        <div>
+
+          <span class="topbar-label">
+            Administración
+          </span>
+
+          <h1>
+            Ventas
+          </h1>
+
+          <p>
+            Consulta y administra las ventas registradas.
+          </p>
+
+        </div>
+
+
+        <div class="admin-profile">
+
+          <div class="admin-logo">
+            D12
+          </div>
+
+          <div class="admin-info">
+
+            <strong data-current-user>
+              Administrador
+            </strong>
+
+            <span>
+              Duvant 12
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+
+      <!-- =====================================
+           ESTADÍSTICAS
+      ====================================== -->
+
+      <section class="sales-stats-grid">
+
+        <article class="sales-stat-card">
+
+          <span>
+            Ventas de hoy
+          </span>
+
+          <strong id="salesToday">
+            0
+          </strong>
+
+          <small>
+            Unidades registradas hoy
+          </small>
+
+        </article>
+
+
+        <article class="sales-stat-card">
+
+          <span>
+            Ingresos de hoy
+          </span>
+
+          <strong id="revenueToday">
+            $0.00
+          </strong>
+
+          <small>
+            Total vendido hoy
+          </small>
+
+        </article>
+
+
+        <article class="sales-stat-card">
+
+          <span>
+            Ventas del mes
+          </span>
+
+          <strong id="salesMonth">
+            0
+          </strong>
+
+          <small>
+            Unidades registradas este mes
+          </small>
+
+        </article>
+
+
+        <article class="sales-stat-card">
+
+          <span>
+            Ingresos del mes
+          </span>
+
+          <strong id="revenueMonth">
+            $0.00
+          </strong>
+
+          <small>
+            Total vendido este mes
+          </small>
+
+        </article>
+
+      </section>
+
+
+      <!-- =====================================
+           HISTORIAL
+      ====================================== -->
+
+      <section class="panel inventory-panel">
+
+        <div class="sales-panel-heading">
+
+          <div>
+
+            <span class="section-eyebrow">
+              Historial
+            </span>
+
+            <h2>
+              Ventas registradas
+            </h2>
+
+          </div>
+
+        </div>
+
+
+        <div class="sales-toolbar">
+
+          <div class="search-box">
+
+            <span>⌕</span>
+
+            <input
+              id="salesSearchInput"
+              type="search"
+              placeholder="Buscar perfume, código o vendedor..."
+            >
+
+          </div>
+
+
+          <div class="sales-filters">
+
+            <select
+              id="salesSellerFilter"
+              class="filter-select"
+            >
+              <option value="Todos">
+                Todos los vendedores
+              </option>
+            </select>
+
+
+            <input
+              id="salesDateFilter"
+              class="sales-date-filter"
+              type="date"
+              aria-label="Filtrar por fecha"
+            >
+
+
+            <button
+              id="clearSalesFiltersButton"
+              class="outline-button"
+              type="button"
+            >
+              Limpiar
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="table-container">
+
+          <table class="sales-table">
+
+            <thead>
+
+              <tr>
+                <th>Perfume</th>
+                <th>Vendedor</th>
+                <th>Precio</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Acciones</th>
+              </tr>
+
+            </thead>
+
+            <tbody id="salesTableBody">
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <div
+          id="salesEmptyState"
+          class="empty-state"
+        >
+
+          <div class="empty-icon">
+            $
+          </div>
+
+          <h3>
+            No hay ventas
+          </h3>
+
+          <p>
+            Las ventas registradas aparecerán aquí.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================
+           LOGOUT MÓVIL
+      ====================================== -->
+
+      <div class="mobile-logout">
+
+        <div class="mobile-user-info">
+
+          <strong data-current-user>
+            Administrador
+          </strong>
+
+          <span data-current-role>
+            Administrador
+          </span>
+
+        </div>
+
+        <button
+          class="logout-button mobile-logout-button"
+          data-logout
+          type="button"
+        >
+          Cerrar sesión
+        </button>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================
+       MODAL ELIMINAR VENTA
+  ====================================== -->
+
+  <div
+    id="deleteSaleModal"
+    class="delete-sale-modal hidden"
+    aria-hidden="true"
+  >
+
+    <div
+      class="delete-sale-backdrop"
+      data-close-delete-sale
+    ></div>
+
+
+    <section
+      class="delete-sale-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="deleteSaleTitle"
+    >
+
+      <div class="delete-sale-header">
+
+        <div>
+
+          <span class="delete-sale-eyebrow">
+            ELIMINAR VENTA
+          </span>
+
+          <h2 id="deleteSaleTitle">
+            ¿Eliminar esta venta?
+          </h2>
+
+        </div>
+
+
+        <button
+          class="delete-sale-close"
+          data-close-delete-sale
+          type="button"
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="delete-sale-details">
+
+        <span
+          id="deleteSaleBrand"
+          class="delete-sale-brand"
+        >
+          —
+        </span>
+
+        <strong id="deleteSaleName">
+          —
+        </strong>
+
+
+        <div class="delete-sale-meta">
+
+          <span id="deleteSaleSize">
+            —
+          </span>
+
+          <span>•</span>
+
+          <span id="deleteSaleCode">
+            —
+          </span>
+
+        </div>
+
+
+        <span
+          id="deleteSalePrice"
+          class="delete-sale-price"
+        >
+          $0.00
+        </span>
+
+
+        <span
+          id="deleteSaleSeller"
+          class="delete-sale-seller"
+        >
+          Vendido por —
+        </span>
+
+
+        <span
+          id="deleteSaleDate"
+          class="delete-sale-seller"
+        >
+          —
+        </span>
+
+      </div>
+
+
+      <div class="delete-sale-warning">
+
+        <span class="delete-sale-warning-icon">
+          !
+        </span>
+
+        <p>
+          Al eliminar esta venta se devolverá automáticamente
+          una unidad al inventario. Esta acción debe utilizarse
+          únicamente para corregir ventas registradas por error.
+        </p>
+
+      </div>
+
+
+      <div class="delete-sale-actions">
+
+        <button
+          id="cancelDeleteSaleButton"
+          class="delete-sale-cancel"
+          type="button"
+        >
+          Cancelar
+        </button>
+
+        <button
+          id="confirmDeleteSaleButton"
+          class="delete-sale-confirm"
+          type="button"
+        >
+          Eliminar venta
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- =====================================
+       TOAST
+  ====================================== -->
+
+  <div
+    id="toast"
+    class="toast"
+  >
+    <span id="toastMessage"></span>
+  </div>
+
+
+  <!-- =====================================
+       SCRIPTS
+  ====================================== -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="supabase-config.js"></script>
+
+  <script src="script.js"></script>
+
+
+  <!-- =====================================
+       LÓGICA ESPECÍFICA DE VENTAS
+       CON ELIMINACIÓN
+  ====================================== -->
+
+  <script>
+    /*
+     * Este bloque reemplaza la función
+     * initializeSalesPage() que existe en
+     * script.js antes de que DOMContentLoaded
+     * ejecute initializeApp().
+     */
+
+    initializeSalesPage =
+      function initializeSalesPageWithDelete() {
+
+        const tableBody =
+          document.getElementById(
+            "salesTableBody"
+          );
+
+        if (!tableBody) {
+          return;
+        }
+
+
+        const searchInput =
+          document.getElementById(
+            "salesSearchInput"
+          );
+
+        const sellerFilter =
+          document.getElementById(
+            "salesSellerFilter"
+          );
+
+        const dateFilter =
+          document.getElementById(
+            "salesDateFilter"
+          );
+
+        const clearButton =
+          document.getElementById(
+            "clearSalesFiltersButton"
+          );
+
+        const emptyState =
+          document.getElementById(
+            "salesEmptyState"
+          );
+
+
+        /* =================================
+           MODAL
+        ================================= */
+
+        const modal =
+          document.getElementById(
+            "deleteSaleModal"
+          );
+
+        const modalBrand =
+          document.getElementById(
+            "deleteSaleBrand"
+          );
+
+        const modalName =
+          document.getElementById(
+            "deleteSaleName"
+          );
+
+        const modalSize =
+          document.getElementById(
+            "deleteSaleSize"
+          );
+
+        const modalCode =
+          document.getElementById(
+            "deleteSaleCode"
+          );
+
+        const modalPrice =
+          document.getElementById(
+            "deleteSalePrice"
+          );
+
+        const modalSeller =
+          document.getElementById(
+            "deleteSaleSeller"
+          );
+
+        const modalDate =
+          document.getElementById(
+            "deleteSaleDate"
+          );
+
+        const cancelDeleteButton =
+          document.getElementById(
+            "cancelDeleteSaleButton"
+          );
+
+        const confirmDeleteButton =
+          document.getElementById(
+            "confirmDeleteSaleButton"
+          );
+
+
+        let selectedSale = null;
+        let deletingSale = false;
+
+
+        /* =================================
+           ESTADÍSTICAS
+        ================================= */
+
+        function updateStatistics() {
+          const now =
+            new Date();
+
+          const todayKey =
+            getLocalDateKey(
+              now
+            );
+
+          const currentYear =
+            now.getFullYear();
+
+          const currentMonth =
+            now.getMonth();
+
+
+          const todaySales =
+            adminSales.filter(
+              (sale) =>
+                getLocalDateKey(
+                  sale.createdAt
+                ) === todayKey
+            );
+
+
+          const monthSales =
+            adminSales.filter(
+              (sale) => {
+                const date =
+                  new Date(
+                    sale.createdAt
+                  );
+
+                return (
+                  !Number.isNaN(
+                    date.getTime()
+                  ) &&
+                  date.getFullYear() ===
+                    currentYear &&
+                  date.getMonth() ===
+                    currentMonth
+                );
+              }
+            );
+
+
+          const todayRevenue =
+            todaySales.reduce(
+              (total, sale) =>
+                total +
+                sale.salePrice,
+              0
+            );
+
+
+          const monthRevenue =
+            monthSales.reduce(
+              (total, sale) =>
+                total +
+                sale.salePrice,
+              0
+            );
+
+
+          setText(
+            "salesToday",
+            todaySales.length
+          );
+
+          setText(
+            "revenueToday",
+            formatCurrency(
+              todayRevenue
+            )
+          );
+
+          setText(
+            "salesMonth",
+            monthSales.length
+          );
+
+          setText(
+            "revenueMonth",
+            formatCurrency(
+              monthRevenue
+            )
+          );
+        }
+
+
+        /* =================================
+           VENDEDORES DEL FILTRO
+        ================================= */
+
+        function populateSellerFilter() {
+          if (!sellerFilter) {
+            return;
+          }
+
+          const currentValue =
+            sellerFilter.value;
+
+          const sellers =
+            new Map();
+
+
+          adminSales.forEach(
+            (sale) => {
+              if (!sale.sellerId) {
+                return;
+              }
+
+              sellers.set(
+                String(
+                  sale.sellerId
+                ),
+                sale.sellerName ||
+                "Vendedor"
+              );
+            }
+          );
+
+
+          const sorted =
+            [...sellers.entries()]
+              .sort(
+                (a, b) =>
+                  a[1].localeCompare(
+                    b[1],
+                    "es",
+                    {
+                      sensitivity:
+                        "base"
+                    }
+                  )
+              );
+
+
+          sellerFilter.innerHTML = `
+            <option value="Todos">
+              Todos los vendedores
+            </option>
+
+            ${sorted
+              .map(
+                ([id, name]) => `
+                  <option
+                    value="${escapeHTML(
+                      id
+                    )}"
+                  >
+                    ${escapeHTML(
+                      name
+                    )}
+                  </option>
+                `
+              )
+              .join("")}
+          `;
+
+
+          if (
+            [...sellerFilter.options]
+              .some(
+                (option) =>
+                  option.value ===
+                  currentValue
+              )
+          ) {
+            sellerFilter.value =
+              currentValue;
+          }
+        }
+
+
+        /* =================================
+           FILTROS
+        ================================= */
+
+        function filteredSales() {
+          const query =
+            normalizeText(
+              searchInput?.value ||
+              ""
+            );
+
+          const sellerId =
+            sellerFilter?.value ||
+            "Todos";
+
+          const selectedDate =
+            dateFilter?.value ||
+            "";
+
+
+          return adminSales.filter(
+            (sale) => {
+              const searchable =
+                normalizeText(
+                  [
+                    sale.perfumeName,
+                    sale.perfumeBrand,
+                    sale.perfumeSize,
+                    sale.perfumeCode,
+                    sale.sellerName,
+                    sale.sellerEmail
+                  ].join(" ")
+                );
+
+
+              const matchesSearch =
+                searchable.includes(
+                  query
+                );
+
+
+              const matchesSeller =
+                sellerId ===
+                  "Todos" ||
+                String(
+                  sale.sellerId
+                ) === sellerId;
+
+
+              const matchesDate =
+                !selectedDate ||
+                getLocalDateKey(
+                  sale.createdAt
+                ) === selectedDate;
+
+
+              return (
+                matchesSearch &&
+                matchesSeller &&
+                matchesDate
+              );
+            }
+          );
+        }
+
+
+        /* =================================
+           RENDER
+        ================================= */
+
+        function renderSales() {
+          const sales =
+            filteredSales();
+
+          tableBody.innerHTML =
+            "";
+
+
+          if (emptyState) {
+            emptyState.style.display =
+              sales.length === 0
+                ? "block"
+                : "none";
+          }
+
+
+          sales.forEach(
+            (sale) => {
+              const row =
+                document.createElement(
+                  "tr"
+                );
+
+
+              row.innerHTML = `
+                <td>
+
+                  <div class="sales-product-cell">
+
+                    <strong>
+                      ${escapeHTML(
+                        sale.perfumeName
+                      )}
+                    </strong>
+
+                    <span>
+                      ${escapeHTML(
+                        sale.perfumeBrand
+                      )}
+                      ·
+                      ${escapeHTML(
+                        sale.perfumeSize
+                      )}
+                    </span>
+
+                    <small>
+                      ${escapeHTML(
+                        sale.perfumeCode
+                      )}
+                    </small>
+
+                  </div>
+
+                </td>
+
+
+                <td>
+
+                  <div class="sales-seller-cell">
+
+                    <strong>
+                      ${escapeHTML(
+                        sale.sellerName
+                      )}
+                    </strong>
+
+                    <span>
+                      ${escapeHTML(
+                        sale.sellerEmail ||
+                        "—"
+                      )}
+                    </span>
+
+                  </div>
+
+                </td>
+
+
+                <td>
+
+                  <strong class="sales-price">
+                    ${formatCurrency(
+                      sale.salePrice
+                    )}
+                  </strong>
+
+                </td>
+
+
+                <td>
+                  ${escapeHTML(
+                    formatSaleDate(
+                      sale.createdAt
+                    )
+                  )}
+                </td>
+
+
+                <td>
+                  ${escapeHTML(
+                    formatSaleTime(
+                      sale.createdAt
+                    )
+                  )}
+                </td>
+
+
+                <td>
+
+                  <button
+                    class="sales-delete-button"
+                    data-delete-sale-id="${escapeHTML(
+                      sale.id
+                    )}"
+                    type="button"
+                  >
+                    Eliminar
+                  </button>
+
+                </td>
+              `;
+
+
+              tableBody.appendChild(
+                row
+              );
+            }
+          );
+        }
+
+
+        function renderEverything() {
+          updateStatistics();
+
+          populateSellerFilter();
+
+          renderSales();
+        }
+
+
+        /* =================================
+           ABRIR MODAL
+        ================================= */
+
+        function openDeleteModal(
+          sale
+        ) {
+          if (
+            !modal ||
+            !sale
+          ) {
+            return;
+          }
+
+          selectedSale = sale;
+
+
+          modalBrand.textContent =
+            sale.perfumeBrand ||
+            "—";
+
+          modalName.textContent =
+            sale.perfumeName ||
+            "—";
+
+          modalSize.textContent =
+            sale.perfumeSize ||
+            "—";
+
+          modalCode.textContent =
+            sale.perfumeCode ||
+            "—";
+
+          modalPrice.textContent =
+            formatCurrency(
+              sale.salePrice
+            );
+
+          modalSeller.textContent =
+            `Vendido por ${
+              sale.sellerName ||
+              "Vendedor"
+            }`;
+
+          modalDate.textContent =
+            `${formatSaleDate(
+              sale.createdAt
+            )} · ${formatSaleTime(
+              sale.createdAt
+            )}`;
+
+
+          confirmDeleteButton.disabled =
+            false;
+
+          confirmDeleteButton.textContent =
+            "Eliminar venta";
+
+
+          modal.classList.remove(
+            "hidden"
+          );
+
+          modal.setAttribute(
+            "aria-hidden",
+            "false"
+          );
+
+          document.body.classList.add(
+            "modal-open"
+          );
+        }
+
+
+        /* =================================
+           CERRAR MODAL
+        ================================= */
+
+        function closeDeleteModal(
+          force = false
+        ) {
+          if (
+            deletingSale &&
+            !force
+          ) {
+            return;
+          }
+
+          modal?.classList.add(
+            "hidden"
+          );
+
+          modal?.setAttribute(
+            "aria-hidden",
+            "true"
+          );
+
+          document.body.classList.remove(
+            "modal-open"
+          );
+
+          selectedSale = null;
+        }
+
+
+        /* =================================
+           BOTÓN ELIMINAR DE LA TABLA
+        ================================= */
+
+        tableBody.addEventListener(
+          "click",
+          (event) => {
+            const button =
+              event.target.closest(
+                "[data-delete-sale-id]"
+              );
+
+            if (!button) {
+              return;
+            }
+
+
+            const sale =
+              adminSales.find(
+                (item) =>
+                  String(item.id) ===
+                  String(
+                    button.dataset
+                      .deleteSaleId
+                  )
+              );
+
+
+            if (!sale) {
+              showToast(
+                "No se encontró la venta."
+              );
+
+              return;
+            }
+
+
+            openDeleteModal(
+              sale
+            );
+          }
+        );
+
+
+        /* =================================
+           CERRAR MODAL
+        ================================= */
+
+        document
+          .querySelectorAll(
+            "[data-close-delete-sale]"
+          )
+          .forEach(
+            (element) => {
+              element.addEventListener(
+                "click",
+                () => {
+                  closeDeleteModal();
+                }
+              );
+            }
+          );
+
+
+        cancelDeleteButton
+          ?.addEventListener(
+            "click",
+            () => {
+              closeDeleteModal();
+            }
+          );
+
+
+        document.addEventListener(
+          "keydown",
+          (event) => {
+            if (
+              event.key ===
+                "Escape" &&
+              modal &&
+              !modal.classList.contains(
+                "hidden"
+              )
+            ) {
+              closeDeleteModal();
+            }
+          }
+        );
+
+
+        /* =================================
+           CONFIRMAR ELIMINACIÓN
+        ================================= */
+
+        confirmDeleteButton
+          ?.addEventListener(
+            "click",
+            async () => {
+              if (
+                deletingSale ||
+                !selectedSale
+              ) {
+                return;
+              }
+
+
+              const sale = {
+                ...selectedSale
+              };
+
+
+              deletingSale = true;
+
+              confirmDeleteButton.disabled =
+                true;
+
+              confirmDeleteButton.textContent =
+                "Eliminando...";
+
+
+              try {
+                const {
+                  data,
+                  error
+                } =
+                  await supabaseClient.rpc(
+                    "delete_sale",
+                    {
+                      p_sale_id:
+                        sale.id
+                    }
+                  );
+
+
+                if (error) {
+                  console.error(
+                    "Error delete_sale:",
+                    error
+                  );
+
+                  throw new Error(
+                    error.message ||
+                    error.details ||
+                    "No se pudo eliminar la venta."
+                  );
+                }
+
+
+                console.log(
+                  "Venta eliminada:",
+                  data
+                );
+
+
+                /*
+                 * Volvemos a cargar desde
+                 * Supabase para mantener toda
+                 * la información sincronizada.
+                 */
+                await loadAdminSales();
+
+
+                deletingSale = false;
+
+                closeDeleteModal(
+                  true
+                );
+
+
+                renderEverything();
+
+
+                showToast(
+                  "Venta eliminada y unidad devuelta al inventario."
+                );
+
+              } catch (error) {
+                console.error(
+                  "No se pudo eliminar la venta:",
+                  error
+                );
+
+
+                showToast(
+                  error.message ||
+                  "No se pudo eliminar la venta."
+                );
+
+              } finally {
+                deletingSale = false;
+
+
+                if (
+                  confirmDeleteButton &&
+                  selectedSale
+                ) {
+                  confirmDeleteButton.disabled =
+                    false;
+
+                  confirmDeleteButton.textContent =
+                    "Eliminar venta";
+                }
+              }
+            }
+          );
+
+
+        /* =================================
+           FILTROS
+        ================================= */
+
+        searchInput
+          ?.addEventListener(
+            "input",
+            renderSales
+          );
+
+
+        sellerFilter
+          ?.addEventListener(
+            "change",
+            renderSales
+          );
+
+
+        dateFilter
+          ?.addEventListener(
+            "change",
+            renderSales
+          );
+
+
+        clearButton
+          ?.addEventListener(
+            "click",
+            () => {
+              if (searchInput) {
+                searchInput.value =
+                  "";
+              }
+
+              if (sellerFilter) {
+                sellerFilter.value =
+                  "Todos";
+              }
+
+              if (dateFilter) {
+                dateFilter.value =
+                  "";
+              }
+
+              renderSales();
+            }
+          );
+
+
+        /* =================================
+           CARGA INICIAL
+        ================================= */
+
+        async function load() {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="6">
+                <div class="sales-loading">
+                  Cargando ventas...
+                </div>
+              </td>
+            </tr>
+          `;
+
+
+          if (emptyState) {
+            emptyState.style.display =
+              "none";
+          }
+
+
+          try {
+            await loadAdminSales();
+
+            renderEverything();
+
+          } catch (error) {
+            console.error(
+              "Error cargando ventas:",
+              error
+            );
+
+
+            tableBody.innerHTML =
+              "";
+
+
+            if (emptyState) {
+              emptyState.style.display =
+                "block";
+
+
+              const title =
+                emptyState.querySelector(
+                  "h3"
+                );
+
+              const paragraph =
+                emptyState.querySelector(
+                  "p"
+                );
+
+
+              if (title) {
+                title.textContent =
+                  "No se pudieron cargar las ventas";
+              }
+
+
+              if (paragraph) {
+                paragraph.textContent =
+                  error.message ||
+                  "Intenta nuevamente.";
+              }
+            }
+
+
+            showToast(
+              error.message ||
+              "No se pudieron cargar las ventas."
+            );
+          }
+        }
+
+
+        load();
+      };
+  </script>
+
+</body>
+</html>

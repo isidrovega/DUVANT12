@@ -1,6 +1,11 @@
 let perfumes = [];
 let sellerCatalog = [];
 let excelImportRows = [];
+let adminSales = [];
+
+let sellerUsers = [];
+let latestSellerCredentials = null;
+let selectedSellerForPassword = null;
 
 
 /* ======================================
@@ -25,31 +30,15 @@ function normalizeForComparison(value) {
 }
 
 
-/*
- * Orden natural de códigos.
- *
- * Ejemplo:
- * D12-1
- * D12-2
- * D12-10
- * D12-11
- *
- * En vez de:
- * D12-1
- * D12-10
- * D12-11
- * D12-2
- */
 function compareCodes(codeA, codeB) {
-  return String(codeA ?? "")
-    .localeCompare(
-      String(codeB ?? ""),
-      undefined,
-      {
-        numeric: true,
-        sensitivity: "base"
-      }
-    );
+  return String(codeA ?? "").localeCompare(
+    String(codeB ?? ""),
+    undefined,
+    {
+      numeric: true,
+      sensitivity: "base"
+    }
+  );
 }
 
 
@@ -98,12 +87,124 @@ function setText(id, value) {
 
 
 function roundMoney(value) {
-  return Math.round(
-    (
-      Number(value) +
-      Number.EPSILON
-    ) * 100
-  ) / 100;
+  return (
+    Math.round(
+      (
+        Number(value) +
+        Number.EPSILON
+      ) * 100
+    ) / 100
+  );
+}
+
+
+/* ======================================
+   TAMAÑO DE PERFUME
+====================================== */
+
+/*
+ * En el formulario solamente escribimos:
+ *
+ * 50
+ * 75
+ * 100
+ * 125
+ *
+ * Y el sistema guarda:
+ *
+ * 50 ML
+ * 75 ML
+ * 100 ML
+ * 125 ML
+ */
+function formatPerfumeSize(value) {
+  const raw =
+    String(value ?? "")
+      .trim();
+
+
+  if (!raw) {
+    return "";
+  }
+
+
+  const match =
+    raw.match(/\d+/);
+
+
+  if (!match) {
+    return "";
+  }
+
+
+  const number =
+    Number.parseInt(
+      match[0],
+      10
+    );
+
+
+  if (
+    !Number.isInteger(number) ||
+    number <= 0
+  ) {
+    return "";
+  }
+
+
+  return `${number} ML`;
+}
+
+
+/*
+ * Convierte:
+ *
+ * "100 ML" -> "100"
+ * "100 ml" -> "100"
+ * "100"    -> "100"
+ *
+ * Se utiliza cuando editamos un perfume.
+ */
+function getPerfumeSizeNumber(value) {
+  const match =
+    String(value ?? "")
+      .match(/\d+/);
+
+
+  if (!match) {
+    return "";
+  }
+
+
+  const number =
+    Number.parseInt(
+      match[0],
+      10
+    );
+
+
+  return Number.isInteger(number)
+    ? String(number)
+    : "";
+}
+
+
+/*
+ * Compara tamaños aunque un registro viejo
+ * todavía diga "100" y otro diga "100 ML".
+ */
+function normalizePerfumeSizeForComparison(
+  value
+) {
+  const formatted =
+    formatPerfumeSize(
+      value
+    );
+
+
+  return normalizeForComparison(
+    formatted || value
+  );
 }
 
 
@@ -129,8 +230,12 @@ function showToast(message) {
         "div"
       );
 
-    toast.id = "toast";
-    toast.className = "toast";
+    toast.id =
+      "toast";
+
+    toast.className =
+      "toast";
+
 
     toastMessage =
       document.createElement(
@@ -139,6 +244,7 @@ function showToast(message) {
 
     toastMessage.id =
       "toastMessage";
+
 
     toast.appendChild(
       toastMessage
@@ -187,15 +293,22 @@ function showToast(message) {
 
 function mapPerfumeFromDatabase(row) {
   return {
-    id: row.id,
+    id:
+      row.id,
 
-    name: row.name,
+    name:
+      row.name,
 
-    brand: row.brand,
+    brand:
+      row.brand,
 
-    category: row.category,
+    category:
+      row.category,
 
-    size: row.size,
+    size:
+      formatPerfumeSize(
+        row.size
+      ) || row.size,
 
     purchasePrice:
       Number(
@@ -212,7 +325,8 @@ function mapPerfumeFromDatabase(row) {
         row.quantity
       ) || 0,
 
-    code: row.code,
+    code:
+      row.code,
 
     createdAt:
       row.created_at,
@@ -233,9 +347,11 @@ async function getProfile(userId) {
     error
   } =
     await supabaseClient
-      .from("profiles")
+      .from(
+        "profiles"
+      )
       .select(
-        "id, full_name, role, active"
+        "id, full_name, email, role, active"
       )
       .eq(
         "id",
@@ -249,6 +365,7 @@ async function getProfile(userId) {
       "Error obteniendo perfil:",
       error
     );
+
 
     throw new Error(
       "No se pudo obtener el perfil."
@@ -292,18 +409,22 @@ async function getAuthenticatedUser() {
 
 
 /* ======================================
-   CACHE DEL PERFIL
+   CACHE PERFIL
 ====================================== */
 
 function cacheProfile(profile) {
   sessionStorage.setItem(
     "duvant12_profile",
-    JSON.stringify(profile)
+    JSON.stringify(
+      profile
+    )
   );
 
 
-  document.documentElement.dataset.role =
-    profile.role;
+  document.documentElement
+    .dataset
+    .role =
+      profile.role;
 }
 
 
@@ -341,24 +462,20 @@ async function initializeLoginPage() {
       "loginEmail"
     );
 
-
   const passwordInput =
     document.getElementById(
       "loginPassword"
     );
-
 
   const errorElement =
     document.getElementById(
       "loginError"
     );
 
-
   const loginButton =
     document.getElementById(
       "loginButton"
     );
-
 
   const togglePassword =
     document.getElementById(
@@ -385,7 +502,8 @@ async function initializeLoginPage() {
 
 
         window.location.href =
-          profile.role === "admin"
+          profile.role ===
+          "admin"
             ? "index.html"
             : "vendedores.html";
 
@@ -401,8 +519,8 @@ async function initializeLoginPage() {
   }
 
 
-  if (togglePassword) {
-    togglePassword.addEventListener(
+  togglePassword
+    ?.addEventListener(
       "click",
       () => {
         const hidden =
@@ -422,7 +540,6 @@ async function initializeLoginPage() {
             : "Ver";
       }
     );
-  }
 
 
   loginForm.addEventListener(
@@ -431,16 +548,19 @@ async function initializeLoginPage() {
       event.preventDefault();
 
 
-      errorElement.textContent =
-        "";
+      if (errorElement) {
+        errorElement.textContent =
+          "";
+      }
 
 
-      loginButton.disabled =
-        true;
+      if (loginButton) {
+        loginButton.disabled =
+          true;
 
-
-      loginButton.textContent =
-        "Ingresando...";
+        loginButton.textContent =
+          "Ingresando...";
+      }
 
 
       const email =
@@ -473,8 +593,10 @@ async function initializeLoginPage() {
           );
 
 
-          errorElement.textContent =
-            error.message;
+          if (errorElement) {
+            errorElement.textContent =
+              error.message;
+          }
 
 
           return;
@@ -496,8 +618,10 @@ async function initializeLoginPage() {
           clearCachedProfile();
 
 
-          errorElement.textContent =
-            "Esta cuenta está desactivada.";
+          if (errorElement) {
+            errorElement.textContent =
+              "Esta cuenta está desactivada.";
+          }
 
 
           return;
@@ -510,7 +634,8 @@ async function initializeLoginPage() {
 
 
         window.location.href =
-          profile.role === "admin"
+          profile.role ===
+          "admin"
             ? "index.html"
             : "vendedores.html";
 
@@ -520,16 +645,19 @@ async function initializeLoginPage() {
         );
 
 
-        errorElement.textContent =
-          "No se pudo iniciar sesión.";
+        if (errorElement) {
+          errorElement.textContent =
+            "No se pudo iniciar sesión.";
+        }
 
       } finally {
-        loginButton.disabled =
-          false;
+        if (loginButton) {
+          loginButton.disabled =
+            false;
 
-
-        loginButton.textContent =
-          "Iniciar sesión";
+          loginButton.textContent =
+            "Iniciar sesión";
+        }
       }
     }
   );
@@ -598,12 +726,15 @@ async function protectCurrentPage() {
 
 
     const requiredPage =
-      document.body.dataset.page;
+      document.body.dataset
+        .page;
 
 
     if (
-      requiredPage === "admin" &&
-      profile.role !== "admin"
+      requiredPage ===
+        "admin" &&
+      profile.role !==
+        "admin"
     ) {
       window.location.replace(
         "vendedores.html"
@@ -671,10 +802,12 @@ async function logout() {
 
 
 /* ======================================
-   INTERFAZ POR ROL
+   INTERFAZ SEGÚN ROL
 ====================================== */
 
-function configureUserInterface(profile) {
+function configureUserInterface(
+  profile
+) {
   document
     .querySelectorAll(
       "[data-current-user]"
@@ -682,7 +815,13 @@ function configureUserInterface(profile) {
     .forEach(
       (element) => {
         element.textContent =
-          profile.full_name;
+          profile.full_name ||
+          (
+            profile.role ===
+            "admin"
+              ? "Administrador"
+              : "Vendedor"
+          );
       }
     );
 
@@ -694,7 +833,8 @@ function configureUserInterface(profile) {
     .forEach(
       (element) => {
         element.textContent =
-          profile.role === "admin"
+          profile.role ===
+          "admin"
             ? "Administrador"
             : "Vendedor";
       }
@@ -702,7 +842,8 @@ function configureUserInterface(profile) {
 
 
   if (
-    profile.role !== "admin"
+    profile.role !==
+    "admin"
   ) {
     document
       .querySelectorAll(
@@ -743,7 +884,9 @@ async function loadInventoryFromSupabase() {
     error
   } =
     await supabaseClient
-      .from("perfumes")
+      .from(
+        "perfumes"
+      )
       .select(`
         id,
         name,
@@ -770,20 +913,6 @@ async function loadInventoryFromSupabase() {
   }
 
 
-  /*
-   * Ordenamos en JavaScript con comparación
-   * natural para evitar problemas como:
-   *
-   * D12-1
-   * D12-10
-   * D12-2
-   *
-   * El resultado correcto será:
-   *
-   * D12-1
-   * D12-2
-   * D12-10
-   */
   perfumes =
     (data || [])
       .map(
@@ -814,7 +943,9 @@ async function addPerfumeToSupabase(
     error
   } =
     await supabaseClient
-      .from("perfumes")
+      .from(
+        "perfumes"
+      )
       .insert({
         name:
           perfume.name,
@@ -826,7 +957,9 @@ async function addPerfumeToSupabase(
           perfume.category,
 
         size:
-          perfume.size,
+          formatPerfumeSize(
+            perfume.size
+          ),
 
         purchase_price:
           perfume.purchasePrice,
@@ -863,12 +996,20 @@ async function updatePerfumeInSupabase(
   id,
   perfume
 ) {
+  const normalizedSize =
+    formatPerfumeSize(
+      perfume.size
+    );
+
+
   const {
     data,
     error
   } =
     await supabaseClient
-      .from("perfumes")
+      .from(
+        "perfumes"
+      )
       .update({
         name:
           perfume.name,
@@ -880,6 +1021,7 @@ async function updatePerfumeInSupabase(
           perfume.category,
 
         size:
+          normalizedSize ||
           perfume.size,
 
         purchase_price:
@@ -926,7 +1068,9 @@ async function updateStockInSupabase(
     error
   } =
     await supabaseClient
-      .from("perfumes")
+      .from(
+        "perfumes"
+      )
       .update({
         quantity:
           newQuantity
@@ -961,7 +1105,9 @@ async function deletePerfumeFromSupabase(
     error
   } =
     await supabaseClient
-      .from("perfumes")
+      .from(
+        "perfumes"
+      )
       .delete()
       .eq(
         "id",
@@ -1055,18 +1201,15 @@ function updateDashboard() {
     products
   );
 
-
   setText(
     "totalUnits",
     units
   );
 
-
   setText(
     "lowStock",
     low
   );
-
 
   setText(
     "inventoryValue",
@@ -1075,7 +1218,6 @@ function updateDashboard() {
     )
   );
 
-
   setText(
     "inventoryCost",
     formatCurrency(
@@ -1083,18 +1225,15 @@ function updateDashboard() {
     )
   );
 
-
   setText(
     "summaryUnits",
     units
   );
 
-
   setText(
     "summaryLowStock",
     low
   );
-
 
   setText(
     "summaryValue",
@@ -1102,7 +1241,6 @@ function updateDashboard() {
       totalValue
     )
   );
-
 
   setText(
     "summaryCost",
@@ -1134,50 +1272,74 @@ function initializeInventoryPage() {
       "inventoryBody"
     );
 
-
   const search =
     document.getElementById(
       "searchInput"
     );
-
 
   const category =
     document.getElementById(
       "categoryFilter"
     );
 
-
   const empty =
     document.getElementById(
       "emptyMessage"
     );
-
 
   const editingId =
     document.getElementById(
       "editingId"
     );
 
-
   const submitButton =
     document.getElementById(
       "submitButton"
     );
-
 
   const cancelButton =
     document.getElementById(
       "cancelEditButton"
     );
 
-
   const exportButton =
     document.getElementById(
       "exportButton"
     );
 
+  const sizeInput =
+    document.getElementById(
+      "size"
+    );
 
-  function stockClass(quantity) {
+
+  /*
+   * Hacemos el campo Tamaño numérico
+   * desde JavaScript.
+   *
+   * No necesitas escribir "ML".
+   */
+  if (sizeInput) {
+    sizeInput.type =
+      "number";
+
+    sizeInput.min =
+      "1";
+
+    sizeInput.step =
+      "1";
+
+    sizeInput.inputMode =
+      "numeric";
+
+    sizeInput.placeholder =
+      "Ej. 100";
+  }
+
+
+  function stockClass(
+    quantity
+  ) {
     if (quantity === 0) {
       return "empty";
     }
@@ -1195,7 +1357,7 @@ function initializeInventoryPage() {
   function filtered() {
     const query =
       normalizeText(
-        search.value
+        search?.value || ""
       );
 
 
@@ -1218,6 +1380,7 @@ function initializeInventoryPage() {
               query
             ) &&
             (
+              !category ||
               category.value ===
                 "Todos" ||
               perfume.category ===
@@ -1237,17 +1400,25 @@ function initializeInventoryPage() {
 
 
   function render() {
-    body.innerHTML = "";
+    if (!body) {
+      return;
+    }
+
+
+    body.innerHTML =
+      "";
 
 
     const items =
       filtered();
 
 
-    empty.style.display =
-      items.length === 0
-        ? "block"
-        : "none";
+    if (empty) {
+      empty.style.display =
+        items.length === 0
+          ? "block"
+          : "none";
+    }
 
 
     items.forEach(
@@ -1266,9 +1437,7 @@ function initializeInventoryPage() {
 
         row.innerHTML = `
           <td>
-
             <div class="product-name">
-
               <strong>
                 ${escapeHTML(
                   perfume.name
@@ -1281,18 +1450,14 @@ function initializeInventoryPage() {
                   perfume.code
                 )}
               </small>
-
             </div>
-
           </td>
-
 
           <td>
             ${escapeHTML(
               perfume.brand
             )}
           </td>
-
 
           <td>
             <span class="category-badge">
@@ -1302,27 +1467,27 @@ function initializeInventoryPage() {
             </span>
           </td>
 
-
           <td>
             ${escapeHTML(
+              formatPerfumeSize(
+                perfume.size
+              ) ||
               perfume.size
             )}
           </td>
 
-
           <td>
-
             <div class="stock-control">
-
               <button
                 class="stock-button"
                 data-action="decrease"
-                data-id="${perfume.id}"
+                data-id="${escapeHTML(
+                  perfume.id
+                )}"
                 type="button"
               >
                 −
               </button>
-
 
               <span
                 class="
@@ -1335,20 +1500,18 @@ function initializeInventoryPage() {
                 ${quantity}
               </span>
 
-
               <button
                 class="stock-button"
                 data-action="increase"
-                data-id="${perfume.id}"
+                data-id="${escapeHTML(
+                  perfume.id
+                )}"
                 type="button"
               >
                 +
               </button>
-
             </div>
-
           </td>
-
 
           <td>
             ${formatCurrency(
@@ -1356,13 +1519,11 @@ function initializeInventoryPage() {
             )}
           </td>
 
-
           <td>
             ${formatCurrency(
               perfume.price
             )}
           </td>
-
 
           <td>
             ${formatCurrency(
@@ -1371,32 +1532,31 @@ function initializeInventoryPage() {
             )}
           </td>
 
-
           <td>
-
             <div class="actions">
-
               <button
                 class="action-button edit-button"
                 data-action="edit"
-                data-id="${perfume.id}"
+                data-id="${escapeHTML(
+                  perfume.id
+                )}"
                 type="button"
               >
                 Editar
               </button>
 
-
               <button
                 class="action-button delete-button"
                 data-action="delete"
-                data-id="${perfume.id}"
+                data-id="${escapeHTML(
+                  perfume.id
+                )}"
                 type="button"
+                aria-label="Eliminar perfume"
               >
                 ×
               </button>
-
             </div>
-
           </td>
         `;
 
@@ -1437,13 +1597,18 @@ function initializeInventoryPage() {
           )
           .value,
 
+      /*
+       * AQUÍ SE AGREGA "ML"
+       * AUTOMÁTICAMENTE.
+       */
       size:
-        document
-          .getElementById(
-            "size"
-          )
-          .value
-          .trim(),
+        formatPerfumeSize(
+          document
+            .getElementById(
+              "size"
+            )
+            .value
+        ),
 
       purchasePrice:
         Number(
@@ -1484,6 +1649,55 @@ function initializeInventoryPage() {
 
 
   function validate(data) {
+    if (
+      !data.name ||
+      !data.brand ||
+      !data.category ||
+      !data.code
+    ) {
+      showToast(
+        "Completa todos los campos."
+      );
+
+      return false;
+    }
+
+
+    if (!data.size) {
+      showToast(
+        "Escribe un tamaño válido en ML."
+      );
+
+      sizeInput?.focus();
+
+      return false;
+    }
+
+
+    const sizeNumber =
+      Number(
+        getPerfumeSizeNumber(
+          data.size
+        )
+      );
+
+
+    if (
+      !Number.isInteger(
+        sizeNumber
+      ) ||
+      sizeNumber <= 0
+    ) {
+      showToast(
+        "El tamaño debe ser un número mayor que 0."
+      );
+
+      sizeInput?.focus();
+
+      return false;
+    }
+
+
     const duplicateCode =
       perfumes.some(
         (perfume) =>
@@ -1493,9 +1707,12 @@ function initializeInventoryPage() {
             normalizeText(
               data.code
             ) &&
-          String(perfume.id) !==
+          String(
+            perfume.id
+          ) !==
             String(
-              editingId.value
+              editingId?.value ||
+              ""
             )
       );
 
@@ -1504,7 +1721,6 @@ function initializeInventoryPage() {
       showToast(
         "Ese código ya existe."
       );
-
 
       return false;
     }
@@ -1525,15 +1741,18 @@ function initializeInventoryPage() {
             normalizeText(
               data.brand
             ) &&
-          normalizeText(
+          normalizePerfumeSizeForComparison(
             perfume.size
           ) ===
-            normalizeText(
+            normalizePerfumeSizeForComparison(
               data.size
             ) &&
-          String(perfume.id) !==
+          String(
+            perfume.id
+          ) !==
             String(
-              editingId.value
+              editingId?.value ||
+              ""
             )
       );
 
@@ -1543,6 +1762,24 @@ function initializeInventoryPage() {
         "Ese perfume ya existe."
       );
 
+      return false;
+    }
+
+
+    if (
+      !Number.isFinite(
+        data.purchasePrice
+      ) ||
+      !Number.isFinite(
+        data.price
+      ) ||
+      !Number.isFinite(
+        data.quantity
+      )
+    ) {
+      showToast(
+        "Revisa los valores numéricos."
+      );
 
       return false;
     }
@@ -1557,6 +1794,18 @@ function initializeInventoryPage() {
         "Los valores no pueden ser negativos."
       );
 
+      return false;
+    }
+
+
+    if (
+      !Number.isInteger(
+        data.quantity
+      )
+    ) {
+      showToast(
+        "La cantidad debe ser un número entero."
+      );
 
       return false;
     }
@@ -1570,23 +1819,35 @@ function initializeInventoryPage() {
     form.reset();
 
 
-    editingId.value = "";
+    if (editingId) {
+      editingId.value =
+        "";
+    }
 
 
-    document
-      .getElementById(
+    const quantityInput =
+      document.getElementById(
         "quantity"
-      )
-      .value = 1;
+      );
 
 
-    submitButton.textContent =
-      "+ Agregar perfume";
+    if (quantityInput) {
+      quantityInput.value =
+        1;
+    }
 
 
-    cancelButton.classList.add(
-      "hidden"
-    );
+    if (submitButton) {
+      submitButton.textContent =
+        "+ Agregar perfume";
+    }
+
+
+    cancelButton
+      ?.classList
+      .add(
+        "hidden"
+      );
   }
 
 
@@ -1609,13 +1870,15 @@ function initializeInventoryPage() {
       }
 
 
-      submitButton.disabled =
-        true;
+      if (submitButton) {
+        submitButton.disabled =
+          true;
+      }
 
 
       try {
         if (
-          editingId.value
+          editingId?.value
         ) {
           const updated =
             await updatePerfumeInSupabase(
@@ -1627,8 +1890,12 @@ function initializeInventoryPage() {
           const index =
             perfumes.findIndex(
               (item) =>
-                String(item.id) ===
-                String(updated.id)
+                String(
+                  item.id
+                ) ===
+                String(
+                  updated.id
+                )
             );
 
 
@@ -1674,11 +1941,11 @@ function initializeInventoryPage() {
 
         resetForm();
 
-
         render();
 
       } catch (error) {
         console.error(
+          "Error guardando perfume:",
           error
         );
 
@@ -1693,368 +1960,429 @@ function initializeInventoryPage() {
 
         } else {
           showToast(
+            error.message ||
             "No se pudo guardar el perfume."
           );
         }
 
       } finally {
-        submitButton.disabled =
-          false;
+        if (submitButton) {
+          submitButton.disabled =
+            false;
+        }
       }
     }
   );
 
 
-  cancelButton.addEventListener(
-    "click",
-    resetForm
-  );
+  cancelButton
+    ?.addEventListener(
+      "click",
+      resetForm
+    );
 
 
-  body.addEventListener(
-    "click",
-    async (event) => {
-      const button =
-        event.target.closest(
-          "[data-action]"
-        );
+  body
+    ?.addEventListener(
+      "click",
+      async (event) => {
+        const button =
+          event.target.closest(
+            "[data-action]"
+          );
 
 
-      if (!button) {
-        return;
-      }
-
-
-      const perfume =
-        perfumes.find(
-          (item) =>
-            String(item.id) ===
-            String(
-              button.dataset.id
-            )
-        );
-
-
-      if (!perfume) {
-        return;
-      }
-
-
-      const action =
-        button.dataset.action;
-
-
-      if (
-        action === "increase" ||
-        action === "decrease"
-      ) {
-        const currentQuantity =
-          Number(
-            perfume.quantity
-          ) || 0;
-
-
-        const newQuantity =
-          action === "increase"
-            ? currentQuantity + 1
-            : currentQuantity - 1;
-
-
-        if (newQuantity < 0) {
+        if (!button) {
           return;
         }
 
 
-        try {
-          const updated =
-            await updateStockInSupabase(
-              perfume.id,
-              newQuantity
-            );
-
-
-          perfume.quantity =
-            updated.quantity;
-
-
-          render();
-
-        } catch (error) {
-          console.error(
-            error
+        const perfume =
+          perfumes.find(
+            (item) =>
+              String(
+                item.id
+              ) ===
+              String(
+                button.dataset.id
+              )
           );
 
 
-          showToast(
-            "No se pudo actualizar el stock."
-          );
-        }
-
-
-        return;
-      }
-
-
-      if (
-        action === "delete"
-      ) {
-        const confirmed =
-          window.confirm(
-            `¿Eliminar "${perfume.name}"?`
-          );
-
-
-        if (!confirmed) {
+        if (!perfume) {
           return;
         }
 
 
-        try {
-          await deletePerfumeFromSupabase(
-            perfume.id
-          );
+        const action =
+          button.dataset.action;
 
 
-          perfumes =
-            perfumes.filter(
-              (item) =>
-                item.id !==
-                perfume.id
-            );
+        if (
+          action ===
+            "increase" ||
+          action ===
+            "decrease"
+        ) {
+          const currentQuantity =
+            Number(
+              perfume.quantity
+            ) || 0;
 
 
-          render();
+          const newQuantity =
+            action ===
+            "increase"
+              ? currentQuantity + 1
+              : currentQuantity - 1;
 
 
-          showToast(
-            "Perfume eliminado."
-          );
-
-        } catch (error) {
-          console.error(
-            error
-          );
-
-
-          showToast(
-            "No se pudo eliminar el perfume."
-          );
-        }
-
-
-        return;
-      }
-
-
-      if (
-        action === "edit"
-      ) {
-        editingId.value =
-          perfume.id;
-
-
-        document
-          .getElementById(
-            "name"
-          )
-          .value =
-            perfume.name;
-
-
-        document
-          .getElementById(
-            "brand"
-          )
-          .value =
-            perfume.brand;
-
-
-        document
-          .getElementById(
-            "category"
-          )
-          .value =
-            perfume.category;
-
-
-        document
-          .getElementById(
-            "size"
-          )
-          .value =
-            perfume.size;
-
-
-        document
-          .getElementById(
-            "purchasePrice"
-          )
-          .value =
-            perfume.purchasePrice;
-
-
-        document
-          .getElementById(
-            "price"
-          )
-          .value =
-            perfume.price;
-
-
-        document
-          .getElementById(
-            "quantity"
-          )
-          .value =
-            perfume.quantity;
-
-
-        document
-          .getElementById(
-            "code"
-          )
-          .value =
-            perfume.code;
-
-
-        submitButton.textContent =
-          "Guardar cambios";
-
-
-        cancelButton.classList.remove(
-          "hidden"
-        );
-
-
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
-      }
-    }
-  );
-
-
-  search.addEventListener(
-    "input",
-    render
-  );
-
-
-  category.addEventListener(
-    "change",
-    render
-  );
-
-
-  exportButton.addEventListener(
-    "click",
-    () => {
-      if (
-        perfumes.length === 0
-      ) {
-        showToast(
-          "No hay productos para exportar."
-        );
-
-
-        return;
-      }
-
-
-      const orderedPerfumes =
-        sortPerfumesByCode(
-          perfumes
-        );
-
-
-      const rows = [
-        [
-          "Código",
-          "Nombre",
-          "Marca",
-          "Categoría",
-          "Tamaño",
-          "Cantidad",
-          "Compra",
-          "Venta"
-        ],
-
-        ...orderedPerfumes.map(
-          (perfume) => [
-            perfume.code,
-            perfume.name,
-            perfume.brand,
-            perfume.category,
-            perfume.size,
-            perfume.quantity,
-            perfume.purchasePrice,
-            perfume.price
-          ]
-        )
-      ];
-
-
-      const csv =
-        rows
-          .map(
-            (row) =>
-              row
-                .map(
-                  (value) =>
-                    `"${String(
-                      value
-                    ).replaceAll(
-                      '"',
-                      '""'
-                    )}"`
-                )
-                .join(",")
-          )
-          .join("\n");
-
-
-      const blob =
-        new Blob(
-          [
-            "\uFEFF" +
-            csv
-          ],
-          {
-            type:
-              "text/csv;charset=utf-8"
+          if (
+            newQuantity < 0
+          ) {
+            return;
           }
+
+
+          button.disabled =
+            true;
+
+
+          try {
+            const updated =
+              await updateStockInSupabase(
+                perfume.id,
+                newQuantity
+              );
+
+
+            perfume.quantity =
+              updated.quantity;
+
+
+            render();
+
+          } catch (error) {
+            console.error(
+              error
+            );
+
+
+            showToast(
+              "No se pudo actualizar el stock."
+            );
+
+          } finally {
+            button.disabled =
+              false;
+          }
+
+
+          return;
+        }
+
+
+        if (
+          action ===
+          "delete"
+        ) {
+          const confirmed =
+            window.confirm(
+              `¿Eliminar "${perfume.name}"?`
+            );
+
+
+          if (!confirmed) {
+            return;
+          }
+
+
+          button.disabled =
+            true;
+
+
+          try {
+            await deletePerfumeFromSupabase(
+              perfume.id
+            );
+
+
+            perfumes =
+              perfumes.filter(
+                (item) =>
+                  String(
+                    item.id
+                  ) !==
+                  String(
+                    perfume.id
+                  )
+              );
+
+
+            render();
+
+
+            showToast(
+              "Perfume eliminado."
+            );
+
+          } catch (error) {
+            console.error(
+              error
+            );
+
+
+            showToast(
+              error.message ||
+              "No se pudo eliminar el perfume."
+            );
+          }
+
+
+          return;
+        }
+
+
+        if (
+          action ===
+          "edit"
+        ) {
+          if (editingId) {
+            editingId.value =
+              perfume.id;
+          }
+
+
+          document
+            .getElementById(
+              "name"
+            )
+            .value =
+              perfume.name;
+
+
+          document
+            .getElementById(
+              "brand"
+            )
+            .value =
+              perfume.brand;
+
+
+          document
+            .getElementById(
+              "category"
+            )
+            .value =
+              perfume.category;
+
+
+          /*
+           * IMPORTANTE:
+           *
+           * Si está guardado como:
+           * 100 ML
+           *
+           * en el formulario muestra:
+           * 100
+           */
+          if (sizeInput) {
+            sizeInput.value =
+              getPerfumeSizeNumber(
+                perfume.size
+              );
+          }
+
+
+          document
+            .getElementById(
+              "purchasePrice"
+            )
+            .value =
+              perfume.purchasePrice;
+
+
+          document
+            .getElementById(
+              "price"
+            )
+            .value =
+              perfume.price;
+
+
+          document
+            .getElementById(
+              "quantity"
+            )
+            .value =
+              perfume.quantity;
+
+
+          document
+            .getElementById(
+              "code"
+            )
+            .value =
+              perfume.code;
+
+
+          if (submitButton) {
+            submitButton.textContent =
+              "Guardar cambios";
+          }
+
+
+          cancelButton
+            ?.classList
+            .remove(
+              "hidden"
+            );
+
+
+          window.scrollTo({
+            top:
+              0,
+
+            behavior:
+              "smooth"
+          });
+        }
+      }
+    );
+
+
+  search
+    ?.addEventListener(
+      "input",
+      render
+    );
+
+
+  category
+    ?.addEventListener(
+      "change",
+      render
+    );
+
+
+  exportButton
+    ?.addEventListener(
+      "click",
+      () => {
+        if (
+          perfumes.length === 0
+        ) {
+          showToast(
+            "No hay productos para exportar."
+          );
+
+          return;
+        }
+
+
+        const orderedPerfumes =
+          sortPerfumesByCode(
+            perfumes
+          );
+
+
+        const rows = [
+          [
+            "Código",
+            "Nombre",
+            "Marca",
+            "Categoría",
+            "Tamaño",
+            "Cantidad",
+            "Compra",
+            "Venta"
+          ],
+
+          ...orderedPerfumes.map(
+            (perfume) => [
+              perfume.code,
+              perfume.name,
+              perfume.brand,
+              perfume.category,
+              formatPerfumeSize(
+                perfume.size
+              ) ||
+                perfume.size,
+              perfume.quantity,
+              perfume.purchasePrice,
+              perfume.price
+            ]
+          )
+        ];
+
+
+        const csv =
+          rows
+            .map(
+              (row) =>
+                row
+                  .map(
+                    (value) =>
+                      `"${String(
+                        value
+                      ).replaceAll(
+                        '"',
+                        '""'
+                      )}"`
+                  )
+                  .join(",")
+            )
+            .join("\n");
+
+
+        const blob =
+          new Blob(
+            [
+              "\uFEFF" +
+              csv
+            ],
+            {
+              type:
+                "text/csv;charset=utf-8"
+            }
+          );
+
+
+        const url =
+          URL.createObjectURL(
+            blob
+          );
+
+
+        const link =
+          document.createElement(
+            "a"
+          );
+
+
+        link.href =
+          url;
+
+
+        link.download =
+          "inventario-duvant12.csv";
+
+
+        document.body.appendChild(
+          link
         );
 
 
-      const url =
-        URL.createObjectURL(
-          blob
+        link.click();
+
+        link.remove();
+
+
+        URL.revokeObjectURL(
+          url
         );
-
-
-      const link =
-        document.createElement(
-          "a"
-        );
-
-
-      link.href =
-        url;
-
-
-      link.download =
-        "inventario-duvant12.csv";
-
-
-      link.click();
-
-
-      URL.revokeObjectURL(
-        url
-      );
-    }
-  );
+      }
+    );
 
 
   initializeExcelImport(
@@ -2078,36 +2406,30 @@ function initializeExcelImport(
       "downloadExcelTemplateButton"
     );
 
-
   const importButton =
     document.getElementById(
       "importExcelButton"
     );
-
 
   const fileInput =
     document.getElementById(
       "excelFileInput"
     );
 
-
   const modal =
     document.getElementById(
       "excelImportModal"
     );
-
 
   const previewBody =
     document.getElementById(
       "excelPreviewBody"
     );
 
-
   const summary =
     document.getElementById(
       "excelImportSummary"
     );
-
 
   const confirmButton =
     document.getElementById(
@@ -2130,7 +2452,6 @@ function initializeExcelImport(
 
   /* ====================================
      DESCARGAR PLANTILLA
-     CON INVENTARIO ACTUAL ORDENADO
   ==================================== */
 
   downloadButton.addEventListener(
@@ -2154,18 +2475,6 @@ function initializeExcelImport(
         );
 
 
-      /*
-       * IMPORTANTE:
-       *
-       * Esta plantilla NO contiene:
-       * - precio de compra
-       * - precio de venta
-       * - margen
-       * - costo total
-       *
-       * Solo contiene información
-       * que puedes enviar al distribuidor.
-       */
       const rows = [
         [
           "Código",
@@ -2182,7 +2491,15 @@ function initializeExcelImport(
             perfume.name,
             perfume.brand,
             perfume.category,
-            perfume.size,
+
+            /*
+             * En Excel dejamos solamente
+             * el número para facilitar pedidos.
+             */
+            getPerfumeSizeNumber(
+              perfume.size
+            ),
+
             perfume.quantity
           ]
         )
@@ -2196,12 +2513,24 @@ function initializeExcelImport(
 
 
       worksheet["!cols"] = [
-        { wch: 16 },
-        { wch: 30 },
-        { wch: 24 },
-        { wch: 18 },
-        { wch: 16 },
-        { wch: 12 }
+        {
+          wch: 16
+        },
+        {
+          wch: 30
+        },
+        {
+          wch: 24
+        },
+        {
+          wch: 18
+        },
+        {
+          wch: 16
+        },
+        {
+          wch: 12
+        }
       ];
 
 
@@ -2219,7 +2548,10 @@ function initializeExcelImport(
       const today =
         new Date()
           .toISOString()
-          .slice(0, 10);
+          .slice(
+            0,
+            10
+          );
 
 
       XLSX.writeFile(
@@ -2242,7 +2574,8 @@ function initializeExcelImport(
   importButton.addEventListener(
     "click",
     () => {
-      fileInput.value = "";
+      fileInput.value =
+        "";
 
       fileInput.click();
     }
@@ -2270,7 +2603,8 @@ function initializeExcelImport(
     );
 
 
-    excelImportRows = [];
+    excelImportRows =
+      [];
   }
 
 
@@ -2292,10 +2626,13 @@ function initializeExcelImport(
     "keydown",
     (event) => {
       if (
-        event.key === "Escape" &&
-        !modal.classList.contains(
-          "hidden"
-        )
+        event.key ===
+          "Escape" &&
+        !modal
+          .classList
+          .contains(
+            "hidden"
+          )
       ) {
         closeModal();
       }
@@ -2303,15 +2640,16 @@ function initializeExcelImport(
   );
 
 
-  /* ====================================
-     NORMALIZAR CABECERAS
-  ==================================== */
-
-  function normalizeHeader(value) {
+  function normalizeHeader(
+    value
+  ) {
     return normalizeForComparison(
       value
     )
-      .replace(/\s+/g, "")
+      .replace(
+        /\s+/g,
+        ""
+      )
       .replace(
         /[^a-z0-9]/g,
         ""
@@ -2319,19 +2657,17 @@ function initializeExcelImport(
   }
 
 
-  /* ====================================
-     CATEGORÍA
-  ==================================== */
-
-  function normalizeCategory(value) {
-    const normalizedCategory =
+  function normalizeCategory(
+    value
+  ) {
+    const normalized =
       normalizeForComparison(
         value
       );
 
 
     if (
-      normalizedCategory ===
+      normalized ===
       "hombre"
     ) {
       return "Hombre";
@@ -2339,7 +2675,7 @@ function initializeExcelImport(
 
 
     if (
-      normalizedCategory ===
+      normalized ===
       "mujer"
     ) {
       return "Mujer";
@@ -2347,7 +2683,7 @@ function initializeExcelImport(
 
 
     if (
-      normalizedCategory ===
+      normalized ===
       "unisex"
     ) {
       return "Unisex";
@@ -2358,94 +2694,83 @@ function initializeExcelImport(
   }
 
 
-  /* ====================================
-     BUSCAR PRODUCTO EXISTENTE
-  ==================================== */
+  function findExistingByCode(
+    code
+  ) {
+    const key =
+      normalizeForComparison(
+        code
+      );
 
-  function analyzeExistingProduct(row) {
-    const byCode =
-      perfumes.find(
-        (perfume) =>
+
+    return perfumes.find(
+      (perfume) =>
+        normalizeForComparison(
+          perfume.code
+        ) === key
+    );
+  }
+
+
+  function findExistingByProduct(
+    name,
+    brand,
+    size
+  ) {
+    return perfumes.find(
+      (perfume) =>
+        normalizeForComparison(
+          perfume.name
+        ) ===
           normalizeForComparison(
-            perfume.code
-          ) ===
+            name
+          ) &&
+        normalizeForComparison(
+          perfume.brand
+        ) ===
           normalizeForComparison(
-            row.code
+            brand
+          ) &&
+        normalizePerfumeSizeForComparison(
+          perfume.size
+        ) ===
+          normalizePerfumeSizeForComparison(
+            size
           )
+    );
+  }
+
+
+  function analyzeExistingProduct(
+    row
+  ) {
+    const byCode =
+      findExistingByCode(
+        row.code
       );
 
 
-    const byIdentity =
-      perfumes.find(
-        (perfume) =>
-          normalizeForComparison(
-            perfume.name
-          ) ===
-            normalizeForComparison(
-              row.name
-            ) &&
-          normalizeForComparison(
-            perfume.brand
-          ) ===
-            normalizeForComparison(
-              row.brand
-            ) &&
-          normalizeForComparison(
-            perfume.size
-          ) ===
-            normalizeForComparison(
-              row.size
-            )
+    const byProduct =
+      findExistingByProduct(
+        row.name,
+        row.brand,
+        row.size
       );
 
 
     if (
       byCode &&
-      byIdentity &&
-      byCode.id !==
-        byIdentity.id
+      byProduct &&
+      String(
+        byCode.id
+      ) ===
+      String(
+        byProduct.id
+      )
     ) {
       return {
-        type: "conflict",
-
-        message:
-          "El código y el producto corresponden a registros diferentes."
-      };
-    }
-
-
-    if (
-      byCode &&
-      !byIdentity
-    ) {
-      return {
-        type: "conflict",
-
-        message:
-          "Ese código ya pertenece a otro perfume."
-      };
-    }
-
-
-    if (
-      !byCode &&
-      byIdentity
-    ) {
-      return {
-        type: "conflict",
-
-        message:
-          `Ese perfume ya existe con el código ${byIdentity.code}.`
-      };
-    }
-
-
-    if (
-      byCode &&
-      byIdentity
-    ) {
-      return {
-        type: "existing",
+        type:
+          "existing",
 
         perfume:
           byCode
@@ -2453,16 +2778,78 @@ function initializeExcelImport(
     }
 
 
-    return {
-      type: "new",
+    if (
+      byCode &&
+      !byProduct
+    ) {
+      return {
+        type:
+          "conflict",
 
-      perfume: null
+        message:
+          "El código ya pertenece a otro perfume."
+      };
+    }
+
+
+    if (
+      byProduct &&
+      !byCode
+    ) {
+      return {
+        type:
+          "conflict",
+
+        message:
+          "El perfume ya existe con otro código."
+      };
+    }
+
+
+    if (
+      byCode &&
+      byProduct
+    ) {
+      return {
+        type:
+          "conflict",
+
+        message:
+          "El código y el perfume pertenecen a registros distintos."
+      };
+    }
+
+
+    return {
+      type:
+        "new"
     };
   }
 
 
+  function openPreview() {
+    renderExcelPreview();
+
+
+    modal.classList.remove(
+      "hidden"
+    );
+
+
+    modal.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+
+    document.body.classList.add(
+      "modal-open"
+    );
+  }
+
+
   /* ====================================
-     LEER ARCHIVO
+     LEER EXCEL
   ==================================== */
 
   fileInput.addEventListener(
@@ -2498,44 +2885,45 @@ function initializeExcelImport(
           XLSX.read(
             buffer,
             {
-              type: "array"
+              type:
+                "array"
             }
           );
 
 
-        const sheetName =
-          workbook.SheetNames[0];
+        const firstSheet =
+          workbook.Sheets[
+            workbook
+              .SheetNames[0]
+          ];
 
 
-        if (!sheetName) {
+        if (!firstSheet) {
           throw new Error(
             "El archivo no contiene hojas."
           );
         }
 
 
-        const worksheet =
-          workbook.Sheets[
-            sheetName
-          ];
-
-
-        const matrix =
+        const rawRows =
           XLSX.utils.sheet_to_json(
-            worksheet,
+            firstSheet,
             {
-              header: 1,
-              defval: "",
-              raw: false
+              header:
+                1,
+
+              defval:
+                ""
             }
           );
 
 
         if (
-          matrix.length < 2
+          rawRows.length <
+          2
         ) {
           showToast(
-            "El Excel no contiene productos."
+            "El archivo no contiene productos."
           );
 
           return;
@@ -2543,53 +2931,80 @@ function initializeExcelImport(
 
 
         const headers =
-          matrix[0].map(
+          rawRows[0].map(
             normalizeHeader
           );
 
 
-        const requiredHeaders = {
-          codigo: "Código",
-          nombre: "Nombre",
-          marca: "Marca",
-          categoria: "Categoría",
-          tamano: "Tamaño",
-          cantidad: "Cantidad"
-        };
-
-
-        const indexes = {};
-
-
-        for (
-          const [
-            key,
-            label
-          ] of Object.entries(
-            requiredHeaders
-          )
+        function columnIndex(
+          ...names
         ) {
-          const index =
-            headers.indexOf(
-              key
-            );
-
-
-          if (index === -1) {
-            showToast(
-              `Falta la columna "${label}".`
-            );
-
-            return;
-          }
-
-
-          indexes[key] =
-            index;
+          return headers.findIndex(
+            (header) =>
+              names.includes(
+                header
+              )
+          );
         }
 
 
-        const parsedRows = [];
+        const codeIndex =
+          columnIndex(
+            "codigo",
+            "code"
+          );
+
+        const nameIndex =
+          columnIndex(
+            "nombre",
+            "name"
+          );
+
+        const brandIndex =
+          columnIndex(
+            "marca",
+            "brand"
+          );
+
+        const categoryIndex =
+          columnIndex(
+            "categoria",
+            "category"
+          );
+
+        const sizeIndex =
+          columnIndex(
+            "tamano",
+            "tamaño",
+            "size",
+            "ml"
+          );
+
+        const quantityIndex =
+          columnIndex(
+            "cantidad",
+            "quantity"
+          );
+
+
+        if (
+          codeIndex === -1 ||
+          nameIndex === -1 ||
+          brandIndex === -1 ||
+          categoryIndex === -1 ||
+          sizeIndex === -1 ||
+          quantityIndex === -1
+        ) {
+          showToast(
+            "El Excel no tiene las columnas requeridas."
+          );
+
+          return;
+        }
+
+
+        const parsedRows =
+          [];
 
         const seenCodes =
           new Set();
@@ -2598,97 +3013,96 @@ function initializeExcelImport(
           new Set();
 
 
-        matrix
+        rawRows
           .slice(1)
           .forEach(
             (
-              values,
-              arrayIndex
+              source,
+              rowIndex
             ) => {
-              const excelRow =
-                arrayIndex + 2;
+              const rowNumber =
+                rowIndex + 2;
 
 
               const code =
                 String(
-                  values[
-                    indexes.codigo
+                  source[
+                    codeIndex
                   ] ?? ""
-                ).trim();
+                )
+                  .trim();
 
 
               const name =
                 String(
-                  values[
-                    indexes.nombre
+                  source[
+                    nameIndex
                   ] ?? ""
-                ).trim();
+                )
+                  .trim();
 
 
               const brand =
                 String(
-                  values[
-                    indexes.marca
-                  ] ?? ""
-                ).trim();
-
-
-              const rawCategory =
-                String(
-                  values[
-                    indexes.categoria
-                  ] ?? ""
-                ).trim();
-
-
-              const size =
-                String(
-                  values[
-                    indexes.tamano
-                  ] ?? ""
-                ).trim();
-
-
-              const rawQuantity =
-                String(
-                  values[
-                    indexes.cantidad
+                  source[
+                    brandIndex
                   ] ?? ""
                 )
-                  .trim()
-                  .replace(
-                    ",",
-                    "."
-                  );
+                  .trim();
 
 
-              if (
-                !code &&
-                !name &&
-                !brand &&
-                !rawCategory &&
-                !size &&
-                !rawQuantity
-              ) {
-                return;
-              }
+              const categoryValue =
+                String(
+                  source[
+                    categoryIndex
+                  ] ?? ""
+                )
+                  .trim();
 
 
-              const normalizedCategory =
-                normalizeCategory(
-                  rawCategory
+              /*
+               * Excel también puede traer:
+               * 100
+               * o
+               * 100 ML
+               *
+               * Ambos se convierten a 100 ML.
+               */
+              const size =
+                formatPerfumeSize(
+                  source[
+                    sizeIndex
+                  ]
                 );
 
 
               const quantity =
                 Number(
-                  rawQuantity
+                  source[
+                    quantityIndex
+                  ]
                 );
 
 
+              /*
+               * Ignorar filas totalmente vacías.
+               */
+              if (
+                !code &&
+                !name &&
+                !brand &&
+                !categoryValue &&
+                !size &&
+                !source[
+                  quantityIndex
+                ]
+              ) {
+                return;
+              }
+
+
               const row = {
-                rowNumber:
-                  excelRow,
+                rowNumber,
 
                 code,
 
@@ -2697,31 +3111,31 @@ function initializeExcelImport(
                 brand,
 
                 category:
-                  normalizedCategory,
-
-                rawCategory,
+                  normalizeCategory(
+                    categoryValue
+                  ),
 
                 size,
 
                 quantity,
 
-                purchasePrice:
-                  null,
-
-                salePrice:
-                  null,
+                status:
+                  "valid",
 
                 action:
-                  "new",
+                  "create",
+
+                error:
+                  "",
 
                 existing:
                   null,
 
-                status:
-                  "valid",
+                purchasePrice:
+                  null,
 
-                error:
-                  ""
+                salePrice:
+                  null
               };
 
 
@@ -2729,15 +3143,15 @@ function initializeExcelImport(
                 !code ||
                 !name ||
                 !brand ||
-                !rawCategory ||
-                !size ||
-                !rawQuantity
+                !categoryValue ||
+                !size
               ) {
                 row.status =
                   "error";
 
+
                 row.error =
-                  "Hay campos obligatorios vacíos.";
+                  "Faltan datos obligatorios.";
 
 
                 parsedRows.push(
@@ -2750,10 +3164,11 @@ function initializeExcelImport(
 
 
               if (
-                !normalizedCategory
+                !row.category
               ) {
                 row.status =
                   "error";
+
 
                 row.error =
                   "Categoría inválida. Usa Hombre, Mujer o Unisex.";
@@ -2776,6 +3191,7 @@ function initializeExcelImport(
               ) {
                 row.status =
                   "error";
+
 
                 row.error =
                   "Cantidad debe ser un número entero mayor que 0.";
@@ -2806,10 +3222,12 @@ function initializeExcelImport(
                     brand
                   ),
 
-                  normalizeForComparison(
+                  normalizePerfumeSizeForComparison(
                     size
                   )
-                ].join("|");
+                ].join(
+                  "|"
+                );
 
 
               if (
@@ -2819,6 +3237,7 @@ function initializeExcelImport(
               ) {
                 row.status =
                   "error";
+
 
                 row.error =
                   "Código repetido dentro del Excel.";
@@ -2840,6 +3259,7 @@ function initializeExcelImport(
               ) {
                 row.status =
                   "error";
+
 
                 row.error =
                   "Perfume repetido dentro del Excel.";
@@ -2877,6 +3297,7 @@ function initializeExcelImport(
                 row.status =
                   "error";
 
+
                 row.error =
                   analysis.message;
 
@@ -2897,20 +3318,24 @@ function initializeExcelImport(
                 row.status =
                   "existing";
 
+
                 row.action =
                   "restock";
+
 
                 row.existing =
                   analysis.perfume;
 
 
                 row.purchasePrice =
-                  analysis.perfume
+                  analysis
+                    .perfume
                     .purchasePrice;
 
 
                 row.salePrice =
-                  analysis.perfume
+                  analysis
+                    .perfume
                     .price;
               }
 
@@ -2922,10 +3347,6 @@ function initializeExcelImport(
           );
 
 
-        /*
-         * También ordenamos la vista previa
-         * del Excel por código.
-         */
         excelImportRows =
           parsedRows.sort(
             (a, b) =>
@@ -2936,23 +3357,7 @@ function initializeExcelImport(
           );
 
 
-        renderExcelPreview();
-
-
-        modal.classList.remove(
-          "hidden"
-        );
-
-
-        modal.setAttribute(
-          "aria-hidden",
-          "false"
-        );
-
-
-        document.body.classList.add(
-          "modal-open"
-        );
+        openPreview();
 
       } catch (error) {
         console.error(
@@ -2974,33 +3379,36 @@ function initializeExcelImport(
   ==================================== */
 
   function renderExcelPreview() {
-    previewBody.innerHTML = "";
+    previewBody.innerHTML =
+      "";
 
 
     const validCount =
       excelImportRows.filter(
         (row) =>
-          row.status === "valid"
+          row.status ===
+          "valid"
       ).length;
 
 
     const existingCount =
       excelImportRows.filter(
         (row) =>
-          row.status === "existing"
+          row.status ===
+          "existing"
       ).length;
 
 
     const errorCount =
       excelImportRows.filter(
         (row) =>
-          row.status === "error"
+          row.status ===
+          "error"
       ).length;
 
 
     summary.innerHTML = `
       <article class="excel-summary-item">
-
         <span>
           Productos detectados
         </span>
@@ -3008,12 +3416,9 @@ function initializeExcelImport(
         <strong>
           ${excelImportRows.length}
         </strong>
-
       </article>
 
-
       <article class="excel-summary-item excel-summary-new">
-
         <span>
           Nuevos
         </span>
@@ -3021,12 +3426,9 @@ function initializeExcelImport(
         <strong>
           ${validCount}
         </strong>
-
       </article>
 
-
       <article class="excel-summary-item excel-summary-existing">
-
         <span>
           Ya existentes
         </span>
@@ -3034,12 +3436,9 @@ function initializeExcelImport(
         <strong>
           ${existingCount}
         </strong>
-
       </article>
 
-
       <article class="excel-summary-item excel-summary-error">
-
         <span>
           Con errores
         </span>
@@ -3047,7 +3446,6 @@ function initializeExcelImport(
         <strong>
           ${errorCount}
         </strong>
-
       </article>
     `;
 
@@ -3070,14 +3468,22 @@ function initializeExcelImport(
         }
 
 
-        let statusHTML = "";
-        let actionHTML = "";
-        let purchaseHTML = "";
-        let saleHTML = "";
+        let statusHTML =
+          "";
+
+        let actionHTML =
+          "";
+
+        let purchaseHTML =
+          "";
+
+        let saleHTML =
+          "";
 
 
         if (
-          row.status === "error"
+          row.status ===
+          "error"
         ) {
           statusHTML = `
             <span class="excel-status excel-status-error">
@@ -3095,9 +3501,11 @@ function initializeExcelImport(
           actionHTML =
             "No disponible";
 
+          purchaseHTML =
+            "—";
 
-          purchaseHTML = "—";
-          saleHTML = "—";
+          saleHTML =
+            "—";
 
         } else if (
           row.status ===
@@ -3107,35 +3515,30 @@ function initializeExcelImport(
             <span class="excel-status excel-status-existing">
               Ya existe
             </span>
-
-            <small class="excel-row-message">
-              Stock actual: ${row.existing.quantity}
-            </small>
           `;
 
 
           actionHTML = `
             <select
-              class="excel-action-select"
               data-excel-action="${index}"
             >
               <option
                 value="restock"
                 ${
                   row.action ===
-                    "restock"
+                  "restock"
                     ? "selected"
                     : ""
                 }
               >
-                Sumar al stock
+                Agregar existencias
               </option>
 
               <option
                 value="skip"
                 ${
                   row.action ===
-                    "skip"
+                  "skip"
                     ? "selected"
                     : ""
                 }
@@ -3146,40 +3549,44 @@ function initializeExcelImport(
           `;
 
 
-          purchaseHTML = `
-            <input
-              class="excel-price-input"
-              data-excel-purchase="${index}"
-              type="number"
-              min="0"
-              step="0.01"
-              value="${row.purchasePrice ?? ""}"
-              ${
-                row.action ===
-                  "skip"
-                  ? "disabled"
-                  : ""
-              }
-            >
-          `;
+          if (
+            row.action ===
+            "skip"
+          ) {
+            purchaseHTML =
+              "—";
+
+            saleHTML =
+              "—";
+
+          } else {
+            purchaseHTML = `
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                data-excel-purchase="${index}"
+                value="${
+                  row.purchasePrice ??
+                  ""
+                }"
+              >
+            `;
 
 
-          saleHTML = `
-            <input
-              class="excel-price-input"
-              data-excel-sale="${index}"
-              type="number"
-              min="0"
-              step="0.01"
-              value="${row.salePrice ?? ""}"
-              ${
-                row.action ===
-                  "skip"
-                  ? "disabled"
-                  : ""
-              }
-            >
-          `;
+            saleHTML = `
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                data-excel-sale="${index}"
+                value="${
+                  row.salePrice ??
+                  ""
+                }"
+              >
+            `;
+          }
 
         } else {
           statusHTML = `
@@ -3189,35 +3596,36 @@ function initializeExcelImport(
           `;
 
 
-          actionHTML = `
-            <span class="excel-fixed-action">
-              Agregar
-            </span>
-          `;
+          actionHTML =
+            "Crear";
 
 
           purchaseHTML = `
             <input
-              class="excel-price-input"
-              data-excel-purchase="${index}"
               type="number"
               min="0"
               step="0.01"
-              placeholder="0.00"
-              value="${row.purchasePrice ?? ""}"
+              data-excel-purchase="${index}"
+              value="${
+                row.purchasePrice ??
+                ""
+              }"
+              placeholder="Compra"
             >
           `;
 
 
           saleHTML = `
             <input
-              class="excel-price-input"
-              data-excel-sale="${index}"
               type="number"
               min="0"
               step="0.01"
-              placeholder="0.00"
-              value="${row.salePrice ?? ""}"
+              data-excel-sale="${index}"
+              value="${
+                row.salePrice ??
+                ""
+              }"
+              placeholder="Venta"
             >
           `;
         }
@@ -3225,73 +3633,54 @@ function initializeExcelImport(
 
         tr.innerHTML = `
           <td>
-            ${row.rowNumber}
+            ${escapeHTML(
+              row.code
+            )}
           </td>
-
-
-          <td>
-
-            <div class="excel-product-cell">
-
-              <strong>
-                ${escapeHTML(
-                  row.name
-                )}
-              </strong>
-
-              <span>
-                ${escapeHTML(
-                  row.brand
-                )}
-                ·
-                ${escapeHTML(
-                  row.size
-                )}
-              </span>
-
-              <small>
-                ${escapeHTML(
-                  row.code
-                )}
-                ·
-                ${escapeHTML(
-                  row.category ||
-                  row.rawCategory
-                )}
-              </small>
-
-            </div>
-
-          </td>
-
 
           <td>
             <strong>
-              ${
-                Number.isFinite(
-                  row.quantity
-                )
-                  ? row.quantity
-                  : "—"
-              }
+              ${escapeHTML(
+                row.name
+              )}
             </strong>
+
+            <small>
+              ${escapeHTML(
+                row.brand
+              )}
+            </small>
           </td>
 
+          <td>
+            ${escapeHTML(
+              row.category
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              row.size
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              row.quantity
+            )}
+          </td>
 
           <td>
             ${statusHTML}
           </td>
 
-
           <td>
             ${actionHTML}
           </td>
 
-
           <td>
             ${purchaseHTML}
           </td>
-
 
           <td>
             ${saleHTML}
@@ -3310,10 +3699,6 @@ function initializeExcelImport(
   }
 
 
-  /* ====================================
-     CAMBIAR ACCIÓN
-  ==================================== */
-
   previewBody.addEventListener(
     "change",
     (event) => {
@@ -3326,7 +3711,8 @@ function initializeExcelImport(
       if (actionSelect) {
         const index =
           Number(
-            actionSelect.dataset
+            actionSelect
+              .dataset
               .excelAction
           );
 
@@ -3353,7 +3739,8 @@ function initializeExcelImport(
       if (purchaseInput) {
         const index =
           Number(
-            purchaseInput.dataset
+            purchaseInput
+              .dataset
               .excelPurchase
           );
 
@@ -3361,7 +3748,8 @@ function initializeExcelImport(
         excelImportRows[
           index
         ].purchasePrice =
-          purchaseInput.value === ""
+          purchaseInput.value ===
+          ""
             ? null
             : Number(
                 purchaseInput.value
@@ -3369,7 +3757,6 @@ function initializeExcelImport(
 
 
         updateConfirmButton();
-
 
         return;
       }
@@ -3384,7 +3771,8 @@ function initializeExcelImport(
       if (saleInput) {
         const index =
           Number(
-            saleInput.dataset
+            saleInput
+              .dataset
               .excelSale
           );
 
@@ -3392,7 +3780,8 @@ function initializeExcelImport(
         excelImportRows[
           index
         ].salePrice =
-          saleInput.value === ""
+          saleInput.value ===
+          ""
             ? null
             : Number(
                 saleInput.value
@@ -3417,7 +3806,8 @@ function initializeExcelImport(
       if (purchaseInput) {
         const index =
           Number(
-            purchaseInput.dataset
+            purchaseInput
+              .dataset
               .excelPurchase
           );
 
@@ -3425,7 +3815,8 @@ function initializeExcelImport(
         excelImportRows[
           index
         ].purchasePrice =
-          purchaseInput.value === ""
+          purchaseInput.value ===
+          ""
             ? null
             : Number(
                 purchaseInput.value
@@ -3445,7 +3836,8 @@ function initializeExcelImport(
       if (saleInput) {
         const index =
           Number(
-            saleInput.dataset
+            saleInput
+              .dataset
               .excelSale
           );
 
@@ -3453,7 +3845,8 @@ function initializeExcelImport(
         excelImportRows[
           index
         ].salePrice =
-          saleInput.value === ""
+          saleInput.value ===
+          ""
             ? null
             : Number(
                 saleInput.value
@@ -3466,14 +3859,14 @@ function initializeExcelImport(
   );
 
 
-  /* ====================================
-     VALIDAR PRECIOS
-  ==================================== */
-
-  function rowHasValidPrices(row) {
+  function rowHasValidPrices(
+    row
+  ) {
     if (
-      row.status === "error" ||
-      row.action === "skip"
+      row.status ===
+        "error" ||
+      row.action ===
+        "skip"
     ) {
       return true;
     }
@@ -3495,8 +3888,10 @@ function initializeExcelImport(
   function rowsToImport() {
     return excelImportRows.filter(
       (row) =>
-        row.status !== "error" &&
-        row.action !== "skip"
+        row.status !==
+          "error" &&
+        row.action !==
+          "skip"
     );
   }
 
@@ -3582,8 +3977,11 @@ function initializeExcelImport(
         "Importando...";
 
 
-      let successCount = 0;
-      let errorCount = 0;
+      let successCount =
+        0;
+
+      let errorCount =
+        0;
 
 
       for (
@@ -3638,7 +4036,7 @@ function initializeExcelImport(
                       currentValue +
                       incomingValue
                     ) /
-                    totalQuantity
+                      totalQuantity
                   )
                 : row.purchasePrice;
 
@@ -3657,6 +4055,9 @@ function initializeExcelImport(
                     existing.category,
 
                   size:
+                    formatPerfumeSize(
+                      existing.size
+                    ) ||
                     existing.size,
 
                   purchasePrice:
@@ -3677,17 +4078,20 @@ function initializeExcelImport(
             const index =
               perfumes.findIndex(
                 (item) =>
-                  item.id ===
-                  updated.id
+                  String(
+                    item.id
+                  ) ===
+                  String(
+                    updated.id
+                  )
               );
 
 
             if (
               index !== -1
             ) {
-              perfumes[
-                index
-              ] = updated;
+              perfumes[index] =
+                updated;
             }
 
 
@@ -3699,7 +4103,8 @@ function initializeExcelImport(
 
 
           if (
-            row.status === "valid"
+            row.status ===
+            "valid"
           ) {
             const created =
               await addPerfumeToSupabase({
@@ -3713,7 +4118,9 @@ function initializeExcelImport(
                   row.category,
 
                 size:
-                  row.size,
+                  formatPerfumeSize(
+                    row.size
+                  ),
 
                 purchasePrice:
                   row.purchasePrice,
@@ -3750,13 +4157,6 @@ function initializeExcelImport(
 
 
       try {
-        /*
-         * Recargamos desde Supabase.
-         *
-         * loadInventoryFromSupabase()
-         * ya ordena automáticamente
-         * por código.
-         */
         await loadInventoryFromSupabase();
 
 
@@ -3792,14 +4192,22 @@ function initializeExcelImport(
     }
   );
 }
+
+
 /* ======================================
    VENDEDORES - SUPABASE
 ====================================== */
 
 async function loadSellerCatalog() {
-  const { data, error } = await supabaseClient.rpc(
-    "get_seller_catalog"
-  );
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .rpc(
+        "get_seller_catalog"
+      );
+
 
   if (error) {
     console.error(
@@ -3807,26 +4215,53 @@ async function loadSellerCatalog() {
       error
     );
 
+
     throw error;
   }
 
-  sellerCatalog = (data || [])
-    .map((perfume) => ({
-      id: perfume.id,
-      name: perfume.name,
-      brand: perfume.brand,
-      category: perfume.category,
-      size: perfume.size,
-      price: Number(perfume.price) || 0,
-      code: perfume.code,
-      availability: perfume.availability
-    }))
-    .sort((a, b) =>
-      compareCodes(
-        a.code,
-        b.code
+
+  sellerCatalog =
+    (data || [])
+      .map(
+        (perfume) => ({
+          id:
+            perfume.id,
+
+          name:
+            perfume.name,
+
+          brand:
+            perfume.brand,
+
+          category:
+            perfume.category,
+
+          size:
+            formatPerfumeSize(
+              perfume.size
+            ) ||
+            perfume.size,
+
+          price:
+            Number(
+              perfume.price
+            ) || 0,
+
+          code:
+            perfume.code,
+
+          availability:
+            perfume.availability
+        })
       )
-    );
+      .sort(
+        (a, b) =>
+          compareCodes(
+            a.code,
+            b.code
+          )
+      );
+
 
   return sellerCatalog;
 }
@@ -3839,24 +4274,38 @@ async function loadSellerCatalog() {
 async function registerSellerSale(
   perfumeId
 ) {
-  const { data, error } =
-    await supabaseClient.rpc(
-      "register_sale",
-      {
-        p_perfume_id: perfumeId
-      }
-    );
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .rpc(
+        "register_sale",
+        {
+          p_perfume_id:
+            perfumeId
+        }
+      );
+
 
   if (error) {
     console.error(
       "Error RPC register_sale:",
       {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code
+        message:
+          error.message,
+
+        details:
+          error.details,
+
+        hint:
+          error.hint,
+
+        code:
+          error.code
       }
     );
+
 
     throw new Error(
       error.message ||
@@ -3864,6 +4313,7 @@ async function registerSellerSale(
       "No se pudo registrar la venta."
     );
   }
+
 
   return data;
 }
@@ -3879,9 +4329,11 @@ function initializeSellerPage() {
       "sellerProductsGrid"
     );
 
+
   if (!grid) {
     return;
   }
+
 
   const search =
     document.getElementById(
@@ -3902,6 +4354,7 @@ function initializeSellerPage() {
     document.getElementById(
       "sellerEmptyState"
     );
+
 
   const modal =
     document.getElementById(
@@ -3933,30 +4386,34 @@ function initializeSellerPage() {
       "saleModalPrice"
     );
 
-  const cancelButton =
+  const cancelSaleButton =
     document.getElementById(
       "cancelSaleButton"
     );
 
-  const confirmButton =
+  const confirmSaleButton =
     document.getElementById(
       "confirmSaleButton"
     );
 
-  let selectedPerfume = null;
-  let registeringSale = false;
 
+  let selectedPerfume =
+    null;
 
-  /* ====================================
-     DISPONIBILIDAD
-  ==================================== */
+  let registeringSale =
+    false;
+
 
   function availabilityClass(
     state
   ) {
-    if (state === "Agotado") {
+    if (
+      state ===
+      "Agotado"
+    ) {
       return "availability-out";
     }
+
 
     if (
       state ===
@@ -3965,6 +4422,7 @@ function initializeSellerPage() {
       return "availability-last";
     }
 
+
     if (
       state ===
       "Pocas unidades"
@@ -3972,73 +4430,74 @@ function initializeSellerPage() {
       return "availability-low";
     }
 
+
     return "availability-available";
   }
 
 
-  /* ====================================
-     FILTRAR
-  ==================================== */
-
   function filtered() {
     const query =
       normalizeText(
-        search?.value || ""
+        search?.value ||
+        ""
       );
 
+
     return sellerCatalog
-      .filter((perfume) => {
-        const text =
-          normalizeText(
-            [
-              perfume.name,
-              perfume.brand,
-              perfume.code,
-              perfume.size
-            ].join(" ")
+      .filter(
+        (perfume) => {
+          const text =
+            normalizeText(
+              [
+                perfume.name,
+                perfume.brand,
+                perfume.code,
+                perfume.size
+              ].join(
+                " "
+              )
+            );
+
+
+          return (
+            text.includes(
+              query
+            ) &&
+            (
+              !category ||
+              category.value ===
+                "Todos" ||
+              perfume.category ===
+                category.value
+            ) &&
+            (
+              !availabilityFilter ||
+              availabilityFilter.value ===
+                "Todos" ||
+              perfume.availability ===
+                availabilityFilter.value
+            )
           );
-
-        const matchesSearch =
-          text.includes(query);
-
-        const matchesCategory =
-          !category ||
-          category.value ===
-            "Todos" ||
-          perfume.category ===
-            category.value;
-
-        const matchesAvailability =
-          !availabilityFilter ||
-          availabilityFilter.value ===
-            "Todos" ||
-          perfume.availability ===
-            availabilityFilter.value;
-
-        return (
-          matchesSearch &&
-          matchesCategory &&
-          matchesAvailability
-        );
-      })
-      .sort((a, b) =>
-        compareCodes(
-          a.code,
-          b.code
-        )
+        }
+      )
+      .sort(
+        (a, b) =>
+          compareCodes(
+            a.code,
+            b.code
+          )
       );
   }
 
 
-  /* ====================================
-     RENDER CATÁLOGO
-  ==================================== */
-
   function render() {
-    grid.innerHTML = "";
+    grid.innerHTML =
+      "";
+
 
     const items =
       filtered();
+
 
     if (empty) {
       empty.style.display =
@@ -4047,19 +4506,23 @@ function initializeSellerPage() {
           : "none";
     }
 
+
     items.forEach(
       (perfume) => {
         const soldOut =
           perfume.availability ===
           "Agotado";
 
+
         const card =
           document.createElement(
             "article"
           );
 
+
         card.className =
           "seller-product-card";
+
 
         if (soldOut) {
           card.classList.add(
@@ -4067,62 +4530,13 @@ function initializeSellerPage() {
           );
         }
 
+
         card.innerHTML = `
           <div class="seller-card-top">
 
-            <span class="seller-brand">
-              ${escapeHTML(
-                perfume.brand
-              )}
-            </span>
-
-            <span class="seller-category">
-              ${escapeHTML(
-                perfume.category
-              )}
-            </span>
-
-          </div>
-
-
-          <div class="seller-card-body">
-
-            <h3>
-              ${escapeHTML(
-                perfume.name
-              )}
-            </h3>
-
-
-            <div class="seller-product-meta">
-
-              <span>
-                ${escapeHTML(
-                  perfume.size
-                )}
-              </span>
-
-              <span>•</span>
-
-              <span>
-                ${escapeHTML(
-                  perfume.code
-                )}
-              </span>
-
-            </div>
-
-
-            <strong class="seller-product-price">
-              ${formatCurrency(
-                perfume.price
-              )}
-            </strong>
-
-
             <span
               class="
-                availability-status
+                seller-availability
                 ${availabilityClass(
                   perfume.availability
                 )}
@@ -4133,32 +4547,79 @@ function initializeSellerPage() {
               )}
             </span>
 
+            <span class="seller-code">
+              ${escapeHTML(
+                perfume.code
+              )}
+            </span>
 
-            <div class="seller-sale-action">
+          </div>
 
-              <button
-                class="seller-sale-button"
-                data-sale-id="${escapeHTML(
-                  perfume.id
-                )}"
-                type="button"
-                ${
-                  soldOut
-                    ? "disabled"
-                    : ""
-                }
-              >
-                ${
-                  soldOut
-                    ? "Producto agotado"
-                    : "Registrar venta"
-                }
-              </button>
+          <div class="seller-card-content">
+
+            <span class="seller-brand">
+              ${escapeHTML(
+                perfume.brand
+              )}
+            </span>
+
+            <h3>
+              ${escapeHTML(
+                perfume.name
+              )}
+            </h3>
+
+            <div class="seller-card-meta">
+
+              <span>
+                ${escapeHTML(
+                  perfume.category
+                )}
+              </span>
+
+              <span>
+                ${escapeHTML(
+                  formatPerfumeSize(
+                    perfume.size
+                  ) ||
+                  perfume.size
+                )}
+              </span>
 
             </div>
 
           </div>
+
+          <div class="seller-card-bottom">
+
+            <strong>
+              ${formatCurrency(
+                perfume.price
+              )}
+            </strong>
+
+            <button
+              class="seller-sale-button"
+              data-seller-sale="${escapeHTML(
+                perfume.id
+              )}"
+              type="button"
+              ${
+                soldOut
+                  ? "disabled"
+                  : ""
+              }
+            >
+              ${
+                soldOut
+                  ? "Agotado"
+                  : "Registrar venta"
+              }
+            </button>
+
+          </div>
         `;
+
 
         grid.appendChild(
           card
@@ -4168,42 +4629,57 @@ function initializeSellerPage() {
   }
 
 
-  /* ====================================
-     ABRIR MODAL
-  ==================================== */
-
   function openSaleModal(
     perfume
   ) {
-    if (
-      !modal ||
-      !perfume
-    ) {
-      return;
-    }
-
     selectedPerfume =
       perfume;
 
+
+    if (!modal) {
+      const confirmed =
+        window.confirm(
+          `¿Registrar venta de "${perfume.name}" por ${formatCurrency(
+            perfume.price
+          )}?`
+        );
+
+
+      if (confirmed) {
+        processSelectedSale();
+      }
+
+
+      return;
+    }
+
+
     if (modalBrand) {
       modalBrand.textContent =
-        perfume.brand || "—";
+        perfume.brand;
     }
+
 
     if (modalName) {
       modalName.textContent =
-        perfume.name || "—";
+        perfume.name;
     }
+
 
     if (modalSize) {
       modalSize.textContent =
-        perfume.size || "—";
+        formatPerfumeSize(
+          perfume.size
+        ) ||
+        perfume.size;
     }
+
 
     if (modalCode) {
       modalCode.textContent =
-        perfume.code || "—";
+        perfume.code;
     }
+
 
     if (modalPrice) {
       modalPrice.textContent =
@@ -4212,32 +4688,23 @@ function initializeSellerPage() {
         );
     }
 
-    if (confirmButton) {
-      confirmButton.disabled =
-        false;
-
-      confirmButton.textContent =
-        "Confirmar venta";
-    }
 
     modal.classList.remove(
       "hidden"
     );
+
 
     modal.setAttribute(
       "aria-hidden",
       "false"
     );
 
+
     document.body.classList.add(
       "modal-open"
     );
   }
 
-
-  /* ====================================
-     CERRAR MODAL
-  ==================================== */
 
   function closeSaleModal(
     force = false
@@ -4249,68 +4716,201 @@ function initializeSellerPage() {
       return;
     }
 
-    if (modal) {
-      modal.classList.add(
+
+    modal
+      ?.classList
+      .add(
         "hidden"
       );
 
-      modal.setAttribute(
+
+    modal
+      ?.setAttribute(
         "aria-hidden",
         "true"
       );
-    }
+
 
     document.body.classList.remove(
       "modal-open"
     );
 
-    selectedPerfume = null;
+
+    if (!registeringSale) {
+      selectedPerfume =
+        null;
+    }
   }
 
 
-  /* ====================================
-     ABRIR CONFIRMACIÓN DESDE PRODUCTO
-  ==================================== */
+  async function processSelectedSale() {
+    if (
+      !selectedPerfume ||
+      registeringSale
+    ) {
+      return;
+    }
+
+
+    const perfume = {
+      ...selectedPerfume
+    };
+
+
+    registeringSale =
+      true;
+
+
+    if (
+      confirmSaleButton
+    ) {
+      confirmSaleButton.disabled =
+        true;
+
+      confirmSaleButton.textContent =
+        "Registrando...";
+    }
+
+
+    /*
+     * Cerramos inmediatamente el modal
+     * al presionar Confirmar.
+     */
+    if (modal) {
+      closeSaleModal(
+        true
+      );
+    }
+
+
+    showToast(
+      "Registrando venta..."
+    );
+
+
+    try {
+      await registerSellerSale(
+        perfume.id
+      );
+
+
+      await loadSellerCatalog();
+
+
+      render();
+
+
+      showToast(
+        `Venta registrada: ${perfume.name}`
+      );
+
+    } catch (error) {
+      console.error(
+        "Error registrando venta:",
+        error
+      );
+
+
+      try {
+        await loadSellerCatalog();
+
+        render();
+
+      } catch (
+        refreshError
+      ) {
+        console.error(
+          refreshError
+        );
+      }
+
+
+      const message =
+        String(
+          error.message ||
+          ""
+        )
+          .toLowerCase();
+
+
+      showToast(
+        message.includes(
+          "agotado"
+        )
+          ? "El perfume ya está agotado."
+          : (
+              error.message ||
+              "No se pudo registrar la venta."
+            )
+      );
+
+    } finally {
+      registeringSale =
+        false;
+
+      selectedPerfume =
+        null;
+
+
+      if (
+        confirmSaleButton
+      ) {
+        confirmSaleButton.disabled =
+          false;
+
+        confirmSaleButton.textContent =
+          "Confirmar venta";
+      }
+    }
+  }
+
 
   grid.addEventListener(
     "click",
     (event) => {
       const button =
         event.target.closest(
-          "[data-sale-id]"
+          "[data-seller-sale]"
         );
 
-      if (!button) {
+
+      if (
+        !button ||
+        button.disabled
+      ) {
         return;
       }
+
 
       const perfume =
         sellerCatalog.find(
           (item) =>
-            String(item.id) ===
             String(
-              button.dataset.saleId
+              item.id
+            ) ===
+            String(
+              button.dataset
+                .sellerSale
             )
         );
 
-      if (!perfume) {
-        showToast(
-          "No se encontró el perfume."
-        );
 
+      if (!perfume) {
         return;
       }
+
 
       if (
         perfume.availability ===
         "Agotado"
       ) {
         showToast(
-          "Este perfume está agotado."
+          "El perfume está agotado."
         );
 
         return;
       }
+
 
       openSaleModal(
         perfume
@@ -4319,9 +4919,14 @@ function initializeSellerPage() {
   );
 
 
-  /* ====================================
-     CERRAR CON X / FONDO
-  ==================================== */
+  cancelSaleButton
+    ?.addEventListener(
+      "click",
+      () => {
+        closeSaleModal();
+      }
+    );
+
 
   document
     .querySelectorAll(
@@ -4339,22 +4944,12 @@ function initializeSellerPage() {
     );
 
 
-  /* ====================================
-     CANCELAR
-  ==================================== */
-
-  cancelButton
+  confirmSaleButton
     ?.addEventListener(
       "click",
-      () => {
-        closeSaleModal();
-      }
+      processSelectedSale
     );
 
-
-  /* ====================================
-     ESC
-  ==================================== */
 
   document.addEventListener(
     "keydown",
@@ -4363,9 +4958,11 @@ function initializeSellerPage() {
         event.key ===
           "Escape" &&
         modal &&
-        !modal.classList.contains(
-          "hidden"
-        )
+        !modal
+          .classList
+          .contains(
+            "hidden"
+          )
       ) {
         closeSaleModal();
       }
@@ -4373,184 +4970,19 @@ function initializeSellerPage() {
   );
 
 
-  /* ====================================
-   CONFIRMAR VENTA
-==================================== */
-
-confirmButton
-  ?.addEventListener(
-    "click",
-    async () => {
-      if (
-        registeringSale ||
-        !selectedPerfume
-      ) {
-        return;
-      }
-
-      /*
-       * Guardamos el perfume antes de cerrar
-       * el modal, porque closeSaleModal()
-       * limpia selectedPerfume.
-       */
-      const perfume = {
-        ...selectedPerfume
-      };
-
-      registeringSale = true;
-
-      confirmButton.disabled = true;
-      confirmButton.textContent =
-        "Registrando...";
+  search
+    ?.addEventListener(
+      "input",
+      render
+    );
 
 
-      /*
-       * Cerramos el modal INMEDIATAMENTE
-       * después de confirmar.
-       */
-      closeSaleModal(true);
+  category
+    ?.addEventListener(
+      "change",
+      render
+    );
 
-
-      /*
-       * Avisamos al vendedor que la operación
-       * comenzó.
-       */
-      showToast(
-        "Registrando venta..."
-      );
-
-
-      try {
-        const result =
-          await registerSellerSale(
-            perfume.id
-          );
-
-        console.log(
-          "Venta registrada:",
-          result
-        );
-
-
-        /*
-         * Actualizamos el catálogo después
-         * de descontar la unidad.
-         */
-        await loadSellerCatalog();
-
-        render();
-
-
-        showToast(
-          `Venta registrada: ${perfume.name}`
-        );
-
-      } catch (error) {
-        console.error(
-          "Error registrando venta:",
-          error
-        );
-
-        const message =
-          String(
-            error?.message ||
-            ""
-          );
-
-        const normalizedMessage =
-          normalizeForComparison(
-            message
-          );
-
-
-        if (
-          normalizedMessage.includes(
-            "agotado"
-          )
-        ) {
-          showToast(
-            "El perfume ya está agotado."
-          );
-
-        } else if (
-          normalizedMessage.includes(
-            "desactivada"
-          )
-        ) {
-          showToast(
-            "Tu cuenta está desactivada."
-          );
-
-        } else if (
-          normalizedMessage.includes(
-            "solo los vendedores"
-          )
-        ) {
-          showToast(
-            "Solo los vendedores pueden registrar ventas."
-          );
-
-        } else if (
-          normalizedMessage.includes(
-            "iniciar sesion"
-          )
-        ) {
-          showToast(
-            "Tu sesión expiró. Inicia sesión nuevamente."
-          );
-
-        } else {
-          showToast(
-            message ||
-            "No se pudo registrar la venta."
-          );
-        }
-
-
-        /*
-         * Aunque haya error, volvemos a
-         * consultar el catálogo para mantener
-         * la pantalla sincronizada.
-         */
-        try {
-          await loadSellerCatalog();
-
-          render();
-
-        } catch (refreshError) {
-          console.error(
-            "Error actualizando catálogo:",
-            refreshError
-          );
-        }
-
-      } finally {
-        registeringSale = false;
-
-        if (confirmButton) {
-          confirmButton.disabled =
-            false;
-
-          confirmButton.textContent =
-            "Confirmar venta";
-        }
-      }
-    }
-  );
-
-  /* ====================================
-     FILTROS
-  ==================================== */
-
-  search?.addEventListener(
-    "input",
-    render
-  );
-
-  category?.addEventListener(
-    "change",
-    render
-  );
 
   availabilityFilter
     ?.addEventListener(
@@ -4559,38 +4991,23 @@ confirmButton
     );
 
 
-  /* ====================================
-     CARGA INICIAL
-  ==================================== */
-
   async function load() {
-    grid.innerHTML = `
-      <div class="seller-catalog-loading">
-        Cargando catálogo...
-      </div>
-    `;
-
-    if (empty) {
-      empty.style.display =
-        "none";
-    }
-
     try {
       await loadSellerCatalog();
+
 
       render();
 
     } catch (error) {
       console.error(
-        "No se pudo cargar el catálogo:",
         error
       );
 
-      grid.innerHTML = "";
 
       if (empty) {
         empty.style.display =
           "block";
+
 
         const title =
           empty.querySelector(
@@ -4602,20 +5019,21 @@ confirmButton
             "p"
           );
 
+
         if (title) {
           title.textContent =
             "No se pudo cargar el catálogo";
         }
 
+
         if (paragraph) {
           paragraph.textContent =
-            error.message ||
             "Verifica tu conexión e intenta nuevamente.";
         }
       }
 
+
       showToast(
-        error.message ||
         "No se pudo cargar el catálogo."
       );
     }
@@ -4624,11 +5042,61 @@ confirmButton
 
   load();
 }
+
+
 /* ======================================
    VENTAS - ADMIN
 ====================================== */
 
-let adminSales = [];
+function mapSaleFromDB(
+  sale
+) {
+  return {
+    id:
+      sale.id,
+
+    perfumeId:
+      sale.perfume_id,
+
+    perfumeName:
+      sale.perfume_name ||
+      "",
+
+    perfumeBrand:
+      sale.perfume_brand ||
+      "",
+
+    perfumeSize:
+      formatPerfumeSize(
+        sale.perfume_size
+      ) ||
+      sale.perfume_size ||
+      "",
+
+    perfumeCode:
+      sale.perfume_code ||
+      "",
+
+    salePrice:
+      Number(
+        sale.sale_price
+      ) || 0,
+
+    sellerId:
+      sale.seller_id,
+
+    sellerName:
+      sale.seller_name ||
+      "Vendedor",
+
+    sellerEmail:
+      sale.seller_email ||
+      "",
+
+    createdAt:
+      sale.created_at
+  };
+}
 
 
 /* ======================================
@@ -4640,9 +5108,10 @@ async function loadAdminSales() {
     data,
     error
   } =
-    await supabaseClient.rpc(
-      "get_admin_sales"
-    );
+    await supabaseClient
+      .rpc(
+        "get_admin_sales"
+      );
 
 
   if (error) {
@@ -4650,6 +5119,7 @@ async function loadAdminSales() {
       "Error get_admin_sales:",
       error
     );
+
 
     throw new Error(
       error.message ||
@@ -4659,50 +5129,10 @@ async function loadAdminSales() {
 
 
   adminSales =
-    (data || []).map(
-      (sale) => ({
-        id:
-          sale.id,
-
-        perfumeId:
-          sale.perfume_id,
-
-        perfumeName:
-          sale.perfume_name ||
-          "",
-
-        perfumeBrand:
-          sale.perfume_brand ||
-          "",
-
-        perfumeSize:
-          sale.perfume_size ||
-          "",
-
-        perfumeCode:
-          sale.perfume_code ||
-          "",
-
-        salePrice:
-          Number(
-            sale.sale_price
-          ) || 0,
-
-        sellerId:
-          sale.seller_id,
-
-        sellerName:
-          sale.seller_name ||
-          "Vendedor",
-
-        sellerEmail:
-          sale.seller_email ||
-          "",
-
-        createdAt:
-          sale.created_at
-      })
-    );
+    (data || [])
+      .map(
+        mapSaleFromDB
+      );
 
 
   return adminSales;
@@ -4710,7 +5140,7 @@ async function loadAdminSales() {
 
 
 /* ======================================
-   UTILIDADES FECHA VENTAS
+   FECHAS VENTAS
 ====================================== */
 
 function getLocalDateKey(
@@ -4736,6 +5166,7 @@ function getLocalDateKey(
   const year =
     date.getFullYear();
 
+
   const month =
     String(
       date.getMonth() + 1
@@ -4743,6 +5174,7 @@ function getLocalDateKey(
       2,
       "0"
     );
+
 
   const day =
     String(
@@ -4871,38 +5303,21 @@ function initializeSalesPage() {
       "salesEmptyState"
     );
 
-  const salesToday =
-    document.getElementById(
-      "salesToday"
-    );
-
-  const revenueToday =
-    document.getElementById(
-      "revenueToday"
-    );
-
-  const salesMonth =
-    document.getElementById(
-      "salesMonth"
-    );
-
-  const revenueMonth =
-    document.getElementById(
-      "revenueMonth"
-    );
-
 
   function updateStatistics() {
     const now =
       new Date();
+
 
     const todayKey =
       getLocalDateKey(
         now
       );
 
+
     const currentYear =
       now.getFullYear();
+
 
     const currentMonth =
       now.getMonth();
@@ -4925,6 +5340,7 @@ function initializeSalesPage() {
             new Date(
               sale.createdAt
             );
+
 
           return (
             !Number.isNaN(
@@ -4962,6 +5378,7 @@ function initializeSalesPage() {
       todaySales.length
     );
 
+
     setText(
       "revenueToday",
       formatCurrency(
@@ -4969,10 +5386,12 @@ function initializeSalesPage() {
       )
     );
 
+
     setText(
       "salesMonth",
       monthSales.length
     );
+
 
     setText(
       "revenueMonth",
@@ -5005,6 +5424,7 @@ function initializeSalesPage() {
           return;
         }
 
+
         sellers.set(
           String(
             sale.sellerId
@@ -5035,23 +5455,30 @@ function initializeSalesPage() {
       <option value="Todos">
         Todos los vendedores
       </option>
-
-      ${sorted
-        .map(
-          ([id, name]) => `
-            <option
-              value="${escapeHTML(
-                id
-              )}"
-            >
-              ${escapeHTML(
-                name
-              )}
-            </option>
-          `
-        )
-        .join("")}
     `;
+
+
+    sorted.forEach(
+      ([id, name]) => {
+        const option =
+          document.createElement(
+            "option"
+          );
+
+
+        option.value =
+          id;
+
+
+        option.textContent =
+          name;
+
+
+        sellerFilter.appendChild(
+          option
+        );
+      }
+    );
 
 
     if (
@@ -5075,18 +5502,10 @@ function initializeSalesPage() {
         ""
       );
 
-    const sellerId =
-      sellerFilter?.value ||
-      "Todos";
-
-    const selectedDate =
-      dateFilter?.value ||
-      "";
-
 
     return adminSales.filter(
       (sale) => {
-        const searchable =
+        const text =
           normalizeText(
             [
               sale.perfumeName,
@@ -5102,26 +5521,30 @@ function initializeSalesPage() {
 
 
         const matchesSearch =
-          searchable.includes(
+          text.includes(
             query
           );
 
 
         const matchesSeller =
-          sellerId ===
+          !sellerFilter ||
+          sellerFilter.value ===
             "Todos" ||
           String(
             sale.sellerId
           ) ===
-            sellerId;
+            String(
+              sellerFilter.value
+            );
 
 
         const matchesDate =
-          !selectedDate ||
+          !dateFilter ||
+          !dateFilter.value ||
           getLocalDateKey(
             sale.createdAt
           ) ===
-            selectedDate;
+            dateFilter.value;
 
 
         return (
@@ -5161,9 +5584,7 @@ function initializeSalesPage() {
 
         row.innerHTML = `
           <td>
-
             <div class="sales-product-cell">
-
               <strong>
                 ${escapeHTML(
                   sale.perfumeName
@@ -5176,6 +5597,9 @@ function initializeSalesPage() {
                 )}
                 ·
                 ${escapeHTML(
+                  formatPerfumeSize(
+                    sale.perfumeSize
+                  ) ||
                   sale.perfumeSize
                 )}
               </span>
@@ -5185,16 +5609,11 @@ function initializeSalesPage() {
                   sale.perfumeCode
                 )}
               </small>
-
             </div>
-
           </td>
 
-
           <td>
-
             <div class="sales-seller-cell">
-
               <strong>
                 ${escapeHTML(
                   sale.sellerName
@@ -5207,22 +5626,16 @@ function initializeSalesPage() {
                   "—"
                 )}
               </span>
-
             </div>
-
           </td>
 
-
           <td>
-
             <strong class="sales-price">
               ${formatCurrency(
                 sale.salePrice
               )}
             </strong>
-
           </td>
-
 
           <td>
             ${escapeHTML(
@@ -5231,7 +5644,6 @@ function initializeSalesPage() {
               )
             )}
           </td>
-
 
           <td>
             ${escapeHTML(
@@ -5290,15 +5702,18 @@ function initializeSalesPage() {
             "";
         }
 
+
         if (sellerFilter) {
           sellerFilter.value =
             "Todos";
         }
 
+
         if (dateFilter) {
           dateFilter.value =
             "";
         }
+
 
         renderSales();
       }
@@ -5326,6 +5741,7 @@ function initializeSalesPage() {
     try {
       await loadAdminSales();
 
+
       renderEverything();
 
     } catch (error) {
@@ -5334,27 +5750,33 @@ function initializeSalesPage() {
         error
       );
 
+
       tableBody.innerHTML =
         "";
+
 
       if (emptyState) {
         emptyState.style.display =
           "block";
+
 
         const title =
           emptyState.querySelector(
             "h3"
           );
 
+
         const paragraph =
           emptyState.querySelector(
             "p"
           );
 
+
         if (title) {
           title.textContent =
             "No se pudieron cargar las ventas";
         }
+
 
         if (paragraph) {
           paragraph.textContent =
@@ -5362,6 +5784,7 @@ function initializeSalesPage() {
             "Intenta nuevamente.";
         }
       }
+
 
       showToast(
         error.message ||
@@ -5373,14 +5796,6 @@ function initializeSalesPage() {
 
   load();
 }
-
-/* ======================================
-   USUARIOS
-====================================== */
-
-let sellerUsers = [];
-let latestSellerCredentials = null;
-let selectedSellerForPassword = null;
 
 
 /* ======================================
@@ -5411,7 +5826,8 @@ async function invokeSellerManager(
 
 
   const accessToken =
-    sessionData.session
+    sessionData
+      .session
       .access_token;
 
 
@@ -5452,15 +5868,20 @@ async function invokeSellerManager(
     try {
       if (
         error.context &&
-        typeof error.context.json ===
+        typeof error
+          .context
+          .json ===
           "function"
       ) {
         const errorBody =
-          await error.context
+          await error
+            .context
             .json();
 
 
-        if (errorBody?.error) {
+        if (
+          errorBody?.error
+        ) {
           message =
             errorBody.error;
 
@@ -5530,7 +5951,9 @@ function generateSellerPassword(
 
   function randomIndex(max) {
     const values =
-      new Uint32Array(1);
+      new Uint32Array(
+        1
+      );
 
 
     crypto.getRandomValues(
@@ -5633,6 +6056,7 @@ async function copyTextToClipboard(
         text
       );
 
+
     return;
   }
 
@@ -5645,6 +6069,7 @@ async function copyTextToClipboard(
 
   textarea.value =
     text;
+
 
   textarea.style.position =
     "fixed";
@@ -5684,7 +6109,7 @@ async function copyTextToClipboard(
 
 
 /* ======================================
-   FORMATEAR FECHA
+   FECHA USUARIOS
 ====================================== */
 
 function formatUserDate(
@@ -5774,130 +6199,109 @@ function initializeUsersPage() {
       "sellerFullName"
     );
 
-
   const emailInput =
     document.getElementById(
       "sellerEmail"
     );
-
 
   const passwordInput =
     document.getElementById(
       "sellerPassword"
     );
 
-
   const generateButton =
     document.getElementById(
       "generateCredentialsButton"
     );
 
-
   const submitButton =
     document.getElementById(
       "createSellerButton"
+    ) ||
+    form.querySelector(
+      'button[type="submit"]'
     );
-
 
   const credentialsPanel =
     document.getElementById(
       "credentialsPanel"
     );
 
-
   const credentialsEyebrow =
     document.getElementById(
       "credentialsEyebrow"
     );
-
 
   const credentialsTitle =
     document.getElementById(
       "credentialsTitle"
     );
 
-
   const createdSellerName =
     document.getElementById(
       "createdSellerName"
     );
-
 
   const createdSellerEmail =
     document.getElementById(
       "createdSellerEmail"
     );
 
-
   const createdSellerPassword =
     document.getElementById(
       "createdSellerPassword"
     );
-
 
   const copyCredentialsButton =
     document.getElementById(
       "copyCredentialsButton"
     );
 
-
   const searchInput =
     document.getElementById(
       "userSearchInput"
     );
-
 
   const tableBody =
     document.getElementById(
       "usersTableBody"
     );
 
-
   const emptyState =
     document.getElementById(
       "usersEmptyState"
     );
-
 
   const passwordModal =
     document.getElementById(
       "sellerPasswordModal"
     );
 
-
   const passwordSellerName =
     document.getElementById(
       "passwordSellerName"
     );
-
 
   const passwordSellerEmail =
     document.getElementById(
       "passwordSellerEmail"
     );
 
-
   const newPasswordInput =
     document.getElementById(
       "newSellerPassword"
     );
-
 
   const generateNewPasswordButton =
     document.getElementById(
       "generateNewPasswordButton"
     );
 
-
   const savePasswordButton =
     document.getElementById(
       "saveSellerPasswordButton"
     );
 
-
-  /* ====================================
-     MOSTRAR CREDENCIALES
-  ==================================== */
 
   function showCredentials(
     seller,
@@ -5919,7 +6323,8 @@ function initializeUsersPage() {
       credentialsEyebrow
     ) {
       credentialsEyebrow.textContent =
-        mode === "updated"
+        mode ===
+        "updated"
           ? "CONTRASEÑA ACTUALIZADA"
           : "CREDENCIALES";
     }
@@ -5929,7 +6334,8 @@ function initializeUsersPage() {
       credentialsTitle
     ) {
       credentialsTitle.textContent =
-        mode === "updated"
+        mode ===
+        "updated"
           ? "Nuevo acceso del vendedor"
           : "Acceso del vendedor";
     }
@@ -5969,10 +6375,6 @@ function initializeUsersPage() {
   }
 
 
-  /* ====================================
-     FILTRAR
-  ==================================== */
-
   function filteredUsers() {
     const query =
       normalizeText(
@@ -6001,10 +6403,6 @@ function initializeUsersPage() {
     );
   }
 
-
-  /* ====================================
-     RENDER
-  ==================================== */
 
   function renderUsers() {
     if (!tableBody) {
@@ -6044,7 +6442,6 @@ function initializeUsersPage() {
         row.innerHTML = `
           <td>
             <div class="user-person-cell">
-
               <strong>
                 ${escapeHTML(
                   seller.fullName ||
@@ -6055,10 +6452,8 @@ function initializeUsersPage() {
               <small>
                 Vendedor
               </small>
-
             </div>
           </td>
-
 
           <td>
             <span class="user-email">
@@ -6068,7 +6463,6 @@ function initializeUsersPage() {
               )}
             </span>
           </td>
-
 
           <td>
             <span
@@ -6093,7 +6487,6 @@ function initializeUsersPage() {
             </span>
           </td>
 
-
           <td>
             ${escapeHTML(
               formatUserDate(
@@ -6102,10 +6495,8 @@ function initializeUsersPage() {
             )}
           </td>
 
-
           <td>
             <div class="user-actions">
-
               <button
                 class="
                   action-button
@@ -6119,7 +6510,6 @@ function initializeUsersPage() {
               >
                 Contraseña
               </button>
-
 
               <button
                 class="
@@ -6142,7 +6532,6 @@ function initializeUsersPage() {
                     : "Reactivar"
                 }
               </button>
-
             </div>
           </td>
         `;
@@ -6156,14 +6545,15 @@ function initializeUsersPage() {
   }
 
 
-  /* ====================================
-     GENERAR CONTRASEÑA
-  ==================================== */
-
   generateButton
     ?.addEventListener(
       "click",
       () => {
+        if (!passwordInput) {
+          return;
+        }
+
+
         passwordInput.value =
           generateSellerPassword();
 
@@ -6179,10 +6569,6 @@ function initializeUsersPage() {
       }
     );
 
-
-  /* ====================================
-     CREAR VENDEDOR
-  ==================================== */
 
   form.addEventListener(
     "submit",
@@ -6210,11 +6596,13 @@ function initializeUsersPage() {
 
 
       if (
-        fullName.length < 2
+        fullName.length <
+        2
       ) {
         showToast(
           "Escribe el nombre del vendedor."
         );
+
 
         fullNameInput.focus();
 
@@ -6229,6 +6617,7 @@ function initializeUsersPage() {
           "Escribe un correo electrónico válido."
         );
 
+
         emailInput.focus();
 
         return;
@@ -6236,11 +6625,13 @@ function initializeUsersPage() {
 
 
       if (
-        password.length < 8
+        password.length <
+        8
       ) {
         showToast(
           "La contraseña debe tener al menos 8 caracteres."
         );
+
 
         passwordInput.focus();
 
@@ -6359,10 +6750,6 @@ function initializeUsersPage() {
   );
 
 
-  /* ====================================
-     COPIAR CREDENCIALES
-  ==================================== */
-
   copyCredentialsButton
     ?.addEventListener(
       "click",
@@ -6421,10 +6808,6 @@ function initializeUsersPage() {
       }
     );
 
-
-  /* ====================================
-     MODAL CONTRASEÑA
-  ==================================== */
 
   function openPasswordModal(
     seller
@@ -6535,25 +6918,6 @@ function initializeUsersPage() {
     );
 
 
-  document.addEventListener(
-    "keydown",
-    (event) => {
-      if (
-        event.key ===
-          "Escape" &&
-        passwordModal &&
-        !passwordModal
-          .classList
-          .contains(
-            "hidden"
-          )
-      ) {
-        closePasswordModal();
-      }
-    }
-  );
-
-
   generateNewPasswordButton
     ?.addEventListener(
       "click",
@@ -6581,10 +6945,6 @@ function initializeUsersPage() {
     );
 
 
-  /* ====================================
-     GUARDAR NUEVA CONTRASEÑA
-  ==================================== */
-
   savePasswordButton
     ?.addEventListener(
       "click",
@@ -6602,7 +6962,8 @@ function initializeUsersPage() {
 
 
         if (
-          password.length < 8
+          password.length <
+          8
         ) {
           showToast(
             "La contraseña debe tener al menos 8 caracteres."
@@ -6703,10 +7064,6 @@ function initializeUsersPage() {
       }
     );
 
-
-  /* ====================================
-     ACCIONES TABLA
-  ==================================== */
 
   tableBody
     ?.addEventListener(
@@ -6852,10 +7209,6 @@ function initializeUsersPage() {
     );
 
 
-  /* ====================================
-     BUSCADOR
-  ==================================== */
-
   searchInput
     ?.addEventListener(
       "input",
@@ -6863,9 +7216,24 @@ function initializeUsersPage() {
     );
 
 
-  /* ====================================
-     CARGA INICIAL
-  ==================================== */
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        event.key ===
+          "Escape" &&
+        passwordModal &&
+        !passwordModal
+          .classList
+          .contains(
+            "hidden"
+          )
+      ) {
+        closePasswordModal();
+      }
+    }
+  );
+
 
   async function loadUsersPage() {
     if (tableBody) {
@@ -6947,6 +7315,7 @@ function initializeUsersPage() {
 
   loadUsersPage();
 }
+
 
 /* ======================================
    APP
@@ -7034,6 +7403,7 @@ async function initializeApp() {
         "No se pudo cargar el inventario:",
         error
       );
+
 
       showToast(
         "No se pudo cargar el inventario."

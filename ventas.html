@@ -1,427 +1,126 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Duvant 12 | Ventas</title>
-
-  <link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
-  >
-
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
-
-  <script>
-    try {
-      const cachedProfile =
-        JSON.parse(
-          sessionStorage.getItem(
-            "duvant12_profile"
-          )
-        );
-
-      if (cachedProfile?.role) {
-        document.documentElement.dataset.role =
-          cachedProfile.role;
-      }
-    } catch (error) {
-      console.error(
-        "No se pudo leer el perfil almacenado:",
-        error
-      );
-    }
-  </script>
-
-  <link
-    rel="stylesheet"
-    href="styles.css"
-  >
-</head>
-
-<body data-page="admin">
-
-  <div class="app">
-
-    <aside class="sidebar">
-
-      <div class="brand">
-
-        <img
-          src="logo.png"
-          alt="Logo Duvant 12"
-          class="brand-logo"
-        >
-
-        <div class="brand-text">
-          <strong>Duvant 12</strong>
-          <span>Fragrances House</span>
-        </div>
-
-      </div>
+create or replace function public.delete_sale(
+  p_sale_id uuid
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+  v_profile public.profiles%rowtype;
+  v_sale public.sales%rowtype;
+  v_restored_quantity integer;
+begin
 
+  /* =====================================
+     USUARIO AUTENTICADO
+  ===================================== */
 
-      <nav class="sidebar-nav">
+  v_user_id := auth.uid();
 
-        <a
-          href="index.html"
-          class="nav-link admin-only"
-        >
-          <span class="nav-icon">⌂</span>
-          <span>Dashboard</span>
-        </a>
+  if v_user_id is null then
+    raise exception
+      'Debes iniciar sesión.';
+  end if;
 
-        <a
-          href="inventario.html"
-          class="nav-link admin-only"
-        >
-          <span class="nav-icon">▣</span>
-          <span>Inventario</span>
-        </a>
 
-        <a
-          href="vendedores.html"
-          class="nav-link"
-        >
-          <span class="nav-icon">◇</span>
-          <span>Vendedores</span>
-        </a>
+  /* =====================================
+     VALIDAR ADMINISTRADOR
+  ===================================== */
 
-        <a
-          href="ventas.html"
-          class="nav-link active admin-only"
-        >
-          <span class="nav-icon">$</span>
-          <span>Ventas</span>
-        </a>
+  select *
+  into v_profile
+  from public.profiles
+  where id = v_user_id;
 
-        <a
-          href="usuarios.html"
-          class="nav-link admin-only"
-        >
-          <span class="nav-icon">♙</span>
-          <span>Usuarios</span>
-        </a>
 
-      </nav>
+  if not found then
+    raise exception
+      'No se encontró el perfil del usuario.';
+  end if;
 
 
-      <div class="sidebar-bottom">
+  if v_profile.active is not true then
+    raise exception
+      'Tu cuenta está desactivada.';
+  end if;
 
-        <div class="quote-card">
 
-          <strong data-current-user>
-            Administrador
-          </strong>
+  if v_profile.role <> 'admin' then
+    raise exception
+      'Solo los administradores pueden eliminar ventas.';
+  end if;
 
-          <span data-current-role>
-            Administrador
-          </span>
 
-          <div class="quote-divider"></div>
+  /* =====================================
+     OBTENER Y BLOQUEAR LA VENTA
+  ===================================== */
 
-          <button
-            class="logout-button"
-            data-logout
-            type="button"
-          >
-            Cerrar sesión
-          </button>
+  select *
+  into v_sale
+  from public.sales
+  where id = p_sale_id
+  for update;
 
-        </div>
 
-      </div>
+  if not found then
+    raise exception
+      'La venta no existe o ya fue eliminada.';
+  end if;
 
-    </aside>
 
+  /* =====================================
+     DEVOLVER UNIDAD AL INVENTARIO
+  ===================================== */
 
-    <main class="main-content">
+  update public.perfumes
+  set
+    quantity = quantity + 1,
+    updated_at = now()
+  where id = v_sale.perfume_id
+  returning quantity
+  into v_restored_quantity;
 
-      <header class="topbar">
 
-        <div>
+  if not found then
+    raise exception
+      'No se encontró el perfume asociado a esta venta.';
+  end if;
 
-          <span class="topbar-label">
-            Administración
-          </span>
 
-          <h1>
-            Ventas
-          </h1>
+  /* =====================================
+     ELIMINAR VENTA
+  ===================================== */
 
-          <p>
-            Consulta las ventas registradas por tus vendedores.
-          </p>
+  delete from public.sales
+  where id = p_sale_id;
 
-        </div>
 
-
-        <div class="admin-profile">
-
-          <div class="admin-logo">
-            D12
-          </div>
-
-          <div class="admin-info">
-
-            <strong data-current-user>
-              Administrador
-            </strong>
-
-            <span>
-              Duvant 12
-            </span>
-
-          </div>
-
-        </div>
-
-      </header>
-
-
-      <!-- ESTADÍSTICAS -->
-
-      <section class="sales-stats-grid">
-
-        <article class="sales-stat-card">
-
-          <span>
-            Ventas de hoy
-          </span>
-
-          <strong id="salesToday">
-            0
-          </strong>
-
-          <small>
-            Unidades registradas hoy
-          </small>
-
-        </article>
-
-
-        <article class="sales-stat-card">
-
-          <span>
-            Ingresos de hoy
-          </span>
-
-          <strong id="revenueToday">
-            $0.00
-          </strong>
-
-          <small>
-            Total vendido hoy
-          </small>
-
-        </article>
-
-
-        <article class="sales-stat-card">
-
-          <span>
-            Ventas del mes
-          </span>
-
-          <strong id="salesMonth">
-            0
-          </strong>
-
-          <small>
-            Unidades registradas este mes
-          </small>
-
-        </article>
-
-
-        <article class="sales-stat-card">
-
-          <span>
-            Ingresos del mes
-          </span>
-
-          <strong id="revenueMonth">
-            $0.00
-          </strong>
-
-          <small>
-            Total vendido este mes
-          </small>
-
-        </article>
-
-      </section>
-
-
-      <!-- HISTORIAL -->
-
-      <section class="panel inventory-panel">
-
-        <div class="sales-panel-heading">
-
-          <div>
-
-            <span class="section-eyebrow">
-              Historial
-            </span>
-
-            <h2>
-              Ventas registradas
-            </h2>
-
-          </div>
-
-        </div>
-
-
-        <div class="sales-toolbar">
-
-          <div class="search-box">
-
-            <span>⌕</span>
-
-            <input
-              id="salesSearchInput"
-              type="search"
-              placeholder="Buscar perfume, código o vendedor..."
-            >
-
-          </div>
-
-
-          <div class="sales-filters">
-
-            <select
-              id="salesSellerFilter"
-              class="filter-select"
-            >
-              <option value="Todos">
-                Todos los vendedores
-              </option>
-            </select>
-
-
-            <input
-              id="salesDateFilter"
-              class="sales-date-filter"
-              type="date"
-              aria-label="Filtrar por fecha"
-            >
-
-
-            <button
-              id="clearSalesFiltersButton"
-              class="outline-button"
-              type="button"
-            >
-              Limpiar
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <div class="table-container">
-
-          <table class="sales-table">
-
-            <thead>
-
-              <tr>
-                <th>Perfume</th>
-                <th>Vendedor</th>
-                <th>Precio</th>
-                <th>Fecha</th>
-                <th>Hora</th>
-              </tr>
-
-            </thead>
-
-            <tbody id="salesTableBody">
-            </tbody>
-
-          </table>
-
-        </div>
-
-
-        <div
-          id="salesEmptyState"
-          class="empty-state"
-        >
-
-          <div class="empty-icon">
-            $
-          </div>
-
-          <h3>
-            No hay ventas
-          </h3>
-
-          <p>
-            Las ventas registradas por los vendedores aparecerán aquí.
-          </p>
-
-        </div>
-
-      </section>
-
-
-      <div class="mobile-logout">
-
-        <div class="mobile-user-info">
-
-          <strong data-current-user>
-            Administrador
-          </strong>
-
-          <span data-current-role>
-            Administrador
-          </span>
-
-        </div>
-
-        <button
-          class="logout-button mobile-logout-button"
-          data-logout
-          type="button"
-        >
-          Cerrar sesión
-        </button>
-
-      </div>
-
-    </main>
-
-  </div>
-
-
-  <div
-    id="toast"
-    class="toast"
-  >
-    <span id="toastMessage"></span>
-  </div>
-
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
-  <script src="script.js"></script>
-
-</body>
-</html>
+  /* =====================================
+     RESPUESTA
+  ===================================== */
+
+  return jsonb_build_object(
+    'success', true,
+    'saleId', v_sale.id,
+    'perfumeId', v_sale.perfume_id,
+    'perfumeName', v_sale.perfume_name,
+    'restoredQuantity', v_restored_quantity
+  );
+
+end;
+$$;
+
+
+/* =====================================
+   PERMISOS
+===================================== */
+
+revoke all
+on function public.delete_sale(uuid)
+from public;
+
+grant execute
+on function public.delete_sale(uuid)
+to authenticated;

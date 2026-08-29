@@ -1561,123 +1561,150 @@
         );
 
 
-        /* =================================
-           CONFIRMAR ELIMINACIÓN
-        ================================= */
+       /* =================================
+   CONFIRMAR ELIMINACIÓN
+================================= */
 
-        confirmDeleteButton
-          ?.addEventListener(
-            "click",
-            async () => {
-              if (
-                deletingSale ||
-                !selectedSale
-              ) {
-                return;
-              }
-
-
-              const sale = {
-                ...selectedSale
-              };
+confirmDeleteButton
+  ?.addEventListener(
+    "click",
+    async () => {
+      if (
+        deletingSale ||
+        !selectedSale
+      ) {
+        return;
+      }
 
 
-              deletingSale = true;
-
-              confirmDeleteButton.disabled =
-                true;
-
-              confirmDeleteButton.textContent =
-                "Eliminando...";
-
-
-              try {
-                const {
-                  data,
-                  error
-                } =
-                  await supabaseClient.rpc(
-                    "delete_sale",
-                    {
-                      p_sale_id:
-                        sale.id
-                    }
-                  );
+      /*
+       * Guardamos la venta antes de cerrar
+       * el modal, porque closeDeleteModal()
+       * limpia selectedSale.
+       */
+      const sale = {
+        ...selectedSale
+      };
 
 
-                if (error) {
-                  console.error(
-                    "Error delete_sale:",
-                    error
-                  );
+      deletingSale = true;
 
-                  throw new Error(
-                    error.message ||
-                    error.details ||
-                    "No se pudo eliminar la venta."
-                  );
-                }
+      confirmDeleteButton.disabled =
+        true;
+
+      confirmDeleteButton.textContent =
+        "Eliminando...";
 
 
-                console.log(
-                  "Venta eliminada:",
-                  data
-                );
+      /*
+       * Cerramos el modal inmediatamente.
+       */
+      closeDeleteModal(
+        true
+      );
 
 
-                /*
-                 * Volvemos a cargar desde
-                 * Supabase para mantener toda
-                 * la información sincronizada.
-                 */
-                await loadAdminSales();
+      /*
+       * Avisamos que la operación empezó.
+       */
+      showToast(
+        "Eliminando venta..."
+      );
 
 
-                deletingSale = false;
-
-                closeDeleteModal(
-                  true
-                );
-
-
-                renderEverything();
-
-
-                showToast(
-                  "Venta eliminada y unidad devuelta al inventario."
-                );
-
-              } catch (error) {
-                console.error(
-                  "No se pudo eliminar la venta:",
-                  error
-                );
-
-
-                showToast(
-                  error.message ||
-                  "No se pudo eliminar la venta."
-                );
-
-              } finally {
-                deletingSale = false;
-
-
-                if (
-                  confirmDeleteButton &&
-                  selectedSale
-                ) {
-                  confirmDeleteButton.disabled =
-                    false;
-
-                  confirmDeleteButton.textContent =
-                    "Eliminar venta";
-                }
-              }
+      try {
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.rpc(
+            "delete_sale",
+            {
+              p_sale_id:
+                sale.id
             }
           );
 
 
+        if (error) {
+          console.error(
+            "Error delete_sale:",
+            error
+          );
+
+          throw new Error(
+            error.message ||
+            error.details ||
+            "No se pudo eliminar la venta."
+          );
+        }
+
+
+        console.log(
+          "Venta eliminada:",
+          data
+        );
+
+
+        /*
+         * Recargamos todas las ventas
+         * para actualizar:
+         * - tabla
+         * - estadísticas
+         * - filtros
+         */
+        await loadAdminSales();
+
+
+        renderEverything();
+
+
+        showToast(
+          "Venta eliminada y unidad devuelta al inventario."
+        );
+
+      } catch (error) {
+        console.error(
+          "No se pudo eliminar la venta:",
+          error
+        );
+
+
+        showToast(
+          error.message ||
+          "No se pudo eliminar la venta."
+        );
+
+
+        /*
+         * Recargamos igualmente para mantener
+         * la interfaz sincronizada.
+         */
+        try {
+          await loadAdminSales();
+
+          renderEverything();
+
+        } catch (refreshError) {
+          console.error(
+            "No se pudo actualizar el historial:",
+            refreshError
+          );
+        }
+
+      } finally {
+        deletingSale = false;
+
+        if (confirmDeleteButton) {
+          confirmDeleteButton.disabled =
+            false;
+
+          confirmDeleteButton.textContent =
+            "Eliminar venta";
+        }
+      }
+    }
+  );
         /* =================================
            FILTROS
         ================================= */

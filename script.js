@@ -4329,11 +4329,9 @@ function initializeSellerPage() {
       "sellerProductsGrid"
     );
 
-
   if (!grid) {
     return;
   }
-
 
   const search =
     document.getElementById(
@@ -4354,7 +4352,6 @@ function initializeSellerPage() {
     document.getElementById(
       "sellerEmptyState"
     );
-
 
   const modal =
     document.getElementById(
@@ -4396,52 +4393,40 @@ function initializeSellerPage() {
       "confirmSaleButton"
     );
 
-
-  let selectedPerfume =
-    null;
-
-  let registeringSale =
-    false;
+  let selectedPerfume = null;
+  let registeringSale = false;
 
 
-  function availabilityClass(
-    state
-  ) {
-    if (
-      state ===
-      "Agotado"
-    ) {
+  /* ====================================
+     CLASE DE DISPONIBILIDAD
+  ==================================== */
+
+  function availabilityClass(state) {
+    if (state === "Agotado") {
       return "availability-out";
     }
 
-
-    if (
-      state ===
-      "Unidad única"
-    ) {
+    if (state === "Unidad única") {
       return "availability-last";
     }
 
-
-    if (
-      state ===
-      "Pocas unidades"
-    ) {
+    if (state === "Pocas unidades") {
       return "availability-low";
     }
-
 
     return "availability-available";
   }
 
 
+  /* ====================================
+     FILTROS
+  ==================================== */
+
   function filtered() {
     const query =
       normalizeText(
-        search?.value ||
-        ""
+        search?.value || ""
       );
-
 
     return sellerCatalog
       .filter(
@@ -4453,29 +4438,20 @@ function initializeSellerPage() {
                 perfume.brand,
                 perfume.code,
                 perfume.size
-              ].join(
-                " "
-              )
+              ].join(" ")
             );
 
-
           return (
-            text.includes(
-              query
-            ) &&
+            text.includes(query) &&
             (
               !category ||
-              category.value ===
-                "Todos" ||
-              perfume.category ===
-                category.value
+              category.value === "Todos" ||
+              perfume.category === category.value
             ) &&
             (
               !availabilityFilter ||
-              availabilityFilter.value ===
-                "Todos" ||
-              perfume.availability ===
-                availabilityFilter.value
+              availabilityFilter.value === "Todos" ||
+              perfume.availability === availabilityFilter.value
             )
           );
         }
@@ -4490,14 +4466,16 @@ function initializeSellerPage() {
   }
 
 
-  function render() {
-    grid.innerHTML =
-      "";
+  /* ====================================
+     RENDER TARJETAS
+     DISEÑO ORIGINAL
+  ==================================== */
 
+  function render() {
+    grid.innerHTML = "";
 
     const items =
       filtered();
-
 
     if (empty) {
       empty.style.display =
@@ -4506,23 +4484,19 @@ function initializeSellerPage() {
           : "none";
     }
 
-
     items.forEach(
       (perfume) => {
         const soldOut =
           perfume.availability ===
           "Agotado";
 
-
         const card =
           document.createElement(
             "article"
           );
 
-
         card.className =
           "seller-product-card";
-
 
         if (soldOut) {
           card.classList.add(
@@ -4530,13 +4504,66 @@ function initializeSellerPage() {
           );
         }
 
-
         card.innerHTML = `
           <div class="seller-card-top">
 
+            <span class="seller-brand">
+              ${escapeHTML(
+                perfume.brand
+              )}
+            </span>
+
+            <span class="seller-category">
+              ${escapeHTML(
+                perfume.category
+              )}
+            </span>
+
+          </div>
+
+
+          <div class="seller-card-body">
+
+            <h3>
+              ${escapeHTML(
+                perfume.name
+              )}
+            </h3>
+
+
+            <div class="seller-product-meta">
+
+              <span>
+                ${escapeHTML(
+                  formatPerfumeSize(
+                    perfume.size
+                  ) || perfume.size
+                )}
+              </span>
+
+              <span>
+                •
+              </span>
+
+              <span>
+                ${escapeHTML(
+                  perfume.code
+                )}
+              </span>
+
+            </div>
+
+
+            <strong class="seller-product-price">
+              ${formatCurrency(
+                perfume.price
+              )}
+            </strong>
+
+
             <span
               class="
-                seller-availability
+                availability-status
                 ${availabilityClass(
                   perfume.availability
                 )}
@@ -4547,95 +4574,48 @@ function initializeSellerPage() {
               )}
             </span>
 
-            <span class="seller-code">
-              ${escapeHTML(
-                perfume.code
-              )}
-            </span>
 
-          </div>
+            <div class="seller-sale-action">
 
-          <div class="seller-card-content">
-
-            <span class="seller-brand">
-              ${escapeHTML(
-                perfume.brand
-              )}
-            </span>
-
-            <h3>
-              ${escapeHTML(
-                perfume.name
-              )}
-            </h3>
-
-            <div class="seller-card-meta">
-
-              <span>
-                ${escapeHTML(
-                  perfume.category
-                )}
-              </span>
-
-              <span>
-                ${escapeHTML(
-                  formatPerfumeSize(
-                    perfume.size
-                  ) ||
-                  perfume.size
-                )}
-              </span>
+              <button
+                class="seller-sale-button"
+                data-sale-id="${escapeHTML(
+                  perfume.id
+                )}"
+                type="button"
+                ${soldOut ? "disabled" : ""}
+              >
+                ${
+                  soldOut
+                    ? "Producto agotado"
+                    : "Registrar venta"
+                }
+              </button>
 
             </div>
 
           </div>
-
-          <div class="seller-card-bottom">
-
-            <strong>
-              ${formatCurrency(
-                perfume.price
-              )}
-            </strong>
-
-            <button
-              class="seller-sale-button"
-              data-seller-sale="${escapeHTML(
-                perfume.id
-              )}"
-              type="button"
-              ${
-                soldOut
-                  ? "disabled"
-                  : ""
-              }
-            >
-              ${
-                soldOut
-                  ? "Agotado"
-                  : "Registrar venta"
-              }
-            </button>
-
-          </div>
         `;
 
-
-        grid.appendChild(
-          card
-        );
+        grid.appendChild(card);
       }
     );
   }
 
 
-  function openSaleModal(
-    perfume
-  ) {
+  /* ====================================
+     ABRIR MODAL DE VENTA
+  ==================================== */
+
+  function openSaleModal(perfume) {
     selectedPerfume =
       perfume;
 
-
+    /*
+     * Si por alguna razón no existe
+     * el modal en el HTML, dejamos
+     * confirmación de respaldo.
+     */
     if (!modal) {
       const confirmed =
         window.confirm(
@@ -4644,42 +4624,34 @@ function initializeSellerPage() {
           )}?`
         );
 
-
       if (confirmed) {
         processSelectedSale();
       }
 
-
       return;
     }
-
 
     if (modalBrand) {
       modalBrand.textContent =
         perfume.brand;
     }
 
-
     if (modalName) {
       modalName.textContent =
         perfume.name;
     }
 
-
     if (modalSize) {
       modalSize.textContent =
         formatPerfumeSize(
           perfume.size
-        ) ||
-        perfume.size;
+        ) || perfume.size;
     }
-
 
     if (modalCode) {
       modalCode.textContent =
         perfume.code;
     }
-
 
     if (modalPrice) {
       modalPrice.textContent =
@@ -4688,23 +4660,24 @@ function initializeSellerPage() {
         );
     }
 
-
     modal.classList.remove(
       "hidden"
     );
-
 
     modal.setAttribute(
       "aria-hidden",
       "false"
     );
 
-
     document.body.classList.add(
       "modal-open"
     );
   }
 
+
+  /* ====================================
+     CERRAR MODAL
+  ==================================== */
 
   function closeSaleModal(
     force = false
@@ -4716,13 +4689,11 @@ function initializeSellerPage() {
       return;
     }
 
-
     modal
       ?.classList
       .add(
         "hidden"
       );
-
 
     modal
       ?.setAttribute(
@@ -4730,11 +4701,9 @@ function initializeSellerPage() {
         "true"
       );
 
-
     document.body.classList.remove(
       "modal-open"
     );
-
 
     if (!registeringSale) {
       selectedPerfume =
@@ -4742,6 +4711,10 @@ function initializeSellerPage() {
     }
   }
 
+
+  /* ====================================
+     PROCESAR VENTA
+  ==================================== */
 
   async function processSelectedSale() {
     if (
@@ -4751,19 +4724,17 @@ function initializeSellerPage() {
       return;
     }
 
-
+    /*
+     * Copiamos el perfume antes de
+     * cerrar el modal.
+     */
     const perfume = {
       ...selectedPerfume
     };
 
+    registeringSale = true;
 
-    registeringSale =
-      true;
-
-
-    if (
-      confirmSaleButton
-    ) {
+    if (confirmSaleButton) {
       confirmSaleButton.disabled =
         true;
 
@@ -4771,34 +4742,30 @@ function initializeSellerPage() {
         "Registrando...";
     }
 
-
     /*
-     * Cerramos inmediatamente el modal
-     * al presionar Confirmar.
+     * Cerramos inmediatamente
+     * el modal al confirmar.
      */
     if (modal) {
-      closeSaleModal(
-        true
-      );
+      closeSaleModal(true);
     }
-
 
     showToast(
       "Registrando venta..."
     );
-
 
     try {
       await registerSellerSale(
         perfume.id
       );
 
-
+      /*
+       * Actualizamos catálogo para
+       * reflejar nueva disponibilidad.
+       */
       await loadSellerCatalog();
 
-
       render();
-
 
       showToast(
         `Venta registrada: ${perfume.name}`
@@ -4810,51 +4777,49 @@ function initializeSellerPage() {
         error
       );
 
-
+      /*
+       * Recargamos de todas formas
+       * para evitar mostrar stock viejo.
+       */
       try {
         await loadSellerCatalog();
 
         render();
 
-      } catch (
-        refreshError
-      ) {
+      } catch (refreshError) {
         console.error(
+          "Error actualizando catálogo:",
           refreshError
         );
       }
 
-
       const message =
         String(
-          error.message ||
-          ""
-        )
-          .toLowerCase();
+          error.message || ""
+        ).toLowerCase();
 
-
-      showToast(
+      if (
         message.includes(
           "agotado"
         )
-          ? "El perfume ya está agotado."
-          : (
-              error.message ||
-              "No se pudo registrar la venta."
-            )
-      );
+      ) {
+        showToast(
+          "El perfume ya está agotado."
+        );
+
+      } else {
+        showToast(
+          error.message ||
+          "No se pudo registrar la venta."
+        );
+      }
 
     } finally {
-      registeringSale =
-        false;
+      registeringSale = false;
 
-      selectedPerfume =
-        null;
+      selectedPerfume = null;
 
-
-      if (
-        confirmSaleButton
-      ) {
+      if (confirmSaleButton) {
         confirmSaleButton.disabled =
           false;
 
@@ -4865,14 +4830,17 @@ function initializeSellerPage() {
   }
 
 
+  /* ====================================
+     CLICK EN REGISTRAR VENTA
+  ==================================== */
+
   grid.addEventListener(
     "click",
     (event) => {
       const button =
         event.target.closest(
-          "[data-seller-sale]"
+          "[data-sale-id]"
         );
-
 
       if (
         !button ||
@@ -4881,24 +4849,18 @@ function initializeSellerPage() {
         return;
       }
 
-
       const perfume =
         sellerCatalog.find(
           (item) =>
+            String(item.id) ===
             String(
-              item.id
-            ) ===
-            String(
-              button.dataset
-                .sellerSale
+              button.dataset.saleId
             )
         );
-
 
       if (!perfume) {
         return;
       }
-
 
       if (
         perfume.availability ===
@@ -4911,13 +4873,16 @@ function initializeSellerPage() {
         return;
       }
 
-
       openSaleModal(
         perfume
       );
     }
   );
 
+
+  /* ====================================
+     BOTÓN CANCELAR
+  ==================================== */
 
   cancelSaleButton
     ?.addEventListener(
@@ -4927,6 +4892,10 @@ function initializeSellerPage() {
       }
     );
 
+
+  /* ====================================
+     CERRAR AL TOCAR FONDO / X
+  ==================================== */
 
   document
     .querySelectorAll(
@@ -4944,6 +4913,10 @@ function initializeSellerPage() {
     );
 
 
+  /* ====================================
+     CONFIRMAR VENTA
+  ==================================== */
+
   confirmSaleButton
     ?.addEventListener(
       "click",
@@ -4951,24 +4924,29 @@ function initializeSellerPage() {
     );
 
 
+  /* ====================================
+     ESC PARA CERRAR MODAL
+  ==================================== */
+
   document.addEventListener(
     "keydown",
     (event) => {
       if (
-        event.key ===
-          "Escape" &&
+        event.key === "Escape" &&
         modal &&
-        !modal
-          .classList
-          .contains(
-            "hidden"
-          )
+        !modal.classList.contains(
+          "hidden"
+        )
       ) {
         closeSaleModal();
       }
     }
   );
 
+
+  /* ====================================
+     BUSCADOR
+  ==================================== */
 
   search
     ?.addEventListener(
@@ -4977,12 +4955,20 @@ function initializeSellerPage() {
     );
 
 
+  /* ====================================
+     FILTRO CATEGORÍA
+  ==================================== */
+
   category
     ?.addEventListener(
       "change",
       render
     );
 
+
+  /* ====================================
+     FILTRO DISPONIBILIDAD
+  ==================================== */
 
   availabilityFilter
     ?.addEventListener(
@@ -4991,23 +4977,25 @@ function initializeSellerPage() {
     );
 
 
+  /* ====================================
+     CARGAR CATÁLOGO
+  ==================================== */
+
   async function load() {
     try {
       await loadSellerCatalog();
-
 
       render();
 
     } catch (error) {
       console.error(
+        "Error cargando catálogo:",
         error
       );
-
 
       if (empty) {
         empty.style.display =
           "block";
-
 
         const title =
           empty.querySelector(
@@ -5019,19 +5007,16 @@ function initializeSellerPage() {
             "p"
           );
 
-
         if (title) {
           title.textContent =
             "No se pudo cargar el catálogo";
         }
-
 
         if (paragraph) {
           paragraph.textContent =
             "Verifica tu conexión e intenta nuevamente.";
         }
       }
-
 
       showToast(
         "No se pudo cargar el catálogo."
@@ -5042,8 +5027,6 @@ function initializeSellerPage() {
 
   load();
 }
-
-
 /* ======================================
    VENTAS - ADMIN
 ====================================== */

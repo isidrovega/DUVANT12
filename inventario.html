@@ -388,6 +388,43 @@
             >
 
           </div>
+          <div class="field perfume-image-field">
+
+  <label for="perfumeImage">
+    Imagen del perfume
+  </label>
+
+  <input
+    id="perfumeImage"
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+  >
+
+  <span class="perfume-image-help">
+    JPG, PNG o WEBP. Máximo 5 MB.
+  </span>
+
+  <div
+    id="perfumeImagePreviewContainer"
+    class="perfume-image-preview-container hidden"
+  >
+    <img
+      id="perfumeImagePreview"
+      class="perfume-image-preview"
+      src=""
+      alt="Vista previa del perfume"
+    >
+
+    <button
+      id="removePerfumeImageButton"
+      class="secondary-button perfume-image-remove"
+      type="button"
+    >
+      Eliminar imagen
+    </button>
+  </div>
+
+</div>
 
 
           <div class="form-actions">

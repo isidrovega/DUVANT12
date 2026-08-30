@@ -97,6 +97,280 @@ function roundMoney(value) {
   );
 }
 
+/* ======================================
+   IMÁGENES DE PERFUMES
+====================================== */
+
+const PERFUME_IMAGES_BUCKET =
+  "perfume-images";
+
+const PERFUME_IMAGE_MAX_SIZE =
+  5 * 1024 * 1024;
+
+const PERFUME_IMAGE_TYPES =
+  new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+  ]);
+
+
+function validatePerfumeImageFile(
+  file
+) {
+  if (!file) {
+    return {
+      valid: true,
+      message: ""
+    };
+  }
+
+
+  if (
+    !PERFUME_IMAGE_TYPES.has(
+      file.type
+    )
+  ) {
+    return {
+      valid: false,
+      message:
+        "La imagen debe ser JPG, PNG o WEBP."
+    };
+  }
+
+
+  if (
+    file.size >
+    PERFUME_IMAGE_MAX_SIZE
+  ) {
+    return {
+      valid: false,
+      message:
+        "La imagen no puede pesar más de 5 MB."
+    };
+  }
+
+
+  return {
+    valid: true,
+    message: ""
+  };
+}
+
+
+function getPerfumeImageExtension(
+  file
+) {
+  const extensionFromName =
+    String(
+      file?.name || ""
+    )
+      .split(".")
+      .pop()
+      ?.toLowerCase();
+
+
+  if (
+    [
+      "jpg",
+      "jpeg",
+      "png",
+      "webp"
+    ].includes(
+      extensionFromName
+    )
+  ) {
+    return extensionFromName ===
+      "jpeg"
+        ? "jpg"
+        : extensionFromName;
+  }
+
+
+  if (
+    file?.type ===
+    "image/png"
+  ) {
+    return "png";
+  }
+
+
+  if (
+    file?.type ===
+    "image/webp"
+  ) {
+    return "webp";
+  }
+
+
+  return "jpg";
+}
+
+
+function createPerfumeImagePath(
+  perfumeId,
+  file
+) {
+  const extension =
+    getPerfumeImageExtension(
+      file
+    );
+
+
+  const randomPart =
+    typeof crypto
+        .randomUUID ===
+      "function"
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2)}`;
+
+
+  return `${perfumeId}/${randomPart}.${extension}`;
+}
+
+
+function getPerfumeImagePublicUrl(
+  imagePath
+) {
+  const path =
+    String(
+      imagePath || ""
+    ).trim();
+
+
+  if (!path) {
+    return "";
+  }
+
+
+  const {
+    data
+  } =
+    supabaseClient
+      .storage
+      .from(
+        PERFUME_IMAGES_BUCKET
+      )
+      .getPublicUrl(
+        path
+      );
+
+
+  return (
+    data?.publicUrl ||
+    ""
+  );
+}
+
+
+async function uploadPerfumeImage(
+  perfumeId,
+  file
+) {
+  const validation =
+    validatePerfumeImageFile(
+      file
+    );
+
+
+  if (!validation.valid) {
+    throw new Error(
+      validation.message
+    );
+  }
+
+
+  const path =
+    createPerfumeImagePath(
+      perfumeId,
+      file
+    );
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(
+        PERFUME_IMAGES_BUCKET
+      )
+      .upload(
+        path,
+        file,
+        {
+          cacheControl:
+            "3600",
+
+          upsert:
+            false,
+
+          contentType:
+            file.type
+        }
+      );
+
+
+  if (error) {
+    console.error(
+      "Error subiendo imagen:",
+      error
+    );
+
+
+    throw new Error(
+      error.message ||
+      "No se pudo subir la imagen."
+    );
+  }
+
+
+  return path;
+}
+
+
+async function deletePerfumeImage(
+  imagePath
+) {
+  const path =
+    String(
+      imagePath || ""
+    ).trim();
+
+
+  if (!path) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(
+        PERFUME_IMAGES_BUCKET
+      )
+      .remove([
+        path
+      ]);
+
+
+  if (error) {
+    console.error(
+      "No se pudo borrar la imagen:",
+      error
+    );
+
+
+    throw new Error(
+      error.message ||
+      "No se pudo eliminar la imagen."
+    );
+  }
+}
 
 /* ======================================
    TAMAÑO DE PERFUME
@@ -290,8 +564,9 @@ function showToast(message) {
 /* ======================================
    MAPEO PERFUMES
 ====================================== */
-
-function mapPerfumeFromDatabase(row) {
+function mapPerfumeFromDatabase(
+  row
+) {
   return {
     id:
       row.id,
@@ -328,6 +603,10 @@ function mapPerfumeFromDatabase(row) {
     code:
       row.code,
 
+    imagePath:
+      row.image_path ||
+      "",
+
     createdAt:
       row.created_at,
 
@@ -335,7 +614,6 @@ function mapPerfumeFromDatabase(row) {
       row.updated_at
   };
 }
-
 
 /* ======================================
    PERFIL SUPABASE
@@ -897,6 +1175,7 @@ async function loadInventoryFromSupabase() {
         price,
         quantity,
         code,
+        image_path,
         created_at,
         updated_at
       `);
@@ -930,7 +1209,6 @@ async function loadInventoryFromSupabase() {
   return perfumes;
 }
 
-
 /* ======================================
    AGREGAR PERFUME
 ====================================== */
@@ -938,6 +1216,49 @@ async function loadInventoryFromSupabase() {
 async function addPerfumeToSupabase(
   perfume
 ) {
+  const payload = {
+    name:
+      perfume.name,
+
+    brand:
+      perfume.brand,
+
+    category:
+      perfume.category,
+
+    size:
+      formatPerfumeSize(
+        perfume.size
+      ),
+
+    purchase_price:
+      perfume.purchasePrice,
+
+    price:
+      perfume.price,
+
+    quantity:
+      perfume.quantity,
+
+    code:
+      perfume.code
+  };
+
+
+  if (
+    Object.prototype
+      .hasOwnProperty
+      .call(
+        perfume,
+        "imagePath"
+      )
+  ) {
+    payload.image_path =
+      perfume.imagePath ||
+      null;
+  }
+
+
   const {
     data,
     error
@@ -946,33 +1267,9 @@ async function addPerfumeToSupabase(
       .from(
         "perfumes"
       )
-      .insert({
-        name:
-          perfume.name,
-
-        brand:
-          perfume.brand,
-
-        category:
-          perfume.category,
-
-        size:
-          formatPerfumeSize(
-            perfume.size
-          ),
-
-        purchase_price:
-          perfume.purchasePrice,
-
-        price:
-          perfume.price,
-
-        quantity:
-          perfume.quantity,
-
-        code:
-          perfume.code
-      })
+      .insert(
+        payload
+      )
       .select()
       .single();
 
@@ -1002,6 +1299,55 @@ async function updatePerfumeInSupabase(
     );
 
 
+  const payload = {
+    name:
+      perfume.name,
+
+    brand:
+      perfume.brand,
+
+    category:
+      perfume.category,
+
+    size:
+      normalizedSize ||
+      perfume.size,
+
+    purchase_price:
+      perfume.purchasePrice,
+
+    price:
+      perfume.price,
+
+    quantity:
+      perfume.quantity,
+
+    code:
+      perfume.code
+  };
+
+
+  /*
+   * Solo modificamos image_path cuando
+   * explícitamente recibimos imagePath.
+   *
+   * Así una importación por Excel NO
+   * borra accidentalmente las imágenes.
+   */
+  if (
+    Object.prototype
+      .hasOwnProperty
+      .call(
+        perfume,
+        "imagePath"
+      )
+  ) {
+    payload.image_path =
+      perfume.imagePath ||
+      null;
+  }
+
+
   const {
     data,
     error
@@ -1010,32 +1356,9 @@ async function updatePerfumeInSupabase(
       .from(
         "perfumes"
       )
-      .update({
-        name:
-          perfume.name,
-
-        brand:
-          perfume.brand,
-
-        category:
-          perfume.category,
-
-        size:
-          normalizedSize ||
-          perfume.size,
-
-        purchase_price:
-          perfume.purchasePrice,
-
-        price:
-          perfume.price,
-
-        quantity:
-          perfume.quantity,
-
-        code:
-          perfume.code
-      })
+      .update(
+        payload
+      )
       .eq(
         "id",
         id
@@ -1053,8 +1376,6 @@ async function updatePerfumeInSupabase(
     data
   );
 }
-
-
 /* ======================================
    CAMBIAR STOCK
 ====================================== */
@@ -1312,13 +1633,40 @@ function initializeInventoryPage() {
       "size"
     );
 
+  const imageInput =
+    document.getElementById(
+      "perfumeImage"
+    );
 
-  /*
-   * Hacemos el campo Tamaño numérico
-   * desde JavaScript.
-   *
-   * No necesitas escribir "ML".
-   */
+  const imagePreviewContainer =
+    document.getElementById(
+      "perfumeImagePreviewContainer"
+    );
+
+  const imagePreview =
+    document.getElementById(
+      "perfumeImagePreview"
+    );
+
+  const removeImageButton =
+    document.getElementById(
+      "removePerfumeImageButton"
+    );
+
+
+  let selectedImageFile =
+    null;
+
+  let currentImagePath =
+    "";
+
+  let removeCurrentImage =
+    false;
+
+  let localPreviewUrl =
+    "";
+
+
   if (sizeInput) {
     sizeInput.type =
       "number";
@@ -1337,15 +1685,244 @@ function initializeInventoryPage() {
   }
 
 
+  function revokeLocalPreview() {
+    if (
+      localPreviewUrl
+    ) {
+      URL.revokeObjectURL(
+        localPreviewUrl
+      );
+
+      localPreviewUrl =
+        "";
+    }
+  }
+
+
+  function hideImagePreview() {
+    revokeLocalPreview();
+
+
+    if (imagePreview) {
+      imagePreview.src =
+        "";
+    }
+
+
+    imagePreviewContainer
+      ?.classList
+      .add(
+        "hidden"
+      );
+  }
+
+
+  function showImagePreview(
+    url
+  ) {
+    if (
+      !imagePreview ||
+      !imagePreviewContainer
+    ) {
+      return;
+    }
+
+
+    imagePreview.src =
+      url;
+
+
+    imagePreviewContainer
+      .classList
+      .remove(
+        "hidden"
+      );
+  }
+
+
+  function resetImageState() {
+    revokeLocalPreview();
+
+
+    selectedImageFile =
+      null;
+
+    currentImagePath =
+      "";
+
+    removeCurrentImage =
+      false;
+
+
+    if (imageInput) {
+      imageInput.value =
+        "";
+    }
+
+
+    hideImagePreview();
+  }
+
+
+  function loadExistingImage(
+    imagePath
+  ) {
+    revokeLocalPreview();
+
+
+    selectedImageFile =
+      null;
+
+    currentImagePath =
+      imagePath ||
+      "";
+
+    removeCurrentImage =
+      false;
+
+
+    if (imageInput) {
+      imageInput.value =
+        "";
+    }
+
+
+    if (
+      currentImagePath
+    ) {
+      const url =
+        getPerfumeImagePublicUrl(
+          currentImagePath
+        );
+
+
+      if (url) {
+        showImagePreview(
+          url
+        );
+
+        return;
+      }
+    }
+
+
+    hideImagePreview();
+  }
+
+
+  imageInput
+    ?.addEventListener(
+      "change",
+      () => {
+        const file =
+          imageInput
+            .files?.[0];
+
+
+        if (!file) {
+          selectedImageFile =
+            null;
+
+          return;
+        }
+
+
+        const validation =
+          validatePerfumeImageFile(
+            file
+          );
+
+
+        if (
+          !validation.valid
+        ) {
+          imageInput.value =
+            "";
+
+          selectedImageFile =
+            null;
+
+
+          showToast(
+            validation.message
+          );
+
+
+          return;
+        }
+
+
+        revokeLocalPreview();
+
+
+        selectedImageFile =
+          file;
+
+        removeCurrentImage =
+          false;
+
+
+        localPreviewUrl =
+          URL.createObjectURL(
+            file
+          );
+
+
+        showImagePreview(
+          localPreviewUrl
+        );
+      }
+    );
+
+
+  removeImageButton
+    ?.addEventListener(
+      "click",
+      () => {
+        revokeLocalPreview();
+
+
+        selectedImageFile =
+          null;
+
+
+        if (imageInput) {
+          imageInput.value =
+            "";
+        }
+
+
+        if (
+          currentImagePath
+        ) {
+          removeCurrentImage =
+            true;
+        }
+
+
+        hideImagePreview();
+
+
+        showToast(
+          "La imagen se eliminará al guardar los cambios."
+        );
+      }
+    );
+
+
   function stockClass(
     quantity
   ) {
-    if (quantity === 0) {
+    if (
+      quantity === 0
+    ) {
       return "empty";
     }
 
 
-    if (quantity <= 3) {
+    if (
+      quantity <= 3
+    ) {
       return "low";
     }
 
@@ -1357,7 +1934,8 @@ function initializeInventoryPage() {
   function filtered() {
     const query =
       normalizeText(
-        search?.value || ""
+        search?.value ||
+        ""
       );
 
 
@@ -1371,7 +1949,9 @@ function initializeInventoryPage() {
                 perfume.brand,
                 perfume.code,
                 perfume.size
-              ].join(" ")
+              ].join(
+                " "
+              )
             );
 
 
@@ -1597,10 +2177,6 @@ function initializeInventoryPage() {
           )
           .value,
 
-      /*
-       * AQUÍ SE AGREGA "ML"
-       * AUTOMÁTICAMENTE.
-       */
       size:
         formatPerfumeSize(
           document
@@ -1648,7 +2224,9 @@ function initializeInventoryPage() {
   }
 
 
-  function validate(data) {
+  function validate(
+    data
+  ) {
     if (
       !data.name ||
       !data.brand ||
@@ -1668,7 +2246,9 @@ function initializeInventoryPage() {
         "Escribe un tamaño válido en ML."
       );
 
-      sizeInput?.focus();
+      sizeInput
+        ?.focus();
+
 
       return false;
     }
@@ -1692,7 +2272,9 @@ function initializeInventoryPage() {
         "El tamaño debe ser un número mayor que 0."
       );
 
-      sizeInput?.focus();
+      sizeInput
+        ?.focus();
+
 
       return false;
     }
@@ -1717,7 +2299,9 @@ function initializeInventoryPage() {
       );
 
 
-    if (duplicateCode) {
+    if (
+      duplicateCode
+    ) {
       showToast(
         "Ese código ya existe."
       );
@@ -1757,7 +2341,9 @@ function initializeInventoryPage() {
       );
 
 
-    if (duplicateProduct) {
+    if (
+      duplicateProduct
+    ) {
       showToast(
         "Ese perfume ya existe."
       );
@@ -1811,6 +2397,27 @@ function initializeInventoryPage() {
     }
 
 
+    if (
+      selectedImageFile
+    ) {
+      const validation =
+        validatePerfumeImageFile(
+          selectedImageFile
+        );
+
+
+      if (
+        !validation.valid
+      ) {
+        showToast(
+          validation.message
+        );
+
+        return false;
+      }
+    }
+
+
     return true;
   }
 
@@ -1819,7 +2426,9 @@ function initializeInventoryPage() {
     form.reset();
 
 
-    if (editingId) {
+    if (
+      editingId
+    ) {
       editingId.value =
         "";
     }
@@ -1831,13 +2440,17 @@ function initializeInventoryPage() {
       );
 
 
-    if (quantityInput) {
+    if (
+      quantityInput
+    ) {
       quantityInput.value =
         1;
     }
 
 
-    if (submitButton) {
+    if (
+      submitButton
+    ) {
       submitButton.textContent =
         "+ Agregar perfume";
     }
@@ -1848,12 +2461,17 @@ function initializeInventoryPage() {
       .add(
         "hidden"
       );
+
+
+    resetImageState();
   }
 
 
   form.addEventListener(
     "submit",
-    async (event) => {
+    async (
+      event
+    ) => {
       event.preventDefault();
 
 
@@ -1870,21 +2488,105 @@ function initializeInventoryPage() {
       }
 
 
-      if (submitButton) {
+      if (
+        submitButton
+      ) {
         submitButton.disabled =
           true;
+
+        submitButton.textContent =
+          editingId?.value
+            ? "Guardando..."
+            : "Agregando...";
       }
 
 
+      let uploadedImagePath =
+        "";
+
+
       try {
+        /*
+         * ==============================
+         * EDITAR
+         * ==============================
+         */
+
         if (
           editingId?.value
         ) {
+          const perfumeId =
+            editingId.value;
+
+
+          const oldImagePath =
+            currentImagePath;
+
+
+          let finalImagePath =
+            oldImagePath;
+
+
+          if (
+            selectedImageFile
+          ) {
+            showToast(
+              "Subiendo imagen..."
+            );
+
+
+            uploadedImagePath =
+              await uploadPerfumeImage(
+                perfumeId,
+                selectedImageFile
+              );
+
+
+            finalImagePath =
+              uploadedImagePath;
+
+          } else if (
+            removeCurrentImage
+          ) {
+            finalImagePath =
+              "";
+          }
+
+
           const updated =
             await updatePerfumeInSupabase(
-              editingId.value,
-              perfumeData
+              perfumeId,
+              {
+                ...perfumeData,
+                imagePath:
+                  finalImagePath
+              }
             );
+
+
+          /*
+           * Una vez que la BD fue actualizada,
+           * borramos la imagen anterior.
+           */
+          if (
+            oldImagePath &&
+            oldImagePath !==
+              finalImagePath
+          ) {
+            try {
+              await deletePerfumeImage(
+                oldImagePath
+              );
+
+            } catch (
+              imageDeleteError
+            ) {
+              console.error(
+                "No se pudo limpiar la imagen anterior:",
+                imageDeleteError
+              );
+            }
+          }
 
 
           const index =
@@ -1899,7 +2601,9 @@ function initializeInventoryPage() {
             );
 
 
-          if (index !== -1) {
+          if (
+            index !== -1
+          ) {
             perfumes[index] =
               updated;
           }
@@ -1916,10 +2620,77 @@ function initializeInventoryPage() {
           );
 
         } else {
-          const created =
+          /*
+           * ==============================
+           * CREAR
+           * ==============================
+           *
+           * Primero creamos el perfume.
+           * Después, si hay foto, la subimos
+           * usando su UUID y actualizamos
+           * image_path.
+           */
+
+          let created =
             await addPerfumeToSupabase(
               perfumeData
             );
+
+
+          if (
+            selectedImageFile
+          ) {
+            try {
+              showToast(
+                "Subiendo imagen..."
+              );
+
+
+              uploadedImagePath =
+                await uploadPerfumeImage(
+                  created.id,
+                  selectedImageFile
+                );
+
+
+              created =
+                await updatePerfumeInSupabase(
+                  created.id,
+                  {
+                    ...created,
+
+                    imagePath:
+                      uploadedImagePath
+                  }
+                );
+
+            } catch (
+              imageError
+            ) {
+              /*
+               * Si la foto falla no dejamos
+               * un archivo huérfano.
+               */
+              if (
+                uploadedImagePath
+              ) {
+                try {
+                  await deletePerfumeImage(
+                    uploadedImagePath
+                  );
+                } catch (
+                  cleanupError
+                ) {
+                  console.error(
+                    cleanupError
+                  );
+                }
+              }
+
+
+              throw imageError;
+            }
+          }
 
 
           perfumes.push(
@@ -1943,11 +2714,48 @@ function initializeInventoryPage() {
 
         render();
 
-      } catch (error) {
+      } catch (
+        error
+      ) {
         console.error(
           "Error guardando perfume:",
           error
         );
+
+
+        /*
+         * Si subimos una nueva imagen durante
+         * una edición y luego falla la BD,
+         * eliminamos esa imagen nueva.
+         */
+        if (
+          uploadedImagePath
+        ) {
+          const imageStillInDatabase =
+            perfumes.some(
+              (perfume) =>
+                perfume.imagePath ===
+                uploadedImagePath
+            );
+
+
+          if (
+            !imageStillInDatabase
+          ) {
+            try {
+              await deletePerfumeImage(
+                uploadedImagePath
+              );
+            } catch (
+              cleanupError
+            ) {
+              console.error(
+                "Error limpiando imagen:",
+                cleanupError
+              );
+            }
+          }
+        }
 
 
         if (
@@ -1966,9 +2774,17 @@ function initializeInventoryPage() {
         }
 
       } finally {
-        if (submitButton) {
+        if (
+          submitButton
+        ) {
           submitButton.disabled =
             false;
+
+
+          submitButton.textContent =
+            editingId?.value
+              ? "Guardar cambios"
+              : "+ Agregar perfume";
         }
       }
     }
@@ -1985,7 +2801,9 @@ function initializeInventoryPage() {
   body
     ?.addEventListener(
       "click",
-      async (event) => {
+      async (
+        event
+      ) => {
         const button =
           event.target.closest(
             "[data-action]"
@@ -2033,8 +2851,10 @@ function initializeInventoryPage() {
           const newQuantity =
             action ===
             "increase"
-              ? currentQuantity + 1
-              : currentQuantity - 1;
+              ? currentQuantity +
+                1
+              : currentQuantity -
+                1;
 
 
           if (
@@ -2062,7 +2882,9 @@ function initializeInventoryPage() {
 
             render();
 
-          } catch (error) {
+          } catch (
+            error
+          ) {
             console.error(
               error
             );
@@ -2092,7 +2914,9 @@ function initializeInventoryPage() {
             );
 
 
-          if (!confirmed) {
+          if (
+            !confirmed
+          ) {
             return;
           }
 
@@ -2105,6 +2929,25 @@ function initializeInventoryPage() {
             await deletePerfumeFromSupabase(
               perfume.id
             );
+
+
+            if (
+              perfume.imagePath
+            ) {
+              try {
+                await deletePerfumeImage(
+                  perfume.imagePath
+                );
+
+              } catch (
+                imageError
+              ) {
+                console.error(
+                  "El perfume se eliminó pero no se pudo borrar su imagen:",
+                  imageError
+                );
+              }
+            }
 
 
             perfumes =
@@ -2126,7 +2969,9 @@ function initializeInventoryPage() {
               "Perfume eliminado."
             );
 
-          } catch (error) {
+          } catch (
+            error
+          ) {
             console.error(
               error
             );
@@ -2147,7 +2992,9 @@ function initializeInventoryPage() {
           action ===
           "edit"
         ) {
-          if (editingId) {
+          if (
+            editingId
+          ) {
             editingId.value =
               perfume.id;
           }
@@ -2177,16 +3024,9 @@ function initializeInventoryPage() {
               perfume.category;
 
 
-          /*
-           * IMPORTANTE:
-           *
-           * Si está guardado como:
-           * 100 ML
-           *
-           * en el formulario muestra:
-           * 100
-           */
-          if (sizeInput) {
+          if (
+            sizeInput
+          ) {
             sizeInput.value =
               getPerfumeSizeNumber(
                 perfume.size
@@ -2226,7 +3066,14 @@ function initializeInventoryPage() {
               perfume.code;
 
 
-          if (submitButton) {
+          loadExistingImage(
+            perfume.imagePath
+          );
+
+
+          if (
+            submitButton
+          ) {
             submitButton.textContent =
               "Guardar cambios";
           }
@@ -2270,7 +3117,8 @@ function initializeInventoryPage() {
       "click",
       () => {
         if (
-          perfumes.length === 0
+          perfumes.length ===
+          0
         ) {
           showToast(
             "No hay productos para exportar."
@@ -2330,9 +3178,13 @@ function initializeInventoryPage() {
                         '""'
                       )}"`
                   )
-                  .join(",")
+                  .join(
+                    ","
+                  )
             )
-            .join("\n");
+            .join(
+              "\n"
+            );
 
 
         const blob =
@@ -2363,14 +3215,14 @@ function initializeInventoryPage() {
         link.href =
           url;
 
-
         link.download =
           "inventario-duvant12.csv";
 
 
-        document.body.appendChild(
-          link
-        );
+        document.body
+          .appendChild(
+            link
+          );
 
 
         link.click();
@@ -2392,7 +3244,6 @@ function initializeInventoryPage() {
 
   render();
 }
-
 
 /* ======================================
    EXCEL
@@ -4251,7 +5102,18 @@ async function loadSellerCatalog() {
             perfume.code,
 
           availability:
-            perfume.availability
+            perfume.availability,
+
+          imagePath:
+            perfume.image_path ||
+            "",
+
+          imageUrl:
+            perfume.image_path
+              ? getPerfumeImagePublicUrl(
+                  perfume.image_path
+                )
+              : ""
         })
       )
       .sort(
@@ -4265,7 +5127,6 @@ async function loadSellerCatalog() {
 
   return sellerCatalog;
 }
-
 
 /* ======================================
    REGISTRAR VENTA
@@ -4472,135 +5333,181 @@ function initializeSellerPage() {
   ==================================== */
 
   function render() {
-    grid.innerHTML = "";
+  grid.innerHTML =
+    "";
 
-    const items =
-      filtered();
 
-    if (empty) {
-      empty.style.display =
-        items.length === 0
-          ? "block"
-          : "none";
-    }
+  const items =
+    filtered();
 
-    items.forEach(
-      (perfume) => {
-        const soldOut =
-          perfume.availability ===
-          "Agotado";
 
-        const card =
-          document.createElement(
-            "article"
-          );
+  if (empty) {
+    empty.style.display =
+      items.length === 0
+        ? "block"
+        : "none";
+  }
 
-        card.className =
-          "seller-product-card";
 
-        if (soldOut) {
-          card.classList.add(
-            "sold-out"
-          );
-        }
+  items.forEach(
+    (perfume) => {
+      const soldOut =
+        perfume.availability ===
+        "Agotado";
 
-        card.innerHTML = `
-          <div class="seller-card-top">
 
-            <span class="seller-brand">
+      const card =
+        document.createElement(
+          "article"
+        );
+
+
+      card.className =
+        "seller-product-card";
+
+
+      if (
+        soldOut
+      ) {
+        card.classList.add(
+          "sold-out"
+        );
+      }
+
+
+      const imageHTML =
+        perfume.imageUrl
+          ? `
+            <div class="seller-product-image-wrapper">
+              <img
+                class="seller-product-image"
+                src="${escapeHTML(
+                  perfume.imageUrl
+                )}"
+                alt="${escapeHTML(
+                  `${perfume.brand} ${perfume.name}`
+                )}"
+                loading="lazy"
+              >
+            </div>
+          `
+          : `
+            <div class="seller-product-image-wrapper seller-product-image-placeholder">
+              <div class="seller-placeholder-mark">
+                <strong>D12</strong>
+                <span>DUVANT 12</span>
+              </div>
+            </div>
+          `;
+
+
+      card.innerHTML = `
+        ${imageHTML}
+
+        <div class="seller-card-top">
+
+          <span class="seller-brand">
+            ${escapeHTML(
+              perfume.brand
+            )}
+          </span>
+
+          <span class="seller-category">
+            ${escapeHTML(
+              perfume.category
+            )}
+          </span>
+
+        </div>
+
+
+        <div class="seller-card-body">
+
+          <h3>
+            ${escapeHTML(
+              perfume.name
+            )}
+          </h3>
+
+
+          <div class="seller-product-meta">
+
+            <span>
               ${escapeHTML(
-                perfume.brand
+                formatPerfumeSize(
+                  perfume.size
+                ) ||
+                perfume.size
               )}
             </span>
 
-            <span class="seller-category">
+            <span>
+              •
+            </span>
+
+            <span>
               ${escapeHTML(
-                perfume.category
+                perfume.code
               )}
             </span>
 
           </div>
 
 
-          <div class="seller-card-body">
-
-            <h3>
-              ${escapeHTML(
-                perfume.name
-              )}
-            </h3>
+          <strong class="seller-product-price">
+            ${formatCurrency(
+              perfume.price
+            )}
+          </strong>
 
 
-            <div class="seller-product-meta">
-
-              <span>
-                ${escapeHTML(
-                  formatPerfumeSize(
-                    perfume.size
-                  ) || perfume.size
-                )}
-              </span>
-
-              <span>
-                •
-              </span>
-
-              <span>
-                ${escapeHTML(
-                  perfume.code
-                )}
-              </span>
-
-            </div>
-
-
-            <strong class="seller-product-price">
-              ${formatCurrency(
-                perfume.price
-              )}
-            </strong>
-
-
-            <span
-              class="
-                availability-status
-                ${availabilityClass(
-                  perfume.availability
-                )}
-              "
-            >
-              ${escapeHTML(
+          <span
+            class="
+              availability-status
+              ${availabilityClass(
                 perfume.availability
               )}
-            </span>
+            "
+          >
+            ${escapeHTML(
+              perfume.availability
+            )}
+          </span>
 
 
-            <div class="seller-sale-action">
+          <div class="seller-sale-action">
 
-              <button
-                class="seller-sale-button"
-                data-sale-id="${escapeHTML(
-                  perfume.id
-                )}"
-                type="button"
-                ${soldOut ? "disabled" : ""}
-              >
-                ${
-                  soldOut
-                    ? "Producto agotado"
-                    : "Registrar venta"
-                }
-              </button>
-
-            </div>
+            <button
+              class="seller-sale-button"
+              data-sale-id="${escapeHTML(
+                perfume.id
+              )}"
+              type="button"
+              ${
+                soldOut
+                  ? "disabled"
+                  : ""
+              }
+            >
+              ${
+                soldOut
+                  ? "Producto agotado"
+                  : "Registrar venta"
+              }
+            </button>
 
           </div>
-        `;
 
-        grid.appendChild(card);
-      }
-    );
-  }
+        </div>
+      `;
+
+
+      grid.appendChild(
+        card
+      );
+    }
+  );
+}
 
 
   /* ====================================

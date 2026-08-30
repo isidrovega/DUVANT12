@@ -4351,3 +4351,429 @@ body.modal-open {
     width: 100%;
   }
 }
+/* =========================================
+   IMÁGENES DE PERFUMES - INVENTARIO
+========================================= */
+
+.perfume-image-field {
+  grid-column: span 2;
+}
+
+
+#perfumeImage {
+  height: auto;
+
+  min-height: 46px;
+
+  padding: 10px 12px;
+
+  cursor: pointer;
+}
+
+
+#perfumeImage::file-selector-button {
+  min-height: 34px;
+
+  margin-right: 12px;
+
+  padding: 0 14px;
+
+  border:
+    1px solid
+    var(--border-light);
+
+  border-radius: 7px;
+
+  background:
+    #17191c;
+
+  color:
+    var(--silver-light);
+
+  font-family: inherit;
+
+  font-size: 0.76rem;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+#perfumeImage::file-selector-button:hover {
+  border-color:
+    var(--silver-dark);
+
+  background:
+    #202226;
+}
+
+
+.perfume-image-help {
+  color:
+    var(--muted);
+
+  font-size:
+    0.7rem;
+
+  line-height:
+    1.4;
+}
+
+
+.perfume-image-preview-container {
+  width:
+    min(
+      100%,
+      280px
+    );
+
+  margin-top:
+    6px;
+
+  padding:
+    12px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    12px;
+
+  background:
+    #0b0c0e;
+}
+
+
+.perfume-image-preview {
+  display:
+    block;
+
+  width:
+    100%;
+
+  height:
+    220px;
+
+  padding:
+    10px;
+
+  object-fit:
+    contain;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.06
+    );
+
+  border-radius:
+    9px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      #1c1e21,
+      #0d0e10 72%
+    );
+}
+
+
+.perfume-image-remove {
+  width:
+    100%;
+
+  margin-top:
+    10px;
+}
+
+
+
+/* =========================================
+   IMAGEN TARJETAS VENDEDORES
+========================================= */
+
+.seller-product-image-wrapper {
+  position:
+    relative;
+
+  width:
+    100%;
+
+  height:
+    260px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  overflow:
+    hidden;
+
+  padding:
+    18px;
+
+  border-bottom:
+    1px solid
+    var(--border);
+
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      #202226 0%,
+      #141517 38%,
+      #0d0e10 78%
+    );
+}
+
+
+.seller-product-image-wrapper::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  right:
+    10%;
+
+  bottom:
+    15px;
+
+  left:
+    10%;
+
+  height:
+    24px;
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(
+      0,
+      0,
+      0,
+      0.35
+    );
+
+  filter:
+    blur(
+      14px
+    );
+
+  pointer-events:
+    none;
+}
+
+
+.seller-product-image {
+  position:
+    relative;
+
+  z-index:
+    1;
+
+  display:
+    block;
+
+  width:
+    100%;
+
+  height:
+    100%;
+
+  object-fit:
+    contain;
+
+  object-position:
+    center;
+
+  transition:
+    transform
+    0.3s
+    ease;
+}
+
+
+.seller-product-card:hover
+.seller-product-image {
+  transform:
+    scale(
+      1.035
+    );
+}
+
+
+
+/* =========================================
+   PLACEHOLDER SIN FOTO
+========================================= */
+
+.seller-product-image-placeholder {
+  background:
+    radial-gradient(
+      circle at center,
+      #1b1d20,
+      #0d0e10 72%
+    );
+}
+
+
+.seller-placeholder-mark {
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    7px;
+
+  width:
+    118px;
+
+  height:
+    118px;
+
+  border:
+    1px solid
+    rgba(
+      199,
+      201,
+      204,
+      0.28
+    );
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.018
+    );
+
+  box-shadow:
+    inset
+    0
+    0
+    30px
+    rgba(
+      255,
+      255,
+      255,
+      0.018
+    );
+}
+
+
+.seller-placeholder-mark strong {
+  color:
+    var(--silver-light);
+
+  font-size:
+    1.4rem;
+
+  font-weight:
+    700;
+
+  letter-spacing:
+    0.08em;
+}
+
+
+.seller-placeholder-mark span {
+  color:
+    var(--silver-dark);
+
+  font-size:
+    0.55rem;
+
+  font-weight:
+    600;
+
+  letter-spacing:
+    0.2em;
+}
+
+
+
+/* =========================================
+   IMÁGENES RESPONSIVE
+========================================= */
+
+@media (
+  max-width:
+    1200px
+) {
+
+  .perfume-image-field {
+    grid-column:
+      span 2;
+  }
+
+
+  .seller-product-image-wrapper {
+    height:
+      280px;
+  }
+
+}
+
+
+@media (
+  max-width:
+    600px
+) {
+
+  .perfume-image-field {
+    grid-column:
+      span 1;
+  }
+
+
+  .perfume-image-preview-container {
+    width:
+      100%;
+  }
+
+
+  .perfume-image-preview {
+    height:
+      260px;
+  }
+
+
+  .seller-product-image-wrapper {
+    height:
+      330px;
+
+    padding:
+      24px;
+  }
+
+}

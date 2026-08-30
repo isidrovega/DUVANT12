@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Duvant 12 | Vendedores</title>
+  <title>Duvant 12 | Catálogo</title>
 
   <link
     rel="preconnect"
@@ -51,11 +51,508 @@
     rel="stylesheet"
     href="styles.css"
   >
+
+
+  <!-- =====================================
+       ESTILOS EXCLUSIVOS:
+       CATÁLOGO / MI CONSIGNACIÓN
+
+       NO MODIFICAN EL DISEÑO DE LAS
+       TARJETAS ACTUALES.
+  ====================================== -->
+
+  <style>
+    .seller-view-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+
+      margin-bottom: 24px;
+      padding: 5px;
+
+      border: 1px solid var(--border);
+      border-radius: 12px;
+
+      background: rgba(
+        255,
+        255,
+        255,
+        0.025
+      );
+    }
+
+
+    .seller-view-tab {
+      min-height: 42px;
+
+      padding: 0 18px;
+
+      border: 1px solid transparent;
+      border-radius: 8px;
+
+      background: transparent;
+      color: var(--muted);
+
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 600;
+
+      transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+    }
+
+
+    .seller-view-tab:hover {
+      color: var(--silver-light);
+
+      background:
+        rgba(
+          255,
+          255,
+          255,
+          0.04
+        );
+    }
+
+
+    .seller-view-tab.active {
+      border-color:
+        rgba(
+          255,
+          255,
+          255,
+          0.12
+        );
+
+      background:
+        linear-gradient(
+          145deg,
+          #202226,
+          #151719
+        );
+
+      color: #ffffff;
+
+      box-shadow:
+        0 8px 24px
+        rgba(
+          0,
+          0,
+          0,
+          0.22
+        );
+    }
+
+
+    .seller-view[hidden] {
+      display: none !important;
+    }
+
+
+    /* =====================================
+       RESUMEN DE MI CONSIGNACIÓN
+    ====================================== */
+
+    .my-consignment-heading {
+      display: flex;
+
+      align-items: flex-end;
+      justify-content: space-between;
+
+      gap: 20px;
+
+      margin-bottom: 20px;
+    }
+
+
+    .my-consignment-heading h2 {
+      margin-top: 5px;
+
+      color: var(--silver-light);
+
+      font-size: 1.35rem;
+      font-weight: 600;
+    }
+
+
+    .my-consignment-heading p {
+      max-width: 650px;
+
+      margin-top: 7px;
+
+      color: var(--muted);
+
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+
+
+    .my-consignment-summary {
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(0, 1fr)
+        );
+
+      gap: 14px;
+
+      margin-bottom: 22px;
+    }
+
+
+    .my-consignment-summary-card {
+      min-width: 0;
+
+      padding: 20px 22px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius:
+        var(--radius);
+
+      background:
+        linear-gradient(
+          145deg,
+          #151618,
+          #0d0e10
+        );
+
+      box-shadow:
+        var(--shadow);
+    }
+
+
+    .my-consignment-summary-card span {
+      display: block;
+
+      margin-bottom: 7px;
+
+      color: var(--muted);
+
+      font-size: 0.72rem;
+      font-weight: 600;
+
+      letter-spacing: 0.08em;
+
+      text-transform: uppercase;
+    }
+
+
+    .my-consignment-summary-card strong {
+      display: block;
+
+      color: var(--silver-light);
+
+      font-size: clamp(
+        1.35rem,
+        2.2vw,
+        1.8rem
+      );
+
+      font-weight: 700;
+    }
+
+
+    /* =====================================
+       DATOS DENTRO DE TARJETA
+    ====================================== */
+
+    .my-consignment-metrics {
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(0, 1fr)
+        );
+
+      gap: 8px;
+
+      margin-top: 18px;
+    }
+
+
+    .my-consignment-metric {
+      min-width: 0;
+
+      padding: 11px 12px;
+
+      border:
+        1px solid
+        rgba(
+          255,
+          255,
+          255,
+          0.07
+        );
+
+      border-radius: 9px;
+
+      background:
+        rgba(
+          255,
+          255,
+          255,
+          0.025
+        );
+    }
+
+
+    .my-consignment-metric span {
+      display: block;
+
+      margin-bottom: 5px;
+
+      color: var(--muted);
+
+      font-size: 0.65rem;
+      font-weight: 500;
+    }
+
+
+    .my-consignment-metric strong {
+      color: var(--silver-light);
+
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+
+    .my-consignment-pending-value {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 12px;
+
+      margin-top: 10px;
+      padding: 12px;
+
+      border:
+        1px solid
+        rgba(
+          199,
+          201,
+          204,
+          0.13
+        );
+
+      border-radius: 9px;
+
+      background:
+        rgba(
+          255,
+          255,
+          255,
+          0.035
+        );
+    }
+
+
+    .my-consignment-pending-value span {
+      color: var(--muted);
+
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+
+    .my-consignment-pending-value strong {
+      color: var(--silver-light);
+
+      font-size: 0.92rem;
+      font-weight: 700;
+
+      text-align: right;
+    }
+
+
+    .consignment-pending-badge {
+      display: inline-flex;
+
+      align-items: center;
+
+      width: max-content;
+
+      margin-top: 14px;
+      padding: 6px 9px;
+
+      border:
+        1px solid
+        rgba(
+          88,
+          214,
+          141,
+          0.25
+        );
+
+      border-radius: 999px;
+
+      background:
+        rgba(
+          88,
+          214,
+          141,
+          0.08
+        );
+
+      color: var(--success);
+
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+
+
+    .consignment-pending-badge.empty {
+      border-color:
+        rgba(
+          142,
+          146,
+          151,
+          0.22
+        );
+
+      background:
+        rgba(
+          142,
+          146,
+          151,
+          0.06
+        );
+
+      color: var(--silver-dark);
+    }
+
+
+    /* =====================================
+       ESTADO VACÍO
+    ====================================== */
+
+    .my-consignment-empty {
+      display: none;
+
+      padding: 50px 20px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius:
+        var(--radius);
+
+      background:
+        linear-gradient(
+          145deg,
+          #131416,
+          #0d0e10
+        );
+
+      text-align: center;
+    }
+
+
+    .my-consignment-empty .empty-icon {
+      margin-bottom: 13px;
+
+      color: var(--silver-dark);
+
+      font-size: 2rem;
+    }
+
+
+    .my-consignment-empty h3 {
+      color: var(--silver-light);
+
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+
+    .my-consignment-empty p {
+      margin-top: 7px;
+
+      color: var(--muted);
+
+      font-size: 0.82rem;
+    }
+
+
+    /* =====================================
+       RESPONSIVE
+    ====================================== */
+
+    @media (
+      max-width: 768px
+    ) {
+
+      .seller-view-tabs {
+        display: grid;
+
+        grid-template-columns:
+          repeat(
+            2,
+            minmax(0, 1fr)
+          );
+
+        width: 100%;
+      }
+
+
+      .seller-view-tab {
+        width: 100%;
+
+        padding:
+          0 12px;
+      }
+
+
+      .my-consignment-heading {
+        flex-direction: column;
+
+        align-items: stretch;
+      }
+
+
+      .my-consignment-summary {
+        grid-template-columns:
+          1fr 1fr;
+      }
+    }
+
+
+    @media (
+      max-width: 480px
+    ) {
+
+      .my-consignment-summary {
+        grid-template-columns:
+          1fr;
+      }
+
+
+      .my-consignment-metrics {
+        grid-template-columns:
+          1fr 1fr;
+      }
+    }
+  </style>
+
 </head>
 
 <body data-page="seller">
 
   <div class="app">
+
+    <!-- =====================================
+         SIDEBAR
+    ====================================== -->
 
     <aside class="sidebar">
 
@@ -68,8 +565,15 @@
         >
 
         <div class="brand-text">
-          <strong>Duvant 12</strong>
-          <span>Fragrances House</span>
+
+          <strong>
+            Duvant 12
+          </strong>
+
+          <span>
+            Fragrances House
+          </span>
+
         </div>
 
       </div>
@@ -81,40 +585,69 @@
           href="index.html"
           class="nav-link admin-only"
         >
-          <span class="nav-icon">⌂</span>
-          <span>Dashboard</span>
+          <span class="nav-icon">
+            ⌂
+          </span>
+
+          <span>
+            Dashboard
+          </span>
         </a>
+
 
         <a
           href="inventario.html"
           class="nav-link admin-only"
         >
-          <span class="nav-icon">▣</span>
-          <span>Inventario</span>
+          <span class="nav-icon">
+            ▣
+          </span>
+
+          <span>
+            Inventario
+          </span>
         </a>
+
 
         <a
           href="vendedores.html"
           class="nav-link active"
         >
-          <span class="nav-icon">◇</span>
-          <span>Catalogo</span>
+          <span class="nav-icon">
+            ◇
+          </span>
+
+          <span>
+            Catálogo
+          </span>
         </a>
+
 
         <a
           href="ventas.html"
           class="nav-link admin-only"
         >
-          <span class="nav-icon">$</span>
-          <span>Ventas</span>
+          <span class="nav-icon">
+            $
+          </span>
+
+          <span>
+            Ventas
+          </span>
         </a>
+
 
         <a
           href="usuarios.html"
           class="nav-link admin-only"
         >
-          <span class="nav-icon">♙</span>
-          <span>Usuarios</span>
+          <span class="nav-icon">
+            ♙
+          </span>
+
+          <span>
+            Usuarios
+          </span>
         </a>
 
       </nav>
@@ -149,6 +682,10 @@
     </aside>
 
 
+    <!-- =====================================
+         CONTENIDO
+    ====================================== -->
+
     <main class="main-content">
 
       <header class="topbar">
@@ -160,7 +697,7 @@
           </span>
 
           <h1>
-            Vendedores
+            Catálogo
           </h1>
 
           <p>
@@ -172,100 +709,250 @@
       </header>
 
 
-      <section class="seller-toolbar">
+      <!-- =====================================
+           PESTAÑAS
+      ====================================== -->
 
-        <div class="search-box seller-search">
+      <div
+        id="sellerViewTabs"
+        class="seller-view-tabs"
+      >
 
-          <span>⌕</span>
-
-          <input
-            id="sellerSearchInput"
-            type="search"
-            placeholder="Buscar perfume, marca o código..."
-          >
-
-        </div>
-
-
-        <div class="seller-filters">
-
-          <select
-            id="sellerCategoryFilter"
-            class="filter-select"
-          >
-            <option value="Todos">
-              Todas las categorías
-            </option>
-
-            <option value="Hombre">
-              Hombre
-            </option>
-
-            <option value="Mujer">
-              Mujer
-            </option>
-
-            <option value="Unisex">
-              Unisex
-            </option>
-          </select>
+        <button
+          id="catalogTabButton"
+          class="seller-view-tab active"
+          type="button"
+          data-seller-view="catalog"
+        >
+          Catálogo
+        </button>
 
 
-          <select
-            id="sellerAvailabilityFilter"
-            class="filter-select"
-          >
-            <option value="Todos">
-              Toda disponibilidad
-            </option>
+        <button
+          id="consignmentTabButton"
+          class="seller-view-tab"
+          type="button"
+          data-seller-view="consignment"
+        >
+          Mi consignación
+        </button>
 
-            <option value="Disponible">
-              Disponible
-            </option>
+      </div>
 
-            <option value="Pocas unidades">
-              Pocas unidades
-            </option>
 
-            <option value="Unidad única">
-              Unidad única
-            </option>
+      <!-- =====================================
+           CATÁLOGO
+      ====================================== -->
 
-            <option value="Agotado">
-              Agotado
-            </option>
-          </select>
+      <section
+        id="catalogView"
+        class="seller-view"
+      >
+
+        <section class="seller-toolbar">
+
+          <div class="search-box seller-search">
+
+            <span>
+              ⌕
+            </span>
+
+            <input
+              id="sellerSearchInput"
+              type="search"
+              placeholder="Buscar perfume, marca o código..."
+            >
+
+          </div>
+
+
+          <div class="seller-filters">
+
+            <select
+              id="sellerCategoryFilter"
+              class="filter-select"
+            >
+
+              <option value="Todos">
+                Todas las categorías
+              </option>
+
+              <option value="Hombre">
+                Hombre
+              </option>
+
+              <option value="Mujer">
+                Mujer
+              </option>
+
+              <option value="Unisex">
+                Unisex
+              </option>
+
+            </select>
+
+
+            <select
+              id="sellerAvailabilityFilter"
+              class="filter-select"
+            >
+
+              <option value="Todos">
+                Toda disponibilidad
+              </option>
+
+              <option value="Disponible">
+                Disponible
+              </option>
+
+              <option value="Pocas unidades">
+                Pocas unidades
+              </option>
+
+              <option value="Unidad única">
+                Unidad única
+              </option>
+
+              <option value="Agotado">
+                Agotado
+              </option>
+
+            </select>
+
+          </div>
+
+        </section>
+
+
+        <section
+          id="sellerProductsGrid"
+          class="seller-products-grid"
+        ></section>
+
+
+        <div
+          id="sellerEmptyState"
+          class="seller-empty-state"
+        >
+
+          <div class="empty-icon">
+            ◇
+          </div>
+
+          <h3>
+            No se encontraron perfumes
+          </h3>
+
+          <p>
+            Cambia la búsqueda o los filtros.
+          </p>
 
         </div>
 
       </section>
 
 
+      <!-- =====================================
+           MI CONSIGNACIÓN
+      ====================================== -->
+
       <section
-        id="sellerProductsGrid"
-        class="seller-products-grid"
-      ></section>
-
-
-      <div
-        id="sellerEmptyState"
-        class="seller-empty-state"
+        id="myConsignmentView"
+        class="seller-view"
+        hidden
       >
 
-        <div class="empty-icon">
-          ◇
+        <div class="my-consignment-heading">
+
+          <div>
+
+            <span class="section-eyebrow">
+              MIS PRODUCTOS
+            </span>
+
+            <h2>
+              Mi consignación
+            </h2>
+
+            <p>
+              Perfumes que Duvant 12 te ha entregado
+              para venta en consignación.
+            </p>
+
+          </div>
+
         </div>
 
-        <h3>
-          No se encontraron perfumes
-        </h3>
 
-        <p>
-          Cambia la búsqueda o los filtros.
-        </p>
+        <div class="my-consignment-summary">
 
-      </div>
+          <article
+            class="my-consignment-summary-card"
+          >
 
+            <span>
+              Unidades conmigo
+            </span>
+
+            <strong
+              id="myConsignmentUnits"
+            >
+              0
+            </strong>
+
+          </article>
+
+
+          <article
+            class="my-consignment-summary-card"
+          >
+
+            <span>
+              Valor pendiente
+            </span>
+
+            <strong
+              id="myConsignmentPendingValue"
+            >
+              $0.00
+            </strong>
+
+          </article>
+
+        </div>
+
+
+        <section
+          id="myConsignmentGrid"
+          class="seller-products-grid"
+        ></section>
+
+
+        <div
+          id="myConsignmentEmpty"
+          class="my-consignment-empty"
+        >
+
+          <div class="empty-icon">
+            ◇
+          </div>
+
+          <h3>
+            No tienes mercancía en consignación
+          </h3>
+
+          <p>
+            Cuando se te asigne mercancía aparecerá aquí.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================
+           LOGOUT MÓVIL
+      ====================================== -->
 
       <div class="mobile-logout">
 
@@ -280,6 +967,7 @@
           </span>
 
         </div>
+
 
         <button
           class="logout-button mobile-logout-button"
@@ -355,6 +1043,7 @@
           —
         </span>
 
+
         <strong id="saleModalName">
           —
         </strong>
@@ -366,7 +1055,9 @@
             —
           </span>
 
-          <span>•</span>
+          <span>
+            •
+          </span>
 
           <span id="saleModalCode">
             —
@@ -392,8 +1083,10 @@
         </span>
 
         <p>
-          Esta acción descontará una unidad del inventario
-          y la venta quedará registrada a tu nombre.
+          La venta quedará registrada a tu nombre.
+          Si tienes unidades de este perfume en consignación,
+          el sistema descontará primero una de esas unidades;
+          de lo contrario utilizará el inventario general.
         </p>
 
       </div>
@@ -408,6 +1101,7 @@
         >
           Cancelar
         </button>
+
 
         <button
           id="confirmSaleButton"
@@ -424,6 +1118,10 @@
   </div>
 
 
+  <!-- =====================================
+       TOAST
+  ====================================== -->
+
   <div
     id="toast"
     class="toast"
@@ -432,9 +1130,1885 @@
   </div>
 
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- =====================================
+       SCRIPTS GENERALES
+  ====================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
   <script src="supabase-config.js"></script>
+
   <script src="script.js"></script>
+
+
+  <!-- =====================================
+       LÓGICA EXCLUSIVA DE CATÁLOGO /
+       MI CONSIGNACIÓN
+
+       Reemplaza initializeSellerPage()
+       antes de DOMContentLoaded.
+  ====================================== -->
+
+  <script>
+
+    /*
+     * ====================================
+     * CARGAR CATÁLOGO
+     * ====================================
+     *
+     * El RPC get_seller_catalog devuelve:
+     *
+     * - disponibilidad total vendible
+     * - can_sell
+     * - consigned_quantity
+     * - image_path
+     */
+
+    loadSellerCatalog =
+      async function loadSellerCatalogWithStock() {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .rpc(
+              "get_seller_catalog"
+            );
+
+
+        if (error) {
+          console.error(
+            "Error cargando catálogo:",
+            error
+          );
+
+
+          throw new Error(
+            error.message ||
+            "No se pudo cargar el catálogo."
+          );
+        }
+
+
+        sellerCatalog =
+          (data || [])
+            .map(
+              (perfume) => ({
+                id:
+                  perfume.id,
+
+                name:
+                  perfume.name ||
+                  "",
+
+                brand:
+                  perfume.brand ||
+                  "",
+
+                category:
+                  perfume.category ||
+                  "",
+
+                size:
+                  formatPerfumeSize(
+                    perfume.size
+                  ) ||
+                  perfume.size ||
+                  "",
+
+                price:
+                  Number(
+                    perfume.price
+                  ) || 0,
+
+                code:
+                  perfume.code ||
+                  "",
+
+                availability:
+                  perfume.availability ||
+                  "Agotado",
+
+                canSell:
+                  perfume.can_sell ===
+                    true ||
+                  perfume.can_sell ===
+                    "true",
+
+                consignedQuantity:
+                  Number(
+                    perfume
+                      .consigned_quantity
+                  ) || 0,
+
+                imagePath:
+                  perfume.image_path ||
+                  "",
+
+                imageUrl:
+                  perfume.image_path
+                    ? getPerfumeImagePublicUrl(
+                        perfume.image_path
+                      )
+                    : ""
+              })
+            )
+            .sort(
+              (a, b) =>
+                compareCodes(
+                  a.code,
+                  b.code
+                )
+            );
+
+
+        return sellerCatalog;
+      };
+
+
+    /*
+     * ====================================
+     * CARGAR MI CONSIGNACIÓN
+     * ====================================
+     */
+
+    async function loadMyConsignments() {
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .rpc(
+            "get_my_consignments"
+          );
+
+
+      if (error) {
+        console.error(
+          "Error get_my_consignments:",
+          error
+        );
+
+
+        throw new Error(
+          error.message ||
+          "No se pudo cargar tu consignación."
+        );
+      }
+
+
+      return (
+        data || []
+      )
+        .map(
+          (row) => ({
+            perfumeId:
+              row.perfume_id,
+
+            name:
+              row.perfume_name ||
+              "",
+
+            brand:
+              row.perfume_brand ||
+              "",
+
+            category:
+              row.perfume_category ||
+              "",
+
+            size:
+              formatPerfumeSize(
+                row.perfume_size
+              ) ||
+              row.perfume_size ||
+              "",
+
+            code:
+              row.perfume_code ||
+              "",
+
+            price:
+              Number(
+                row.perfume_price
+              ) || 0,
+
+            imagePath:
+              row.image_path ||
+              "",
+
+            imageUrl:
+              row.image_path
+                ? getPerfumeImagePublicUrl(
+                    row.image_path
+                  )
+                : "",
+
+            assigned:
+              Number(
+                row.quantity_assigned
+              ) || 0,
+
+            sold:
+              Number(
+                row.quantity_sold
+              ) || 0,
+
+            returned:
+              Number(
+                row.quantity_returned
+              ) || 0,
+
+            pending:
+              Number(
+                row.quantity_pending
+              ) || 0,
+
+            assignedValue:
+              Number(
+                row.assigned_value
+              ) || 0,
+
+            soldValue:
+              Number(
+                row.sold_value
+              ) || 0,
+
+            returnedValue:
+              Number(
+                row.returned_value
+              ) || 0,
+
+            pendingValue:
+              Number(
+                row.pending_value
+              ) || 0
+          })
+        )
+        .sort(
+          (a, b) =>
+            compareCodes(
+              a.code,
+              b.code
+            )
+        );
+    }
+
+
+    /*
+     * ====================================
+     * PÁGINA CATÁLOGO
+     * ====================================
+     */
+
+    initializeSellerPage =
+      function initializeSellerCatalogAndConsignment() {
+
+        const grid =
+          document.getElementById(
+            "sellerProductsGrid"
+          );
+
+
+        if (!grid) {
+          return;
+        }
+
+
+        const search =
+          document.getElementById(
+            "sellerSearchInput"
+          );
+
+
+        const category =
+          document.getElementById(
+            "sellerCategoryFilter"
+          );
+
+
+        const availabilityFilter =
+          document.getElementById(
+            "sellerAvailabilityFilter"
+          );
+
+
+        const empty =
+          document.getElementById(
+            "sellerEmptyState"
+          );
+
+
+        const catalogTab =
+          document.getElementById(
+            "catalogTabButton"
+          );
+
+
+        const consignmentTab =
+          document.getElementById(
+            "consignmentTabButton"
+          );
+
+
+        const catalogView =
+          document.getElementById(
+            "catalogView"
+          );
+
+
+        const consignmentView =
+          document.getElementById(
+            "myConsignmentView"
+          );
+
+
+        const consignmentGrid =
+          document.getElementById(
+            "myConsignmentGrid"
+          );
+
+
+        const consignmentEmpty =
+          document.getElementById(
+            "myConsignmentEmpty"
+          );
+
+
+        const consignmentUnits =
+          document.getElementById(
+            "myConsignmentUnits"
+          );
+
+
+        const consignmentPendingValue =
+          document.getElementById(
+            "myConsignmentPendingValue"
+          );
+
+
+        const modal =
+          document.getElementById(
+            "saleConfirmationModal"
+          );
+
+
+        const modalBrand =
+          document.getElementById(
+            "saleModalBrand"
+          );
+
+
+        const modalName =
+          document.getElementById(
+            "saleModalName"
+          );
+
+
+        const modalSize =
+          document.getElementById(
+            "saleModalSize"
+          );
+
+
+        const modalCode =
+          document.getElementById(
+            "saleModalCode"
+          );
+
+
+        const modalPrice =
+          document.getElementById(
+            "saleModalPrice"
+          );
+
+
+        const cancelSaleButton =
+          document.getElementById(
+            "cancelSaleButton"
+          );
+
+
+        const confirmSaleButton =
+          document.getElementById(
+            "confirmSaleButton"
+          );
+
+
+        const currentRole =
+          document
+            .documentElement
+            .dataset
+            .role ||
+          "";
+
+
+        const isSeller =
+          currentRole ===
+          "seller";
+
+
+        let selectedPerfume =
+          null;
+
+
+        let registeringSale =
+          false;
+
+
+        let myConsignments =
+          [];
+
+
+        /*
+         * Los administradores pueden entrar
+         * al catálogo, pero "Mi consignación"
+         * solamente corresponde al vendedor.
+         */
+
+        if (
+          !isSeller &&
+          consignmentTab
+        ) {
+          consignmentTab.style.display =
+            "none";
+        }
+
+
+        /*
+         * ==================================
+         * HELPERS
+         * ==================================
+         */
+
+        function availabilityClass(
+          state
+        ) {
+
+          if (
+            state ===
+            "Agotado"
+          ) {
+            return "availability-out";
+          }
+
+
+          if (
+            state ===
+            "Unidad única"
+          ) {
+            return "availability-last";
+          }
+
+
+          if (
+            state ===
+            "Pocas unidades"
+          ) {
+            return "availability-low";
+          }
+
+
+          return "availability-available";
+        }
+
+
+        function getImageHTML(
+          perfume
+        ) {
+
+          if (
+            perfume.imageUrl
+          ) {
+            return `
+              <div
+                class="seller-product-image-wrapper"
+              >
+                <img
+                  class="seller-product-image"
+                  src="${escapeHTML(
+                    perfume.imageUrl
+                  )}"
+                  alt="${escapeHTML(
+                    `${perfume.brand} ${perfume.name}`
+                  )}"
+                  loading="lazy"
+                >
+              </div>
+            `;
+          }
+
+
+          return `
+            <div
+              class="
+                seller-product-image-wrapper
+                seller-product-image-placeholder
+              "
+            >
+              <div
+                class="seller-placeholder-mark"
+              >
+                <strong>
+                  D12
+                </strong>
+
+                <span>
+                  DUVANT 12
+                </span>
+              </div>
+            </div>
+          `;
+        }
+
+
+        /*
+         * ==================================
+         * PESTAÑAS
+         * ==================================
+         */
+
+        function setView(
+          view
+        ) {
+
+          const showConsignment =
+            view ===
+              "consignment" &&
+            isSeller;
+
+
+          catalogView.hidden =
+            showConsignment;
+
+
+          consignmentView.hidden =
+            !showConsignment;
+
+
+          catalogTab
+            ?.classList
+            .toggle(
+              "active",
+              !showConsignment
+            );
+
+
+          consignmentTab
+            ?.classList
+            .toggle(
+              "active",
+              showConsignment
+            );
+        }
+
+
+        catalogTab
+          ?.addEventListener(
+            "click",
+            () => {
+              setView(
+                "catalog"
+              );
+            }
+          );
+
+
+        consignmentTab
+          ?.addEventListener(
+            "click",
+            () => {
+              setView(
+                "consignment"
+              );
+            }
+          );
+
+
+        /*
+         * ==================================
+         * FILTROS CATÁLOGO
+         * ==================================
+         */
+
+        function filteredCatalog() {
+
+          const query =
+            normalizeText(
+              search?.value ||
+              ""
+            );
+
+
+          return sellerCatalog
+            .filter(
+              (perfume) => {
+
+                const text =
+                  normalizeText(
+                    [
+                      perfume.name,
+                      perfume.brand,
+                      perfume.code,
+                      perfume.size
+                    ].join(
+                      " "
+                    )
+                  );
+
+
+                const matchesSearch =
+                  text.includes(
+                    query
+                  );
+
+
+                const matchesCategory =
+                  !category ||
+                  category.value ===
+                    "Todos" ||
+                  perfume.category ===
+                    category.value;
+
+
+                const matchesAvailability =
+                  !availabilityFilter ||
+                  availabilityFilter.value ===
+                    "Todos" ||
+                  perfume.availability ===
+                    availabilityFilter.value;
+
+
+                return (
+                  matchesSearch &&
+                  matchesCategory &&
+                  matchesAvailability
+                );
+              }
+            )
+            .sort(
+              (a, b) =>
+                compareCodes(
+                  a.code,
+                  b.code
+                )
+            );
+        }
+
+
+        /*
+         * ==================================
+         * RENDER CATÁLOGO
+         *
+         * IMPORTANTE:
+         * Conservamos exactamente la
+         * estructura de la tarjeta actual.
+         * ==================================
+         */
+
+        function renderCatalog() {
+
+          grid.innerHTML =
+            "";
+
+
+          const items =
+            filteredCatalog();
+
+
+          if (empty) {
+            empty.style.display =
+              items.length === 0
+                ? "block"
+                : "none";
+          }
+
+
+          items.forEach(
+            (perfume) => {
+
+              const soldOut =
+                perfume.canSell !==
+                true;
+
+
+              const card =
+                document.createElement(
+                  "article"
+                );
+
+
+              card.className =
+                "seller-product-card";
+
+
+              if (soldOut) {
+                card.classList.add(
+                  "sold-out"
+                );
+              }
+
+
+              const imageHTML =
+                getImageHTML(
+                  perfume
+                );
+
+
+              card.innerHTML = `
+                ${imageHTML}
+
+                <div class="seller-card-top">
+
+                  <span class="seller-brand">
+                    ${escapeHTML(
+                      perfume.brand
+                    )}
+                  </span>
+
+                  <span class="seller-category">
+                    ${escapeHTML(
+                      perfume.category
+                    )}
+                  </span>
+
+                </div>
+
+
+                <div class="seller-card-body">
+
+                  <h3>
+                    ${escapeHTML(
+                      perfume.name
+                    )}
+                  </h3>
+
+
+                  <div class="seller-product-meta">
+
+                    <span>
+                      ${escapeHTML(
+                        formatPerfumeSize(
+                          perfume.size
+                        ) ||
+                        perfume.size
+                      )}
+                    </span>
+
+                    <span>
+                      •
+                    </span>
+
+                    <span>
+                      ${escapeHTML(
+                        perfume.code
+                      )}
+                    </span>
+
+                  </div>
+
+
+                  <strong class="seller-product-price">
+                    ${formatCurrency(
+                      perfume.price
+                    )}
+                  </strong>
+
+
+                  <span
+                    class="
+                      availability-status
+                      ${availabilityClass(
+                        perfume.availability
+                      )}
+                    "
+                  >
+                    ${escapeHTML(
+                      perfume.availability
+                    )}
+                  </span>
+
+
+                  <div class="seller-sale-action">
+
+                    <button
+                      class="seller-sale-button"
+                      data-sale-id="${escapeHTML(
+                        perfume.id
+                      )}"
+                      type="button"
+                      ${
+                        soldOut
+                          ? "disabled"
+                          : ""
+                      }
+                    >
+                      ${
+                        soldOut
+                          ? "Producto agotado"
+                          : "Registrar venta"
+                      }
+                    </button>
+
+                  </div>
+
+                </div>
+              `;
+
+
+              grid.appendChild(
+                card
+              );
+            }
+          );
+        }
+
+
+        /*
+         * ==================================
+         * RENDER MI CONSIGNACIÓN
+         * ==================================
+         */
+
+        function renderConsignment() {
+
+          if (
+            !consignmentGrid
+          ) {
+            return;
+          }
+
+
+          consignmentGrid.innerHTML =
+            "";
+
+
+          const pendingUnits =
+            myConsignments.reduce(
+              (
+                total,
+                item
+              ) =>
+                total +
+                item.pending,
+              0
+            );
+
+
+          const pendingValue =
+            myConsignments.reduce(
+              (
+                total,
+                item
+              ) =>
+                total +
+                item.pendingValue,
+              0
+            );
+
+
+          if (
+            consignmentUnits
+          ) {
+            consignmentUnits.textContent =
+              String(
+                pendingUnits
+              );
+          }
+
+
+          if (
+            consignmentPendingValue
+          ) {
+            consignmentPendingValue.textContent =
+              formatCurrency(
+                pendingValue
+              );
+          }
+
+
+          if (
+            consignmentEmpty
+          ) {
+            consignmentEmpty.style.display =
+              myConsignments.length === 0
+                ? "block"
+                : "none";
+          }
+
+
+          myConsignments.forEach(
+            (item) => {
+
+              const noPending =
+                item.pending <=
+                0;
+
+
+              const card =
+                document.createElement(
+                  "article"
+                );
+
+
+              card.className =
+                "seller-product-card";
+
+
+              if (noPending) {
+                card.classList.add(
+                  "sold-out"
+                );
+              }
+
+
+              const imageHTML =
+                getImageHTML(
+                  item
+                );
+
+
+              card.innerHTML = `
+                ${imageHTML}
+
+                <div class="seller-card-top">
+
+                  <span class="seller-brand">
+                    ${escapeHTML(
+                      item.brand
+                    )}
+                  </span>
+
+                  <span class="seller-category">
+                    ${escapeHTML(
+                      item.category
+                    )}
+                  </span>
+
+                </div>
+
+
+                <div class="seller-card-body">
+
+                  <h3>
+                    ${escapeHTML(
+                      item.name
+                    )}
+                  </h3>
+
+
+                  <div class="seller-product-meta">
+
+                    <span>
+                      ${escapeHTML(
+                        item.size
+                      )}
+                    </span>
+
+                    <span>
+                      •
+                    </span>
+
+                    <span>
+                      ${escapeHTML(
+                        item.code
+                      )}
+                    </span>
+
+                  </div>
+
+
+                  <strong
+                    class="seller-product-price"
+                  >
+                    ${formatCurrency(
+                      item.price
+                    )}
+                  </strong>
+
+
+                  <span
+                    class="
+                      consignment-pending-badge
+                      ${
+                        noPending
+                          ? "empty"
+                          : ""
+                      }
+                    "
+                  >
+                    ${
+                      noPending
+                        ? "Sin unidades pendientes"
+                        : `${item.pending} ${
+                            item.pending ===
+                            1
+                              ? "unidad conmigo"
+                              : "unidades conmigo"
+                          }`
+                    }
+                  </span>
+
+
+                  <div
+                    class="my-consignment-metrics"
+                  >
+
+                    <div
+                      class="my-consignment-metric"
+                    >
+                      <span>
+                        Entregadas
+                      </span>
+
+                      <strong>
+                        ${item.assigned}
+                      </strong>
+                    </div>
+
+
+                    <div
+                      class="my-consignment-metric"
+                    >
+                      <span>
+                        Vendidas
+                      </span>
+
+                      <strong>
+                        ${item.sold}
+                      </strong>
+                    </div>
+
+
+                    <div
+                      class="my-consignment-metric"
+                    >
+                      <span>
+                        Devueltas
+                      </span>
+
+                      <strong>
+                        ${item.returned}
+                      </strong>
+                    </div>
+
+
+                    <div
+                      class="my-consignment-metric"
+                    >
+                      <span>
+                        Pendientes
+                      </span>
+
+                      <strong>
+                        ${item.pending}
+                      </strong>
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    class="my-consignment-pending-value"
+                  >
+                    <span>
+                      Valor pendiente
+                    </span>
+
+                    <strong>
+                      ${formatCurrency(
+                        item.pendingValue
+                      )}
+                    </strong>
+                  </div>
+
+
+                  <div
+                    class="seller-sale-action"
+                  >
+
+                    <button
+                      class="seller-sale-button"
+                      data-consignment-sale-id="${escapeHTML(
+                        item.perfumeId
+                      )}"
+                      type="button"
+                      ${
+                        noPending
+                          ? "disabled"
+                          : ""
+                      }
+                    >
+                      ${
+                        noPending
+                          ? "Sin unidades"
+                          : "Registrar venta"
+                      }
+                    </button>
+
+                  </div>
+
+                </div>
+              `;
+
+
+              consignmentGrid
+                .appendChild(
+                  card
+                );
+            }
+          );
+        }
+
+
+        /*
+         * ==================================
+         * MODAL
+         * ==================================
+         */
+
+        function openSaleModal(
+          perfume
+        ) {
+
+          if (
+            !perfume
+          ) {
+            return;
+          }
+
+
+          selectedPerfume = {
+            ...perfume
+          };
+
+
+          if (!modal) {
+
+            const confirmed =
+              window.confirm(
+                `¿Registrar venta de "${perfume.name}" por ${formatCurrency(
+                  perfume.price
+                )}?`
+              );
+
+
+            if (confirmed) {
+              processSelectedSale();
+            }
+
+
+            return;
+          }
+
+
+          if (
+            modalBrand
+          ) {
+            modalBrand.textContent =
+              perfume.brand ||
+              "—";
+          }
+
+
+          if (
+            modalName
+          ) {
+            modalName.textContent =
+              perfume.name ||
+              "—";
+          }
+
+
+          if (
+            modalSize
+          ) {
+            modalSize.textContent =
+              formatPerfumeSize(
+                perfume.size
+              ) ||
+              perfume.size ||
+              "—";
+          }
+
+
+          if (
+            modalCode
+          ) {
+            modalCode.textContent =
+              perfume.code ||
+              "—";
+          }
+
+
+          if (
+            modalPrice
+          ) {
+            modalPrice.textContent =
+              formatCurrency(
+                perfume.price
+              );
+          }
+
+
+          modal.classList.remove(
+            "hidden"
+          );
+
+
+          modal.setAttribute(
+            "aria-hidden",
+            "false"
+          );
+
+
+          document.body
+            .classList
+            .add(
+              "modal-open"
+            );
+        }
+
+
+        function closeSaleModal(
+          force = false
+        ) {
+
+          if (
+            registeringSale &&
+            !force
+          ) {
+            return;
+          }
+
+
+          modal
+            ?.classList
+            .add(
+              "hidden"
+            );
+
+
+          modal
+            ?.setAttribute(
+              "aria-hidden",
+              "true"
+            );
+
+
+          document.body
+            .classList
+            .remove(
+              "modal-open"
+            );
+
+
+          if (
+            !registeringSale
+          ) {
+            selectedPerfume =
+              null;
+          }
+        }
+
+
+        /*
+         * ==================================
+         * RECARGAR CATÁLOGO Y CONSIGNACIÓN
+         * ==================================
+         */
+
+        async function refreshSellerData() {
+
+          await loadSellerCatalog();
+
+
+          renderCatalog();
+
+
+          if (isSeller) {
+
+            try {
+
+              myConsignments =
+                await loadMyConsignments();
+
+
+              renderConsignment();
+
+            } catch (error) {
+
+              console.error(
+                "Error actualizando consignación:",
+                error
+              );
+
+
+              /*
+               * La venta no debe considerarse
+               * fallida solamente porque haya
+               * fallado la recarga visual de
+               * esta pestaña.
+               */
+            }
+          }
+        }
+
+
+        /*
+         * ==================================
+         * PROCESAR VENTA
+         * ==================================
+         */
+
+        async function processSelectedSale() {
+
+          if (
+            !selectedPerfume ||
+            registeringSale
+          ) {
+            return;
+          }
+
+
+          const perfume = {
+            ...selectedPerfume
+          };
+
+
+          registeringSale =
+            true;
+
+
+          if (
+            confirmSaleButton
+          ) {
+            confirmSaleButton.disabled =
+              true;
+
+
+            confirmSaleButton.textContent =
+              "Registrando...";
+          }
+
+
+          /*
+           * Cerramos inmediatamente.
+           */
+
+          closeSaleModal(
+            true
+          );
+
+
+          showToast(
+            "Registrando venta..."
+          );
+
+
+          try {
+
+            await registerSellerSale(
+              perfume.id
+            );
+
+
+            await refreshSellerData();
+
+
+            showToast(
+              `Venta registrada: ${perfume.name}`
+            );
+
+          } catch (error) {
+
+            console.error(
+              "Error registrando venta:",
+              error
+            );
+
+
+            try {
+
+              await refreshSellerData();
+
+            } catch (
+              refreshError
+            ) {
+
+              console.error(
+                refreshError
+              );
+            }
+
+
+            const message =
+              String(
+                error.message ||
+                ""
+              );
+
+
+            showToast(
+              message ||
+              "No se pudo registrar la venta."
+            );
+
+          } finally {
+
+            registeringSale =
+              false;
+
+
+            selectedPerfume =
+              null;
+
+
+            if (
+              confirmSaleButton
+            ) {
+              confirmSaleButton.disabled =
+                false;
+
+
+              confirmSaleButton.textContent =
+                "Confirmar venta";
+            }
+          }
+        }
+
+
+        /*
+         * ==================================
+         * CLICK: CATÁLOGO
+         * ==================================
+         */
+
+        grid.addEventListener(
+          "click",
+          (event) => {
+
+            const button =
+              event.target.closest(
+                "[data-sale-id]"
+              );
+
+
+            if (
+              !button ||
+              button.disabled
+            ) {
+              return;
+            }
+
+
+            const perfume =
+              sellerCatalog.find(
+                (item) =>
+                  String(
+                    item.id
+                  ) ===
+                  String(
+                    button.dataset
+                      .saleId
+                  )
+              );
+
+
+            if (
+              !perfume
+            ) {
+              return;
+            }
+
+
+            if (
+              perfume.canSell !==
+              true
+            ) {
+
+              showToast(
+                "El perfume está agotado."
+              );
+
+
+              return;
+            }
+
+
+            openSaleModal(
+              perfume
+            );
+          }
+        );
+
+
+        /*
+         * ==================================
+         * CLICK: MI CONSIGNACIÓN
+         * ==================================
+         */
+
+        consignmentGrid
+          ?.addEventListener(
+            "click",
+            (event) => {
+
+              const button =
+                event.target.closest(
+                  "[data-consignment-sale-id]"
+                );
+
+
+              if (
+                !button ||
+                button.disabled
+              ) {
+                return;
+              }
+
+
+              const item =
+                myConsignments.find(
+                  (consignment) =>
+                    String(
+                      consignment
+                        .perfumeId
+                    ) ===
+                    String(
+                      button
+                        .dataset
+                        .consignmentSaleId
+                    )
+                );
+
+
+              if (
+                !item ||
+                item.pending <=
+                  0
+              ) {
+
+                showToast(
+                  "Ya no tienes unidades pendientes de este perfume."
+                );
+
+
+                return;
+              }
+
+
+              const catalogPerfume =
+                sellerCatalog.find(
+                  (perfume) =>
+                    String(
+                      perfume.id
+                    ) ===
+                    String(
+                      item.perfumeId
+                    )
+                );
+
+
+              openSaleModal(
+                catalogPerfume || {
+                  id:
+                    item.perfumeId,
+
+                  name:
+                    item.name,
+
+                  brand:
+                    item.brand,
+
+                  category:
+                    item.category,
+
+                  size:
+                    item.size,
+
+                  code:
+                    item.code,
+
+                  price:
+                    item.price,
+
+                  imageUrl:
+                    item.imageUrl,
+
+                  canSell:
+                    true
+                }
+              );
+            }
+          );
+
+
+        /*
+         * ==================================
+         * MODAL EVENTS
+         * ==================================
+         */
+
+        cancelSaleButton
+          ?.addEventListener(
+            "click",
+            () => {
+              closeSaleModal();
+            }
+          );
+
+
+        document
+          .querySelectorAll(
+            "[data-close-sale-modal]"
+          )
+          .forEach(
+            (element) => {
+
+              element.addEventListener(
+                "click",
+                () => {
+                  closeSaleModal();
+                }
+              );
+            }
+          );
+
+
+        confirmSaleButton
+          ?.addEventListener(
+            "click",
+            processSelectedSale
+          );
+
+
+        document
+          .addEventListener(
+            "keydown",
+            (event) => {
+
+              if (
+                event.key ===
+                  "Escape" &&
+                modal &&
+                !modal
+                  .classList
+                  .contains(
+                    "hidden"
+                  )
+              ) {
+                closeSaleModal();
+              }
+            }
+          );
+
+
+        /*
+         * ==================================
+         * FILTROS
+         * ==================================
+         */
+
+        search
+          ?.addEventListener(
+            "input",
+            renderCatalog
+          );
+
+
+        category
+          ?.addEventListener(
+            "change",
+            renderCatalog
+          );
+
+
+        availabilityFilter
+          ?.addEventListener(
+            "change",
+            renderCatalog
+          );
+
+
+        /*
+         * ==================================
+         * CARGA INICIAL
+         * ==================================
+         */
+
+        async function load() {
+
+          grid.innerHTML = `
+            <div class="seller-loading">
+              <div
+                class="seller-loading-spinner"
+              ></div>
+
+              Cargando catálogo...
+            </div>
+          `;
+
+
+          if (
+            empty
+          ) {
+            empty.style.display =
+              "none";
+          }
+
+
+          try {
+
+            await loadSellerCatalog();
+
+
+            renderCatalog();
+
+
+            if (isSeller) {
+
+              if (
+                consignmentGrid
+              ) {
+                consignmentGrid.innerHTML = `
+                  <div class="seller-loading">
+                    <div
+                      class="seller-loading-spinner"
+                    ></div>
+
+                    Cargando tu consignación...
+                  </div>
+                `;
+              }
+
+
+              try {
+
+                myConsignments =
+                  await loadMyConsignments();
+
+
+                renderConsignment();
+
+              } catch (error) {
+
+                console.error(
+                  "Error cargando mi consignación:",
+                  error
+                );
+
+
+                if (
+                  consignmentGrid
+                ) {
+                  consignmentGrid.innerHTML =
+                    "";
+                }
+
+
+                if (
+                  consignmentEmpty
+                ) {
+                  consignmentEmpty.style.display =
+                    "block";
+
+
+                  const title =
+                    consignmentEmpty
+                      .querySelector(
+                        "h3"
+                      );
+
+
+                  const paragraph =
+                    consignmentEmpty
+                      .querySelector(
+                        "p"
+                      );
+
+
+                  if (title) {
+                    title.textContent =
+                      "No se pudo cargar tu consignación";
+                  }
+
+
+                  if (paragraph) {
+                    paragraph.textContent =
+                      error.message ||
+                      "Intenta nuevamente.";
+                  }
+                }
+              }
+            }
+
+
+            setView(
+              "catalog"
+            );
+
+          } catch (error) {
+
+            console.error(
+              "Error cargando catálogo:",
+              error
+            );
+
+
+            grid.innerHTML =
+              "";
+
+
+            if (
+              empty
+            ) {
+              empty.style.display =
+                "block";
+
+
+              const title =
+                empty.querySelector(
+                  "h3"
+                );
+
+
+              const paragraph =
+                empty.querySelector(
+                  "p"
+                );
+
+
+              if (title) {
+                title.textContent =
+                  "No se pudo cargar el catálogo";
+              }
+
+
+              if (paragraph) {
+                paragraph.textContent =
+                  error.message ||
+                  "Verifica tu conexión e intenta nuevamente.";
+              }
+            }
+
+
+            showToast(
+              error.message ||
+              "No se pudo cargar el catálogo."
+            );
+          }
+        }
+
+
+        load();
+      };
+
+  </script>
 
 </body>
 </html>

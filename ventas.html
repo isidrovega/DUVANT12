@@ -706,7 +706,246 @@
       color: #fff;
     }
 
+/* =====================================
+   RESUMEN FINANCIERO POR VENDEDOR
+====================================== */
 
+.financial-sellers-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.financial-seller-card {
+  padding: 20px;
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 13px;
+  background:
+    rgba(255, 255, 255, 0.018);
+}
+
+.financial-seller-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.financial-seller-header strong {
+  display: block;
+  color: #f1f2f3;
+  font-size: 0.96rem;
+}
+
+.financial-seller-header span {
+  display: block;
+  margin-top: 4px;
+  color: #777d83;
+  font-size: 0.72rem;
+}
+
+.financial-perfume-count {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+  color: #969ba1;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.financial-unit-row {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.financial-unit-item {
+  padding: 10px;
+  border:
+    1px solid rgba(255, 255, 255, 0.055);
+  border-radius: 8px;
+  background:
+    rgba(255, 255, 255, 0.012);
+}
+
+.financial-unit-item span {
+  display: block;
+  color: #70767c;
+  font-size: 0.62rem;
+  font-weight: 600;
+}
+
+.financial-unit-item strong {
+  display: block;
+  margin-top: 5px;
+  color: #e5e6e8;
+  font-size: 0.95rem;
+}
+
+.financial-money-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  padding-top: 14px;
+  border-top:
+    1px solid rgba(255, 255, 255, 0.06);
+}
+
+.financial-money-item span {
+  display: block;
+  margin-bottom: 5px;
+  color: #72777d;
+  font-size: 0.65rem;
+}
+
+.financial-money-item strong {
+  color: #e9eaeb;
+  font-size: 0.85rem;
+}
+
+.financial-money-item.real strong {
+  color: #afcdb5;
+}
+
+.financial-money-item.pending strong {
+  color: #d5c5a8;
+}
+
+.financial-seller-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.financial-detail-button {
+  min-height: 38px;
+  padding: 8px 14px;
+  border:
+    1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  background:
+    rgba(255, 255, 255, 0.035);
+  color: #c8cbd0;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.financial-detail-button:hover {
+  background:
+    rgba(255, 255, 255, 0.075);
+  color: #fff;
+}
+
+
+/* =====================================
+   MODAL DETALLE FINANCIERO
+====================================== */
+
+.financial-detail-modal-card {
+  width: min(100%, 950px);
+}
+
+.financial-detail-seller {
+  margin-bottom: 22px;
+}
+
+.financial-detail-seller strong {
+  display: block;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.financial-detail-seller span {
+  display: block;
+  margin-top: 5px;
+  color: #7d8288;
+  font-size: 0.76rem;
+}
+
+.financial-detail-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.financial-detail-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+}
+
+.financial-detail-table th {
+  padding: 11px 9px;
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.08);
+  color: #73797f;
+  font-size: 0.65rem;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.financial-detail-table td {
+  padding: 14px 9px;
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.05);
+  color: #b2b6bb;
+  font-size: 0.76rem;
+}
+
+.financial-detail-product strong {
+  display: block;
+  color: #ebeced;
+  font-size: 0.8rem;
+}
+
+.financial-detail-product span {
+  display: block;
+  margin-top: 3px;
+  color: #70757b;
+  font-size: 0.68rem;
+}
+
+.financial-detail-loading,
+.financial-detail-empty {
+  padding: 35px 10px;
+  color: #777d83;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+
+/* RESPONSIVE FINANCIERO */
+
+@media (max-width: 900px) {
+  .financial-sellers-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .financial-unit-row {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .financial-money-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .financial-seller-header {
+    flex-direction: column;
+  }
+}
     /* =====================================
        RESPONSIVE
     ====================================== */
@@ -808,6 +1047,494 @@
         grid-template-columns: 1fr;
       }
     }
+    /* =====================================
+   NÓMINA SEMANAL
+====================================== */
+
+.payroll-layout {
+  display: grid;
+  gap: 22px;
+}
+
+.payroll-panel {
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.035),
+      rgba(255, 255, 255, 0.015)
+    );
+}
+
+.payroll-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.payroll-heading h2,
+.payroll-heading h3 {
+  margin: 4px 0 0;
+  color: #f5f5f6;
+}
+
+.payroll-eyebrow {
+  color: #8d9298;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.payroll-week-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.payroll-week-button,
+.payroll-current-button {
+  min-height: 40px;
+  padding: 8px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #c8cbd0;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.payroll-week-button:hover,
+.payroll-current-button:hover {
+  background: rgba(255, 255, 255, 0.075);
+  color: #fff;
+}
+
+.payroll-week-label {
+  min-width: 210px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  background: #101214;
+  color: #e5e7e9;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.payroll-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.payroll-stat-card {
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.payroll-stat-card span {
+  display: block;
+  margin-bottom: 8px;
+  color: #7f858b;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.payroll-stat-card strong {
+  display: block;
+  color: #f0f1f2;
+  font-size: 1.35rem;
+}
+
+.payroll-stat-card small {
+  display: block;
+  margin-top: 6px;
+  color: #676c71;
+  font-size: 0.68rem;
+}
+
+.payroll-sellers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.payroll-seller-card {
+  padding: 21px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.payroll-seller-card.is-paid {
+  border-color: rgba(106, 171, 126, 0.23);
+  background: rgba(86, 145, 105, 0.035);
+}
+
+.payroll-seller-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.payroll-seller-name strong {
+  display: block;
+  color: #f1f2f3;
+  font-size: 0.98rem;
+}
+
+.payroll-seller-name span {
+  display: block;
+  margin-top: 4px;
+  color: #777d83;
+  font-size: 0.72rem;
+}
+
+.payroll-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.payroll-status.open {
+  border: 1px solid rgba(194, 172, 118, 0.22);
+  background: rgba(194, 172, 118, 0.07);
+  color: #d5c5a8;
+}
+
+.payroll-status.pending {
+  border: 1px solid rgba(171, 178, 189, 0.2);
+  background: rgba(171, 178, 189, 0.06);
+  color: #bec3ca;
+}
+
+.payroll-status.paid {
+  border: 1px solid rgba(103, 171, 126, 0.25);
+  background: rgba(103, 171, 126, 0.08);
+  color: #a8ceb3;
+}
+
+.payroll-unit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 15px;
+}
+
+.payroll-unit-item {
+  padding: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.012);
+}
+
+.payroll-unit-item span {
+  display: block;
+  color: #70767c;
+  font-size: 0.63rem;
+}
+
+.payroll-unit-item strong {
+  display: block;
+  margin-top: 5px;
+  color: #e6e7e9;
+  font-size: 0.92rem;
+}
+
+.payroll-level-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.payroll-level-box span {
+  display: block;
+  color: #777d83;
+  font-size: 0.66rem;
+}
+
+.payroll-level-box strong {
+  display: block;
+  margin-top: 5px;
+  color: #eceef0;
+  font-size: 0.86rem;
+}
+
+.payroll-total-box {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.065);
+}
+
+.payroll-total-box span {
+  display: block;
+  margin-bottom: 5px;
+  color: #777d83;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.payroll-total-box strong {
+  display: block;
+  color: #f0f1f2;
+  font-size: 1.45rem;
+}
+
+.payroll-seller-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.payroll-detail-button,
+.payroll-pay-button {
+  min-height: 38px;
+  padding: 8px 13px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.payroll-detail-button {
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.035);
+  color: #c8cbd0;
+}
+
+.payroll-pay-button {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background:
+    linear-gradient(
+      145deg,
+      #d5d7da,
+      #a9adb2
+    );
+  color: #101113;
+}
+
+.payroll-detail-button:hover {
+  background: rgba(255, 255, 255, 0.075);
+  color: #fff;
+}
+
+.payroll-pay-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.payroll-pay-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.payroll-empty,
+.payroll-loading {
+  padding: 35px 10px;
+  color: #777d83;
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.payroll-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.payroll-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+}
+
+.payroll-table th {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #70767c;
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.payroll-table td {
+  padding: 14px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #afb3b8;
+  font-size: 0.77rem;
+  vertical-align: middle;
+}
+
+.payroll-product strong {
+  display: block;
+  color: #e8e9ea;
+  font-size: 0.8rem;
+}
+
+.payroll-product span {
+  display: block;
+  margin-top: 4px;
+  color: #70767c;
+  font-size: 0.68rem;
+}
+
+.payroll-source-badge {
+  display: inline-flex;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  color: #aaaeb3;
+  font-size: 0.65rem;
+}
+
+.payroll-history-status-paid {
+  color: #a8ceb3;
+  font-weight: 800;
+}
+
+.payroll-modal-card {
+  width: min(100%, 950px);
+}
+
+.payroll-pay-modal-card {
+  width: min(100%, 520px);
+}
+
+.payroll-pay-summary {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.payroll-pay-summary > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+.payroll-pay-summary span {
+  color: #858b91;
+  font-size: 0.76rem;
+}
+
+.payroll-pay-summary strong {
+  color: #e9eaeb;
+  font-size: 0.82rem;
+}
+
+.payroll-notes {
+  width: 100%;
+  min-height: 92px;
+  padding: 12px;
+  resize: vertical;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 9px;
+  outline: none;
+  background: #101214;
+  color: #e8e9eb;
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.payroll-notes:focus {
+  border-color: rgba(210, 213, 217, 0.45);
+}
+
+@media (max-width: 1000px) {
+  .payroll-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .payroll-sellers-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sales-tabs {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .sales-tab {
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 0.72rem;
+  }
+
+  .payroll-panel {
+    padding: 20px;
+  }
+
+  .payroll-heading {
+    flex-direction: column;
+  }
+
+  .payroll-week-control {
+    width: 100%;
+  }
+
+  .payroll-week-label {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .payroll-total-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .payroll-seller-actions {
+    justify-content: stretch;
+  }
+
+  .payroll-detail-button,
+  .payroll-pay-button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .payroll-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .payroll-unit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payroll-level-box {
+    grid-template-columns: 1fr;
+  }
+}
   </style>
 </head>
 
@@ -970,6 +1697,13 @@
         >
           Consignaciones
         </button>
+        <button
+  class="sales-tab"
+  data-sales-tab="payroll"
+  type="button"
+>
+  Nómina semanal
+</button>
 
       </div>
 
@@ -1270,6 +2004,44 @@
 
           </section>
 
+<!-- =====================================
+     RESUMEN FINANCIERO POR VENDEDOR
+====================================== -->
+
+<section class="consignment-panel">
+
+  <div class="consignment-panel-heading">
+
+    <div>
+
+      <span class="consignment-eyebrow">
+        Vista general
+      </span>
+
+      <h2>
+        Resumen financiero por vendedor
+      </h2>
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="financialSellersGrid"
+    class="financial-sellers-grid"
+  >
+  </div>
+
+
+  <div
+    id="financialSellersEmpty"
+    class="consignment-empty"
+  >
+    No hay información financiera de vendedores.
+  </div>
+
+</section>
 
           <!-- RESUMEN -->
 
@@ -1458,7 +2230,212 @@
 
       </div>
 
+<!-- =====================================
+     NÓMINA SEMANAL
+====================================== -->
 
+<div
+  id="payrollView"
+  class="sales-view hidden"
+>
+
+  <div class="payroll-layout">
+
+    <!-- SEMANA -->
+
+    <section class="payroll-panel">
+
+      <div class="payroll-heading">
+
+        <div>
+
+          <span class="payroll-eyebrow">
+            Comisiones
+          </span>
+
+          <h2>
+            Nómina semanal
+          </h2>
+
+        </div>
+
+
+        <div class="payroll-week-control">
+
+          <button
+            id="payrollPreviousWeek"
+            class="payroll-week-button"
+            type="button"
+            aria-label="Semana anterior"
+          >
+            ←
+          </button>
+
+          <div
+            id="payrollWeekLabel"
+            class="payroll-week-label"
+          >
+            —
+          </div>
+
+          <button
+            id="payrollNextWeek"
+            class="payroll-week-button"
+            type="button"
+            aria-label="Semana siguiente"
+          >
+            →
+          </button>
+
+          <button
+            id="payrollCurrentWeek"
+            class="payroll-current-button"
+            type="button"
+          >
+            Semana actual
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="payroll-stats-grid">
+
+        <article class="payroll-stat-card">
+          <span>Vendedores</span>
+          <strong id="payrollSellerCount">0</strong>
+          <small>Con seguimiento esta semana</small>
+        </article>
+
+        <article class="payroll-stat-card">
+          <span>Unidades vendidas</span>
+          <strong id="payrollUnitsTotal">0</strong>
+          <small>Todas las ventas de vendedores</small>
+        </article>
+
+        <article class="payroll-stat-card">
+          <span>Total vendido</span>
+          <strong id="payrollSalesTotal">$0.00</strong>
+          <small>Inventario + consignación</small>
+        </article>
+
+        <article class="payroll-stat-card">
+          <span>Comisiones</span>
+          <strong id="payrollCommissionTotal">$0.00</strong>
+          <small>Total de nómina semanal</small>
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- VENDEDORES -->
+
+    <section class="payroll-panel">
+
+      <div class="payroll-heading">
+
+        <div>
+
+          <span class="payroll-eyebrow">
+            Control semanal
+          </span>
+
+          <h2>
+            Comisiones por vendedor
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="payrollLoading"
+        class="payroll-loading hidden"
+      >
+        Cargando nómina...
+      </div>
+
+
+      <div
+        id="payrollSellersGrid"
+        class="payroll-sellers-grid"
+      >
+      </div>
+
+
+      <div
+        id="payrollEmpty"
+        class="payroll-empty hidden"
+      >
+        No hay vendedores para mostrar.
+      </div>
+
+    </section>
+
+
+    <!-- HISTORIAL -->
+
+    <section class="payroll-panel">
+
+      <div class="payroll-heading">
+
+        <div>
+
+          <span class="payroll-eyebrow">
+            Histórico
+          </span>
+
+          <h2>
+            Nóminas registradas
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="payroll-table-wrapper">
+
+        <table class="payroll-table">
+
+          <thead>
+            <tr>
+              <th>Vendedor</th>
+              <th>Semana</th>
+              <th>Unidades</th>
+              <th>Vendido</th>
+              <th>Comisión / unidad</th>
+              <th>Comisión total</th>
+              <th>Estado</th>
+              <th>Fecha de pago</th>
+            </tr>
+          </thead>
+
+          <tbody id="payrollHistoryBody">
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <div
+        id="payrollHistoryEmpty"
+        class="payroll-empty hidden"
+      >
+        Todavía no hay nóminas registradas.
+      </div>
+
+    </section>
+
+  </div>
+
+</div>
+      
       <!-- LOGOUT MÓVIL -->
 
       <div class="mobile-logout">
@@ -1720,8 +2697,381 @@
     </section>
 
   </div>
+<!-- =====================================
+     MODAL DETALLE FINANCIERO
+====================================== -->
+
+<div
+  id="financialDetailModal"
+  class="duvant-modal hidden"
+  aria-hidden="true"
+>
+
+  <div
+    class="duvant-modal-backdrop"
+    data-close-financial-detail
+  ></div>
 
 
+  <section
+    class="duvant-modal-card financial-detail-modal-card"
+    role="dialog"
+    aria-modal="true"
+  >
+
+    <div class="duvant-modal-header">
+
+      <div>
+
+        <span class="duvant-modal-eyebrow">
+          CONSIGNACIÓN
+        </span>
+
+        <h2>
+          Detalle financiero
+        </h2>
+
+      </div>
+
+
+      <button
+        class="duvant-modal-close"
+        data-close-financial-detail
+        type="button"
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="duvant-modal-body">
+
+      <div class="financial-detail-seller">
+
+        <strong id="financialDetailSellerName">
+          Vendedor
+        </strong>
+
+        <span id="financialDetailSellerEmail">
+          —
+        </span>
+
+      </div>
+
+
+      <div
+        id="financialDetailLoading"
+        class="financial-detail-loading hidden"
+      >
+        Cargando detalle...
+      </div>
+
+
+      <div
+        id="financialDetailTableWrapper"
+        class="financial-detail-table-wrapper"
+      >
+
+        <table class="financial-detail-table">
+
+          <thead>
+
+            <tr>
+              <th>Perfume</th>
+              <th>Entregado</th>
+              <th>Vendido</th>
+              <th>Devuelto</th>
+              <th>Pendiente</th>
+              <th>Valor vendido</th>
+              <th>Valor pendiente</th>
+            </tr>
+
+          </thead>
+
+
+          <tbody id="financialDetailTableBody">
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <div
+        id="financialDetailEmpty"
+        class="financial-detail-empty hidden"
+      >
+        Este vendedor todavía no tiene consignaciones.
+      </div>
+
+    </div>
+
+
+    <div class="duvant-modal-actions">
+
+      <button
+        id="closeFinancialDetailButton"
+        class="duvant-modal-cancel"
+        type="button"
+      >
+        Cerrar
+      </button>
+
+    </div>
+
+  </section>
+
+</div>
+<!-- =====================================
+     MODAL DETALLE NÓMINA
+====================================== -->
+
+<div
+  id="payrollDetailModal"
+  class="duvant-modal hidden"
+  aria-hidden="true"
+>
+
+  <div
+    class="duvant-modal-backdrop"
+    data-close-payroll-detail
+  ></div>
+
+  <section
+    class="duvant-modal-card payroll-modal-card"
+    role="dialog"
+    aria-modal="true"
+  >
+
+    <div class="duvant-modal-header">
+
+      <div>
+
+        <span class="duvant-modal-eyebrow">
+          NÓMINA SEMANAL
+        </span>
+
+        <h2>
+          Detalle de comisión
+        </h2>
+
+      </div>
+
+      <button
+        class="duvant-modal-close"
+        data-close-payroll-detail
+        type="button"
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="duvant-modal-body">
+
+      <div class="financial-detail-seller">
+
+        <strong id="payrollDetailSellerName">
+          Vendedor
+        </strong>
+
+        <span id="payrollDetailSellerMeta">
+          —
+        </span>
+
+      </div>
+
+
+      <div
+        id="payrollDetailLoading"
+        class="payroll-loading hidden"
+      >
+        Cargando ventas...
+      </div>
+
+
+      <div
+        id="payrollDetailWrapper"
+        class="payroll-table-wrapper"
+      >
+
+        <table class="payroll-table">
+
+          <thead>
+            <tr>
+              <th>Perfume</th>
+              <th>Origen</th>
+              <th>Precio venta</th>
+              <th>Comisión</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+            </tr>
+          </thead>
+
+          <tbody id="payrollDetailBody">
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <div
+        id="payrollDetailEmpty"
+        class="payroll-empty hidden"
+      >
+        Este vendedor no tiene ventas durante esta semana.
+      </div>
+
+    </div>
+
+
+    <div class="duvant-modal-actions">
+
+      <button
+        id="closePayrollDetailButton"
+        class="duvant-modal-cancel"
+        type="button"
+      >
+        Cerrar
+      </button>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- =====================================
+     MODAL PAGAR NÓMINA
+====================================== -->
+
+<div
+  id="payrollPayModal"
+  class="duvant-modal hidden"
+  aria-hidden="true"
+>
+
+  <div
+    class="duvant-modal-backdrop"
+    data-close-payroll-pay
+  ></div>
+
+  <section
+    class="duvant-modal-card payroll-pay-modal-card"
+    role="dialog"
+    aria-modal="true"
+  >
+
+    <div class="duvant-modal-header">
+
+      <div>
+
+        <span class="duvant-modal-eyebrow">
+          CONFIRMAR PAGO
+        </span>
+
+        <h2>
+          Marcar nómina como pagada
+        </h2>
+
+      </div>
+
+      <button
+        class="duvant-modal-close"
+        data-close-payroll-pay
+        type="button"
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="duvant-modal-body">
+
+      <div class="payroll-pay-summary">
+
+        <div>
+          <span>Vendedor</span>
+          <strong id="payrollPaySeller">—</strong>
+        </div>
+
+        <div>
+          <span>Semana</span>
+          <strong id="payrollPayWeek">—</strong>
+        </div>
+
+        <div>
+          <span>Unidades vendidas</span>
+          <strong id="payrollPayUnits">0</strong>
+        </div>
+
+        <div>
+          <span>Comisión por unidad</span>
+          <strong id="payrollPayUnitCommission">$0.00</strong>
+        </div>
+
+        <div>
+          <span>Total a pagar</span>
+          <strong id="payrollPayTotal">$0.00</strong>
+        </div>
+
+      </div>
+
+
+      <div class="duvant-modal-field">
+
+        <label for="payrollPayNotes">
+          Notas opcionales
+        </label>
+
+        <textarea
+          id="payrollPayNotes"
+          class="payroll-notes"
+          placeholder="Ej. Pagado en efectivo..."
+        ></textarea>
+
+      </div>
+
+
+      <div class="duvant-modal-warning">
+        Al confirmar, la nómina quedará congelada con las
+        ventas y la comisión correspondientes a esta semana.
+      </div>
+
+    </div>
+
+
+    <div class="duvant-modal-actions">
+
+      <button
+        id="cancelPayrollPayButton"
+        class="duvant-modal-cancel"
+        type="button"
+      >
+        Cancelar
+      </button>
+
+      <button
+        id="confirmPayrollPayButton"
+        class="duvant-modal-confirm"
+        type="button"
+      >
+        Confirmar pago
+      </button>
+
+    </div>
+
+  </section>
+
+</div>
   <!-- TOAST -->
 
   <div
@@ -1739,1868 +3089,1791 @@
   <script src="script.js"></script>
 
 
-  <script>
-    /*
-     * ==========================================
-     * VENTAS + CONSIGNACIONES
-     * ==========================================
-     */
-
-    /*
-     * Sobrescribimos el mapper para incorporar
-     * los dos campos nuevos de sales.
-     */
-
-    mapSaleFromDB =
-      function mapSaleWithSource(
-        sale
-      ) {
-        return {
-          id:
-            sale.id,
-
-          perfumeId:
-            sale.perfume_id,
-
-          perfumeName:
-            sale.perfume_name ||
-            "",
-
-          perfumeBrand:
-            sale.perfume_brand ||
-            "",
-
-          perfumeSize:
-            formatPerfumeSize(
-              sale.perfume_size
-            ) ||
-            sale.perfume_size ||
-            "",
-
-          perfumeCode:
-            sale.perfume_code ||
-            "",
-
-          salePrice:
-            Number(
-              sale.sale_price
-            ) || 0,
-
-          sellerId:
-            sale.seller_id,
-
-          sellerName:
-            sale.seller_name ||
-            "Vendedor",
-
-          sellerEmail:
-            sale.seller_email ||
-            "",
-
-          createdAt:
-            sale.created_at,
-
-          saleSource:
-            sale.sale_source ||
-            "inventory",
-
-          consignmentLotId:
-            sale.consignment_lot_id ||
-            null
-        };
-      };
+ <script>
+/*
+ * ==========================================
+ * DUVANT 12
+ * VENTAS + CONSIGNACIONES + NÓMINA SEMANAL
+ * ==========================================
+ */
 
 
-    initializeSalesPage =
-      function initializeSalesAndConsignments() {
+/* ==========================================
+   MAPA DE VENTAS
+========================================== */
 
-        const tableBody =
-          document.getElementById(
-            "salesTableBody"
-          );
+mapSaleFromDB = function mapSaleWithSource(sale) {
+  return {
+    id: sale.id,
+    perfumeId: sale.perfume_id,
 
-        if (!tableBody) {
-          return;
-        }
+    perfumeName:
+      sale.perfume_name || "",
 
+    perfumeBrand:
+      sale.perfume_brand || "",
 
-        /* =================================
-           ESTADO
-        ================================= */
+    perfumeSize:
+      formatPerfumeSize(
+        sale.perfume_size
+      ) ||
+      sale.perfume_size ||
+      "",
 
-        let consignments =
-          [];
+    perfumeCode:
+      sale.perfume_code || "",
 
-        let consignmentSummary =
-          [];
+    salePrice:
+      Number(
+        sale.sale_price
+      ) || 0,
 
-        let consignmentMovements =
-          [];
+    sellerId:
+      sale.seller_id,
 
-        let selectedSale =
-          null;
+    sellerName:
+      sale.seller_name ||
+      "Vendedor",
 
-        let deletingSale =
-          false;
+    sellerEmail:
+      sale.seller_email ||
+      "",
 
-        let selectedReturn =
-          null;
+    createdAt:
+      sale.created_at,
 
-        let returningConsignment =
-          false;
+    saleSource:
+      sale.sale_source ||
+      "inventory",
 
-        let assigningConsignment =
-          false;
-
-
-        /* =================================
-           ELEMENTOS VENTAS
-        ================================= */
-
-        const searchInput =
-          document.getElementById(
-            "salesSearchInput"
-          );
-
-        const sellerFilter =
-          document.getElementById(
-            "salesSellerFilter"
-          );
-
-        const dateFilter =
-          document.getElementById(
-            "salesDateFilter"
-          );
-
-        const clearButton =
-          document.getElementById(
-            "clearSalesFiltersButton"
-          );
-
-        const salesEmpty =
-          document.getElementById(
-            "salesEmptyState"
-          );
+    consignmentLotId:
+      sale.consignment_lot_id ||
+      null
+  };
+};
 
 
-        /* =================================
-           TABS
-        ================================= */
+/* ==========================================
+   PÁGINA
+========================================== */
 
-        const historyView =
-          document.getElementById(
-            "salesHistoryView"
-          );
+initializeSalesPage =
+  function initializeSalesAndConsignments() {
 
-        const consignmentsView =
-          document.getElementById(
-            "consignmentsView"
-          );
+    const tableBody =
+      document.getElementById(
+        "salesTableBody"
+      );
 
-
-        document
-          .querySelectorAll(
-            "[data-sales-tab]"
-          )
-          .forEach(
-            (button) => {
-              button.addEventListener(
-                "click",
-                async () => {
-                  const tab =
-                    button.dataset
-                      .salesTab;
+    if (!tableBody) {
+      return;
+    }
 
 
-                  document
-                    .querySelectorAll(
-                      "[data-sales-tab]"
-                    )
-                    .forEach(
-                      (item) => {
-                        item.classList
-                          .toggle(
-                            "active",
-                            item ===
-                              button
-                          );
-                      }
+    /* ======================================
+       HELPERS LOCALES
+    ====================================== */
+
+    function safeText(
+      id,
+      value
+    ) {
+      const element =
+        document.getElementById(id);
+
+      if (element) {
+        element.textContent =
+          value ?? "";
+      }
+    }
+
+
+    function normalizeStatus(row) {
+      return String(
+        row?.status ||
+        row?.payroll_status ||
+        "open"
+      ).toLowerCase();
+    }
+
+
+    function sourceLabel(source) {
+      return source ===
+        "consignment"
+        ? "Consignación"
+        : "Inventario";
+    }
+
+
+    /* ======================================
+       ESTADO
+    ====================================== */
+
+    let consignments = [];
+    let consignmentSummary = [];
+    let consignmentMovements = [];
+    let financialSummary = [];
+    let financialDetail = [];
+
+    let selectedSale = null;
+    let deletingSale = false;
+
+    let selectedReturn = null;
+    let returningConsignment = false;
+    let assigningConsignment = false;
+
+
+    /* ======================================
+       ELEMENTOS VENTAS
+    ====================================== */
+
+    const searchInput =
+      document.getElementById(
+        "salesSearchInput"
+      );
+
+    const sellerFilter =
+      document.getElementById(
+        "salesSellerFilter"
+      );
+
+    const dateFilter =
+      document.getElementById(
+        "salesDateFilter"
+      );
+
+    const clearButton =
+      document.getElementById(
+        "clearSalesFiltersButton"
+      );
+
+    const salesEmpty =
+      document.getElementById(
+        "salesEmptyState"
+      );
+
+
+    /* ======================================
+       VISTAS / TABS
+    ====================================== */
+
+    const historyView =
+      document.getElementById(
+        "salesHistoryView"
+      );
+
+    const consignmentsView =
+      document.getElementById(
+        "consignmentsView"
+      );
+
+    const payrollView =
+      document.getElementById(
+        "payrollView"
+      );
+
+
+    document
+      .querySelectorAll(
+        "[data-sales-tab]"
+      )
+      .forEach(
+        (button) => {
+
+          button.addEventListener(
+            "click",
+            async () => {
+
+              const tab =
+                button.dataset.salesTab;
+
+
+              document
+                .querySelectorAll(
+                  "[data-sales-tab]"
+                )
+                .forEach(
+                  (item) => {
+                    item.classList.toggle(
+                      "active",
+                      item === button
                     );
-
-
-                  historyView
-                    ?.classList
-                    .toggle(
-                      "hidden",
-                      tab !==
-                        "history"
-                    );
-
-
-                  consignmentsView
-                    ?.classList
-                    .toggle(
-                      "hidden",
-                      tab !==
-                        "consignments"
-                    );
-
-
-                  if (
-                    tab ===
-                    "consignments"
-                  ) {
-                    await refreshConsignments();
                   }
-                }
-              );
+                );
+
+
+              historyView
+                ?.classList
+                .toggle(
+                  "hidden",
+                  tab !== "history"
+                );
+
+
+              consignmentsView
+                ?.classList
+                .toggle(
+                  "hidden",
+                  tab !==
+                    "consignments"
+                );
+
+
+              payrollView
+                ?.classList
+                .toggle(
+                  "hidden",
+                  tab !== "payroll"
+                );
+
+
+              if (
+                tab ===
+                "consignments"
+              ) {
+                await refreshConsignments();
+              }
+
+
+              if (
+                tab === "payroll"
+              ) {
+                await refreshPayroll();
+              }
             }
           );
+        }
+      );
 
 
-        /* =================================
-           VENTAS
-        ================================= */
+    /* ======================================
+       ESTADÍSTICAS VENTAS
+    ====================================== */
 
-        function updateSalesStatistics() {
-          const now =
-            new Date();
+    function updateSalesStatistics() {
 
-          const todayKey =
+      const now =
+        new Date();
+
+      const todayKey =
+        getLocalDateKey(now);
+
+      const currentYear =
+        now.getFullYear();
+
+      const currentMonth =
+        now.getMonth();
+
+
+      const todaySales =
+        adminSales.filter(
+          (sale) =>
             getLocalDateKey(
-              now
-            );
-
-          const currentYear =
-            now.getFullYear();
-
-          const currentMonth =
-            now.getMonth();
-
-
-          const todaySales =
-            adminSales.filter(
-              (sale) =>
-                getLocalDateKey(
-                  sale.createdAt
-                ) ===
-                todayKey
-            );
-
-
-          const monthSales =
-            adminSales.filter(
-              (sale) => {
-                const date =
-                  new Date(
-                    sale.createdAt
-                  );
-
-
-                return (
-                  !Number.isNaN(
-                    date.getTime()
-                  ) &&
-                  date.getFullYear() ===
-                    currentYear &&
-                  date.getMonth() ===
-                    currentMonth
-                );
-              }
-            );
-
-
-          setText(
-            "salesToday",
-            todaySales.length
-          );
-
-          setText(
-            "revenueToday",
-            formatCurrency(
-              todaySales.reduce(
-                (sum, sale) =>
-                  sum +
-                  sale.salePrice,
-                0
-              )
-            )
-          );
-
-          setText(
-            "salesMonth",
-            monthSales.length
-          );
-
-          setText(
-            "revenueMonth",
-            formatCurrency(
-              monthSales.reduce(
-                (sum, sale) =>
-                  sum +
-                  sale.salePrice,
-                0
-              )
-            )
-          );
-        }
-
-
-        function populateSalesSellerFilter() {
-          const currentValue =
-            sellerFilter?.value ||
-            "Todos";
-
-          const sellers =
-            new Map();
-
-
-          adminSales.forEach(
-            (sale) => {
-              if (!sale.sellerId) {
-                return;
-              }
-
-              sellers.set(
-                String(
-                  sale.sellerId
-                ),
-                sale.sellerName ||
-                "Vendedor"
-              );
-            }
-          );
-
-
-          if (!sellerFilter) {
-            return;
-          }
-
-
-          sellerFilter.innerHTML = `
-            <option value="Todos">
-              Todos los vendedores
-            </option>
-
-            ${
-              [...sellers.entries()]
-                .sort(
-                  (a, b) =>
-                    a[1].localeCompare(
-                      b[1],
-                      "es",
-                      {
-                        sensitivity:
-                          "base"
-                      }
-                    )
-                )
-                .map(
-                  ([id, name]) => `
-                    <option
-                      value="${escapeHTML(
-                        id
-                      )}"
-                    >
-                      ${escapeHTML(
-                        name
-                      )}
-                    </option>
-                  `
-                )
-                .join("")
-            }
-          `;
-
-
-          if (
-            [...sellerFilter.options]
-              .some(
-                (option) =>
-                  option.value ===
-                  currentValue
-              )
-          ) {
-            sellerFilter.value =
-              currentValue;
-          }
-        }
-
-
-        function filteredSales() {
-          const query =
-            normalizeText(
-              searchInput?.value ||
-              ""
-            );
-
-          const sellerId =
-            sellerFilter?.value ||
-            "Todos";
-
-          const selectedDate =
-            dateFilter?.value ||
-            "";
-
-
-          return adminSales.filter(
-            (sale) => {
-              const searchable =
-                normalizeText(
-                  [
-                    sale.perfumeName,
-                    sale.perfumeBrand,
-                    sale.perfumeSize,
-                    sale.perfumeCode,
-                    sale.sellerName,
-                    sale.sellerEmail
-                  ].join(" ")
-                );
-
-
-              return (
-                searchable.includes(
-                  query
-                ) &&
-                (
-                  sellerId ===
-                    "Todos" ||
-                  String(
-                    sale.sellerId
-                  ) ===
-                    sellerId
-                ) &&
-                (
-                  !selectedDate ||
-                  getLocalDateKey(
-                    sale.createdAt
-                  ) ===
-                    selectedDate
-                )
-              );
-            }
-          );
-        }
-
-
-        function renderSales() {
-          const sales =
-            filteredSales();
-
-
-          tableBody.innerHTML =
-            "";
-
-
-          if (salesEmpty) {
-            salesEmpty.style.display =
-              sales.length === 0
-                ? "block"
-                : "none";
-          }
-
-
-          sales.forEach(
-            (sale) => {
-              const row =
-                document.createElement(
-                  "tr"
-                );
-
-
-              row.innerHTML = `
-                <td>
-                  <div class="sales-product-cell">
-
-                    <strong>
-                      ${escapeHTML(
-                        sale.perfumeName
-                      )}
-                    </strong>
-
-                    <span>
-                      ${escapeHTML(
-                        sale.perfumeBrand
-                      )}
-                      ·
-                      ${escapeHTML(
-                        sale.perfumeSize
-                      )}
-                    </span>
-
-                    <small>
-                      ${escapeHTML(
-                        sale.perfumeCode
-                      )}
-                    </small>
-
-                  </div>
-                </td>
-
-                <td>
-                  <div class="sales-seller-cell">
-
-                    <strong>
-                      ${escapeHTML(
-                        sale.sellerName
-                      )}
-                    </strong>
-
-                    <span>
-                      ${escapeHTML(
-                        sale.sellerEmail ||
-                        "—"
-                      )}
-                    </span>
-
-                  </div>
-                </td>
-
-                <td>
-                  <strong class="sales-price">
-                    ${formatCurrency(
-                      sale.salePrice
-                    )}
-                  </strong>
-                </td>
-
-                <td>
-                  ${escapeHTML(
-                    formatSaleDate(
-                      sale.createdAt
-                    )
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHTML(
-                    formatSaleTime(
-                      sale.createdAt
-                    )
-                  )}
-                </td>
-
-                <td>
-                  <button
-                    class="sales-delete-button"
-                    data-delete-sale-id="${escapeHTML(
-                      sale.id
-                    )}"
-                    type="button"
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              `;
-
-
-              tableBody.appendChild(
-                row
-              );
-            }
-          );
-        }
-
-
-        function renderSalesEverything() {
-          updateSalesStatistics();
-          populateSalesSellerFilter();
-          renderSales();
-        }
-
-
-        /* =================================
-           ELIMINAR VENTA
-        ================================= */
-
-        const deleteModal =
-          document.getElementById(
-            "deleteSaleModal"
-          );
-
-        const deleteConfirm =
-          document.getElementById(
-            "confirmDeleteSaleButton"
-          );
-
-
-        function openDeleteSaleModal(
-          sale
-        ) {
-          selectedSale =
-            sale;
-
-
-          setText(
-            "deleteSaleBrand",
-            sale.perfumeBrand ||
-            "—"
-          );
-
-          setText(
-            "deleteSaleName",
-            sale.perfumeName ||
-            "—"
-          );
-
-          setText(
-            "deleteSaleMeta",
-            `${
-              sale.perfumeSize ||
-              "—"
-            } · ${
-              sale.perfumeCode ||
-              "—"
-            }`
-          );
-
-          setText(
-            "deleteSaleSeller",
-            `Vendido por ${
-              sale.sellerName ||
-              "Vendedor"
-            }`
-          );
-
-          setText(
-            "deleteSaleDate",
-            `${formatSaleDate(
               sale.createdAt
-            )} · ${formatSaleTime(
-              sale.createdAt
-            )}`
-          );
-
-          setText(
-            "deleteSalePrice",
-            formatCurrency(
-              sale.salePrice
-            )
-          );
+            ) === todayKey
+        );
 
 
-          const warning =
-            document.getElementById(
-              "deleteSaleWarning"
-            );
+      const monthSales =
+        adminSales.filter(
+          (sale) => {
 
-
-          if (warning) {
-            warning.textContent =
-              sale.saleSource ===
-              "consignment"
-                ? "Esta venta salió de una consignación. Al eliminarla, la unidad regresará automáticamente a la mercancía del vendedor."
-                : "Esta venta salió del inventario general. Al eliminarla, la unidad regresará automáticamente al inventario.";
-          }
-
-
-          deleteModal
-            ?.classList
-            .remove(
-              "hidden"
-            );
-
-          deleteModal
-            ?.setAttribute(
-              "aria-hidden",
-              "false"
-            );
-
-          document.body
-            .classList
-            .add(
-              "modal-open"
-            );
-        }
-
-
-        function closeDeleteSaleModal(
-          force = false
-        ) {
-          if (
-            deletingSale &&
-            !force
-          ) {
-            return;
-          }
-
-
-          deleteModal
-            ?.classList
-            .add(
-              "hidden"
-            );
-
-          deleteModal
-            ?.setAttribute(
-              "aria-hidden",
-              "true"
-            );
-
-          document.body
-            .classList
-            .remove(
-              "modal-open"
-            );
-
-          selectedSale =
-            null;
-        }
-
-
-        tableBody.addEventListener(
-          "click",
-          (event) => {
-            const button =
-              event.target.closest(
-                "[data-delete-sale-id]"
+            const date =
+              new Date(
+                sale.createdAt
               );
 
-
-            if (!button) {
-              return;
-            }
-
-
-            const sale =
-              adminSales.find(
-                (item) =>
-                  String(
-                    item.id
-                  ) ===
-                  String(
-                    button.dataset
-                      .deleteSaleId
-                  )
-              );
-
-
-            if (sale) {
-              openDeleteSaleModal(
-                sale
-              );
-            }
+            return (
+              date.getFullYear() ===
+                currentYear &&
+              date.getMonth() ===
+                currentMonth
+            );
           }
         );
 
 
-        document
-          .querySelectorAll(
-            "[data-close-delete-sale]"
+      const todayRevenue =
+        todaySales.reduce(
+          (
+            total,
+            sale
+          ) =>
+            total +
+            (
+              Number(
+                sale.salePrice
+              ) || 0
+            ),
+          0
+        );
+
+
+      const monthRevenue =
+        monthSales.reduce(
+          (
+            total,
+            sale
+          ) =>
+            total +
+            (
+              Number(
+                sale.salePrice
+              ) || 0
+            ),
+          0
+        );
+
+
+      safeText(
+        "salesToday",
+        todaySales.length
+      );
+
+      safeText(
+        "revenueToday",
+        formatCurrency(
+          todayRevenue
+        )
+      );
+
+      safeText(
+        "salesMonth",
+        monthSales.length
+      );
+
+      safeText(
+        "revenueMonth",
+        formatCurrency(
+          monthRevenue
+        )
+      );
+    }
+
+
+    /* ======================================
+       FILTRO VENDEDORES
+    ====================================== */
+
+    function populateSalesSellerFilter() {
+
+      if (!sellerFilter) {
+        return;
+      }
+
+
+      const currentValue =
+        sellerFilter.value ||
+        "Todos";
+
+
+      const sellers =
+        new Map();
+
+
+      adminSales.forEach(
+        (sale) => {
+
+          const key =
+            String(
+              sale.sellerId ||
+              sale.sellerEmail ||
+              sale.sellerName
+            );
+
+
+          if (
+            !sellers.has(key)
+          ) {
+            sellers.set(
+              key,
+              {
+                id:
+                  sale.sellerId ||
+                  "",
+
+                name:
+                  sale.sellerName ||
+                  "Vendedor",
+
+                email:
+                  sale.sellerEmail ||
+                  ""
+              }
+            );
+          }
+        }
+      );
+
+
+      const options =
+        [...sellers.values()]
+          .sort(
+            (a, b) =>
+              String(
+                a.name
+              ).localeCompare(
+                String(
+                  b.name
+                ),
+                "es",
+                {
+                  sensitivity:
+                    "base"
+                }
+              )
           )
-          .forEach(
-            (element) => {
-              element.addEventListener(
-                "click",
-                () =>
-                  closeDeleteSaleModal()
-              );
-            }
+          .map(
+            (seller) => `
+              <option
+                value="${escapeHTML(
+                  seller.id ||
+                  seller.email ||
+                  seller.name
+                )}"
+              >
+                ${escapeHTML(
+                  seller.name
+                )}
+              </option>
+            `
+          )
+          .join("");
+
+
+      sellerFilter.innerHTML = `
+        <option value="Todos">
+          Todos los vendedores
+        </option>
+        ${options}
+      `;
+
+
+      const optionExists =
+        [...sellerFilter.options]
+          .some(
+            (option) =>
+              option.value ===
+              currentValue
           );
 
 
-        document
-          .getElementById(
-            "cancelDeleteSaleButton"
+      sellerFilter.value =
+        optionExists
+          ? currentValue
+          : "Todos";
+    }
+
+
+    /* ======================================
+       FILTRAR VENTAS
+    ====================================== */
+
+    function filteredSales() {
+
+      const search =
+        String(
+          searchInput?.value ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      const sellerValue =
+        sellerFilter?.value ||
+        "Todos";
+
+
+      const selectedDate =
+        dateFilter?.value ||
+        "";
+
+
+      return adminSales.filter(
+        (sale) => {
+
+          const haystack = [
+            sale.perfumeName,
+            sale.perfumeBrand,
+            sale.perfumeCode,
+            sale.perfumeSize,
+            sale.sellerName,
+            sale.sellerEmail
+          ]
+            .join(" ")
+            .toLowerCase();
+
+
+          if (
+            search &&
+            !haystack.includes(
+              search
+            )
+          ) {
+            return false;
+          }
+
+
+          if (
+            sellerValue !==
+            "Todos"
+          ) {
+
+            const sellerIdentity =
+              sale.sellerId ||
+              sale.sellerEmail ||
+              sale.sellerName;
+
+
+            if (
+              String(
+                sellerIdentity
+              ) !==
+              String(
+                sellerValue
+              )
+            ) {
+              return false;
+            }
+          }
+
+
+          if (
+            selectedDate &&
+            getLocalDateKey(
+              sale.createdAt
+            ) !==
+            selectedDate
+          ) {
+            return false;
+          }
+
+
+          return true;
+        }
+      );
+    }
+
+
+    /* ======================================
+       RENDER VENTAS
+    ====================================== */
+
+    function renderSales() {
+
+      const rows =
+        filteredSales();
+
+
+      tableBody.innerHTML = "";
+
+
+      if (salesEmpty) {
+        salesEmpty.style.display =
+          rows.length === 0
+            ? "block"
+            : "none";
+      }
+
+
+      rows.forEach(
+        (sale) => {
+
+          const row =
+            document.createElement(
+              "tr"
+            );
+
+
+          row.innerHTML = `
+            <td>
+              <div class="sales-product-cell">
+
+                <strong>
+                  ${escapeHTML(
+                    sale.perfumeName ||
+                    "—"
+                  )}
+                </strong>
+
+                <span>
+                  ${escapeHTML(
+                    sale.perfumeBrand ||
+                    ""
+                  )}
+                  ${
+                    sale.perfumeSize
+                      ? ` · ${escapeHTML(
+                          sale.perfumeSize
+                        )}`
+                      : ""
+                  }
+                </span>
+
+                <small>
+                  ${escapeHTML(
+                    sale.perfumeCode ||
+                    "—"
+                  )}
+                  ·
+                  ${escapeHTML(
+                    sourceLabel(
+                      sale.saleSource
+                    )
+                  )}
+                </small>
+
+              </div>
+            </td>
+
+            <td>
+              <div class="sales-seller-cell">
+
+                <strong>
+                  ${escapeHTML(
+                    sale.sellerName ||
+                    "Vendedor"
+                  )}
+                </strong>
+
+                <span>
+                  ${escapeHTML(
+                    sale.sellerEmail ||
+                    ""
+                  )}
+                </span>
+
+              </div>
+            </td>
+
+            <td>
+              ${formatCurrency(
+                sale.salePrice
+              )}
+            </td>
+
+            <td>
+              ${escapeHTML(
+                formatSaleDate(
+                  sale.createdAt
+                )
+              )}
+            </td>
+
+            <td>
+              ${escapeHTML(
+                formatSaleTime(
+                  sale.createdAt
+                )
+              )}
+            </td>
+
+            <td>
+              <button
+                class="sales-delete-button"
+                data-delete-sale-id="${escapeHTML(
+                  sale.id
+                )}"
+                type="button"
+              >
+                Eliminar
+              </button>
+            </td>
+          `;
+
+
+          tableBody.appendChild(
+            row
+          );
+        }
+      );
+    }
+
+
+    function renderSalesEverything() {
+      updateSalesStatistics();
+      populateSalesSellerFilter();
+      renderSales();
+    }
+
+
+    /* ======================================
+       ELIMINAR VENTA
+    ====================================== */
+
+    const deleteModal =
+      document.getElementById(
+        "deleteSaleModal"
+      );
+
+    const deleteConfirm =
+      document.getElementById(
+        "confirmDeleteSaleButton"
+      );
+
+
+    function openDeleteSaleModal(
+      sale
+    ) {
+
+      selectedSale =
+        sale;
+
+
+      safeText(
+        "deleteSaleBrand",
+        sale.perfumeBrand ||
+        "—"
+      );
+
+      safeText(
+        "deleteSaleName",
+        sale.perfumeName ||
+        "—"
+      );
+
+      safeText(
+        "deleteSaleMeta",
+        `${
+          sale.perfumeSize ||
+          "—"
+        } · ${
+          sale.perfumeCode ||
+          "—"
+        }`
+      );
+
+      safeText(
+        "deleteSaleSeller",
+        `Vendido por ${
+          sale.sellerName ||
+          "Vendedor"
+        }`
+      );
+
+      safeText(
+        "deleteSaleDate",
+        `${
+          formatSaleDate(
+            sale.createdAt
           )
-          ?.addEventListener(
+        } · ${
+          formatSaleTime(
+            sale.createdAt
+          )
+        }`
+      );
+
+      safeText(
+        "deleteSalePrice",
+        formatCurrency(
+          sale.salePrice
+        )
+      );
+
+
+      const warning =
+        document.getElementById(
+          "deleteSaleWarning"
+        );
+
+
+      if (warning) {
+
+        warning.textContent =
+          sale.saleSource ===
+          "consignment"
+            ?
+              "Esta venta salió de una consignación. Al eliminarla, la unidad regresará automáticamente a la mercancía del vendedor."
+            :
+              "Esta venta salió del inventario general. Al eliminarla, la unidad regresará automáticamente al inventario.";
+      }
+
+
+      deleteModal
+        ?.classList
+        .remove("hidden");
+
+      deleteModal
+        ?.setAttribute(
+          "aria-hidden",
+          "false"
+        );
+
+      document.body
+        .classList
+        .add("modal-open");
+    }
+
+
+    function closeDeleteSaleModal(
+      force = false
+    ) {
+
+      if (
+        deletingSale &&
+        !force
+      ) {
+        return;
+      }
+
+
+      deleteModal
+        ?.classList
+        .add("hidden");
+
+      deleteModal
+        ?.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+      document.body
+        .classList
+        .remove("modal-open");
+
+      selectedSale =
+        null;
+    }
+
+
+    tableBody.addEventListener(
+      "click",
+      (event) => {
+
+        const button =
+          event.target.closest(
+            "[data-delete-sale-id]"
+          );
+
+
+        if (!button) {
+          return;
+        }
+
+
+        const sale =
+          adminSales.find(
+            (item) =>
+              String(
+                item.id
+              ) ===
+              String(
+                button.dataset
+                  .deleteSaleId
+              )
+          );
+
+
+        if (sale) {
+          openDeleteSaleModal(
+            sale
+          );
+        }
+      }
+    );
+
+
+    document
+      .querySelectorAll(
+        "[data-close-delete-sale]"
+      )
+      .forEach(
+        (element) => {
+
+          element.addEventListener(
             "click",
             () =>
               closeDeleteSaleModal()
           );
+        }
+      );
 
 
-        deleteConfirm
-          ?.addEventListener(
-            "click",
-            async () => {
-              if (
-                deletingSale ||
-                !selectedSale
-              ) {
-                return;
-              }
+    document
+      .getElementById(
+        "cancelDeleteSaleButton"
+      )
+      ?.addEventListener(
+        "click",
+        () =>
+          closeDeleteSaleModal()
+      );
 
 
-              const sale = {
-                ...selectedSale
-              };
+    deleteConfirm
+      ?.addEventListener(
+        "click",
+        async () => {
+
+          if (
+            deletingSale ||
+            !selectedSale
+          ) {
+            return;
+          }
 
 
-              deletingSale =
-                true;
-
-              deleteConfirm.disabled =
-                true;
-
-              deleteConfirm.textContent =
-                "Eliminando...";
+          const sale = {
+            ...selectedSale
+          };
 
 
-              closeDeleteSaleModal(
-                true
-              );
+          deletingSale =
+            true;
+
+          deleteConfirm.disabled =
+            true;
+
+          deleteConfirm.textContent =
+            "Eliminando...";
 
 
-              showToast(
-                "Eliminando venta..."
-              );
-
-
-              try {
-                const {
-                  error
-                } =
-                  await supabaseClient
-                    .rpc(
-                      "delete_sale",
-                      {
-                        p_sale_id:
-                          sale.id
-                      }
-                    );
-
-
-                if (error) {
-                  throw new Error(
-                    error.message
-                  );
-                }
-
-
-                await Promise.all([
-                  loadAdminSales(),
-                  loadConsignmentData()
-                ]);
-
-
-                renderSalesEverything();
-
-                renderConsignmentEverything();
-
-
-                showToast(
-                  sale.saleSource ===
-                  "consignment"
-                    ? "Venta eliminada. La unidad regresó al vendedor."
-                    : "Venta eliminada. La unidad regresó al inventario."
-                );
-
-              } catch (error) {
-                console.error(
-                  error
-                );
-
-
-                showToast(
-                  error.message ||
-                  "No se pudo eliminar la venta."
-                );
-
-              } finally {
-                deletingSale =
-                  false;
-
-                deleteConfirm.disabled =
-                  false;
-
-                deleteConfirm.textContent =
-                  "Eliminar venta";
-              }
-            }
+          closeDeleteSaleModal(
+            true
           );
 
 
-        /* =================================
-           CARGAR CONSIGNACIONES
-        ================================= */
+          showToast(
+            "Eliminando venta..."
+          );
 
-        async function loadConsignmentData() {
-          const [
-            detailResult,
-            summaryResult,
-            movementResult
-          ] =
+
+          try {
+
+            const {
+              error
+            } =
+              await supabaseClient
+                .rpc(
+                  "delete_sale",
+                  {
+                    p_sale_id:
+                      sale.id
+                  }
+                );
+
+
+            if (error) {
+              throw new Error(
+                error.message
+              );
+            }
+
+
             await Promise.all([
-              supabaseClient.rpc(
-                "get_admin_consignments"
-              ),
-
-              supabaseClient.rpc(
-                "get_admin_consignment_summary"
-              ),
-
-              supabaseClient.rpc(
-                "get_admin_consignment_movements"
-              )
+              loadAdminSales(),
+              loadConsignmentData()
             ]);
 
 
-          if (
-            detailResult.error
-          ) {
-            throw new Error(
-              detailResult.error
-                .message
+            renderSalesEverything();
+
+            renderConsignmentEverything();
+
+
+            showToast(
+              sale.saleSource ===
+              "consignment"
+                ?
+                  "Venta eliminada. La unidad regresó al vendedor."
+                :
+                  "Venta eliminada. La unidad regresó al inventario."
             );
-          }
 
+          } catch (error) {
 
-          if (
-            summaryResult.error
-          ) {
-            throw new Error(
-              summaryResult.error
-                .message
+            console.error(
+              "Error eliminando venta:",
+              error
             );
-          }
 
 
-          if (
-            movementResult.error
-          ) {
-            throw new Error(
-              movementResult.error
-                .message
+            showToast(
+              error.message ||
+              "No se pudo eliminar la venta."
             );
-          }
 
+          } finally {
 
-          consignments =
-            detailResult.data ||
-            [];
+            deletingSale =
+              false;
 
-          consignmentSummary =
-            summaryResult.data ||
-            [];
+            deleteConfirm.disabled =
+              false;
 
-          consignmentMovements =
-            movementResult.data ||
-            [];
-        }
-
-
-        /* =================================
-           VENDEDORES + INVENTARIO
-        ================================= */
-
-        const assignSeller =
-          document.getElementById(
-            "consignmentSeller"
-          );
-
-        const summarySeller =
-          document.getElementById(
-            "consignmentSummarySeller"
-          );
-
-        const perfumeSelect =
-          document.getElementById(
-            "consignmentPerfume"
-          );
-
-        const quantityInput =
-          document.getElementById(
-            "consignmentQuantity"
-          );
-
-
-        function populateConsignmentSellers() {
-          const activeSellers =
-            sellerUsers
-              .filter(
-                (seller) =>
-                  seller.active !==
-                  false
-              )
-              .sort(
-                (a, b) =>
-                  String(
-                    a.fullName ||
-                    ""
-                  ).localeCompare(
-                    String(
-                      b.fullName ||
-                      ""
-                    ),
-                    "es",
-                    {
-                      sensitivity:
-                        "base"
-                    }
-                  )
-              );
-
-
-          const options =
-            activeSellers
-              .map(
-                (seller) => `
-                  <option
-                    value="${escapeHTML(
-                      seller.id
-                    )}"
-                  >
-                    ${escapeHTML(
-                      seller.fullName ||
-                      seller.email ||
-                      "Vendedor"
-                    )}
-                  </option>
-                `
-              )
-              .join("");
-
-
-          if (assignSeller) {
-            const current =
-              assignSeller.value;
-
-
-            assignSeller.innerHTML = `
-              <option value="">
-                Selecciona un vendedor
-              </option>
-              ${options}
-            `;
-
-
-            if (
-              activeSellers.some(
-                (seller) =>
-                  String(
-                    seller.id
-                  ) ===
-                  current
-              )
-            ) {
-              assignSeller.value =
-                current;
-            }
-          }
-
-
-          if (summarySeller) {
-            const current =
-              summarySeller.value;
-
-
-            summarySeller.innerHTML = `
-              <option value="">
-                Selecciona un vendedor
-              </option>
-              ${options}
-            `;
-
-
-            if (
-              activeSellers.some(
-                (seller) =>
-                  String(
-                    seller.id
-                  ) ===
-                  current
-              )
-            ) {
-              summarySeller.value =
-                current;
-            }
+            deleteConfirm.textContent =
+              "Eliminar venta";
           }
         }
+      );
 
 
-        function populateConsignmentPerfumes() {
-          if (!perfumeSelect) {
+    /* ======================================
+       CARGAR CONSIGNACIONES
+    ====================================== */
+
+    async function loadConsignmentData() {
+
+      const [
+        detailResult,
+        summaryResult,
+        movementResult,
+        financialResult
+      ] =
+        await Promise.all([
+
+          supabaseClient.rpc(
+            "get_admin_consignments"
+          ),
+
+          supabaseClient.rpc(
+            "get_admin_consignment_summary"
+          ),
+
+          supabaseClient.rpc(
+            "get_admin_consignment_movements"
+          ),
+
+          supabaseClient.rpc(
+            "get_admin_consignment_financial_summary"
+          )
+        ]);
+
+
+      if (detailResult.error) {
+        throw new Error(
+          detailResult.error.message
+        );
+      }
+
+
+      if (summaryResult.error) {
+        throw new Error(
+          summaryResult.error.message
+        );
+      }
+
+
+      if (movementResult.error) {
+        throw new Error(
+          movementResult.error.message
+        );
+      }
+
+
+      if (financialResult.error) {
+        throw new Error(
+          financialResult.error.message
+        );
+      }
+
+
+      consignments =
+        detailResult.data ||
+        [];
+
+      consignmentSummary =
+        summaryResult.data ||
+        [];
+
+      consignmentMovements =
+        movementResult.data ||
+        [];
+
+      financialSummary =
+        financialResult.data ||
+        [];
+    }
+
+
+    /* ======================================
+       CONSIGNACIÓN - ELEMENTOS
+    ====================================== */
+
+    const assignSeller =
+      document.getElementById(
+        "consignmentSeller"
+      );
+
+    const summarySeller =
+      document.getElementById(
+        "consignmentSummarySeller"
+      );
+
+    const perfumeSelect =
+      document.getElementById(
+        "consignmentPerfume"
+      );
+
+    const quantityInput =
+      document.getElementById(
+        "consignmentQuantity"
+      );
+
+
+    /* ======================================
+       VENDEDORES CONSIGNACIÓN
+    ====================================== */
+
+    function populateConsignmentSellers() {
+
+      const activeSellers =
+        sellerUsers
+          .filter(
+            (seller) =>
+              seller.active !==
+              false
+          )
+          .sort(
+            (a, b) =>
+              String(
+                a.fullName ||
+                ""
+              ).localeCompare(
+                String(
+                  b.fullName ||
+                  ""
+                ),
+                "es",
+                {
+                  sensitivity:
+                    "base"
+                }
+              )
+          );
+
+
+      const options =
+        activeSellers
+          .map(
+            (seller) => `
+              <option
+                value="${escapeHTML(
+                  seller.id
+                )}"
+              >
+                ${escapeHTML(
+                  seller.fullName ||
+                  seller.email ||
+                  "Vendedor"
+                )}
+              </option>
+            `
+          )
+          .join("");
+
+
+      if (assignSeller) {
+
+        const current =
+          assignSeller.value;
+
+
+        assignSeller.innerHTML = `
+          <option value="">
+            Selecciona un vendedor
+          </option>
+          ${options}
+        `;
+
+
+        if (
+          activeSellers.some(
+            (seller) =>
+              String(
+                seller.id
+              ) ===
+              String(
+                current
+              )
+          )
+        ) {
+          assignSeller.value =
+            current;
+        }
+      }
+
+
+      if (summarySeller) {
+
+        const current =
+          summarySeller.value;
+
+
+        summarySeller.innerHTML = `
+          <option value="">
+            Selecciona un vendedor
+          </option>
+          ${options}
+        `;
+
+
+        if (
+          activeSellers.some(
+            (seller) =>
+              String(
+                seller.id
+              ) ===
+              String(
+                current
+              )
+          )
+        ) {
+          summarySeller.value =
+            current;
+        }
+      }
+    }
+
+
+    /* ======================================
+       PERFUMES CONSIGNACIÓN
+    ====================================== */
+
+    function populateConsignmentPerfumes() {
+
+      if (!perfumeSelect) {
+        return;
+      }
+
+
+      const current =
+        perfumeSelect.value;
+
+
+      perfumeSelect.innerHTML = `
+        <option value="">
+          Selecciona un perfume
+        </option>
+      `;
+
+
+      const products =
+        [...perfumes]
+          .sort(
+            (a, b) =>
+              compareCodes(
+                a.code,
+                b.code
+              )
+          );
+
+
+      products.forEach(
+        (perfume) => {
+
+          const option =
+            document.createElement(
+              "option"
+            );
+
+
+          option.value =
+            perfume.id;
+
+
+          option.textContent =
+            `${
+              perfume.code ||
+              "S/C"
+            } · ${
+              perfume.name ||
+              "Perfume"
+            } · Stock ${
+              Number(
+                perfume.quantity
+              ) || 0
+            }`;
+
+
+          perfumeSelect.appendChild(
+            option
+          );
+        }
+      );
+
+
+      if (
+        products.some(
+          (perfume) =>
+            String(
+              perfume.id
+            ) ===
+            String(
+              current
+            )
+        )
+      ) {
+        perfumeSelect.value =
+          current;
+      }
+    }
+
+
+    function selectedPerfume() {
+
+      const id =
+        perfumeSelect?.value;
+
+
+      if (!id) {
+        return null;
+      }
+
+
+      return perfumes.find(
+        (perfume) =>
+          String(
+            perfume.id
+          ) ===
+          String(id)
+      ) || null;
+    }
+
+
+    function updateAssignmentPreview() {
+
+      const perfume =
+        selectedPerfume();
+
+
+      const quantity =
+        Math.max(
+          1,
+          Number(
+            quantityInput?.value
+          ) || 1
+        );
+
+
+      safeText(
+        "consignmentAvailableStock",
+        perfume
+          ?
+            `${
+              Number(
+                perfume.quantity
+              ) || 0
+            } unidad(es)`
+          :
+            "—"
+      );
+
+
+      safeText(
+        "consignmentPerfumePrice",
+        perfume
+          ?
+            formatCurrency(
+              perfume.price
+            )
+          :
+            "—"
+      );
+
+
+      safeText(
+        "consignmentAssignmentValue",
+        perfume
+          ?
+            formatCurrency(
+              (
+                Number(
+                  perfume.price
+                ) || 0
+              ) *
+              quantity
+            )
+          :
+            "—"
+      );
+    }
+
+
+    perfumeSelect
+      ?.addEventListener(
+        "change",
+        updateAssignmentPreview
+      );
+
+
+    quantityInput
+      ?.addEventListener(
+        "input",
+        updateAssignmentPreview
+      );
+
+
+    /* ======================================
+       ASIGNAR CONSIGNACIÓN
+    ====================================== */
+
+    const assignForm =
+      document.getElementById(
+        "consignmentAssignForm"
+      );
+
+    const assignButton =
+      document.getElementById(
+        "assignConsignmentButton"
+      );
+
+
+    assignForm
+      ?.addEventListener(
+        "submit",
+        async (event) => {
+
+          event.preventDefault();
+
+
+          if (
+            assigningConsignment
+          ) {
             return;
           }
 
 
-          const current =
-            perfumeSelect.value;
+          const sellerId =
+            assignSeller?.value ||
+            "";
 
 
-          perfumeSelect.innerHTML = `
-            <option value="">
-              Selecciona un perfume
-            </option>
-
-            ${
-              sortPerfumesByCode(
-                perfumes
-              )
-                .map(
-                  (perfume) => `
-                    <option
-                      value="${escapeHTML(
-                        perfume.id
-                      )}"
-                    >
-                      ${escapeHTML(
-                        perfume.code
-                      )}
-                      ·
-                      ${escapeHTML(
-                        perfume.name
-                      )}
-                      ·
-                      ${escapeHTML(
-                        perfume.size
-                      )}
-                    </option>
-                  `
-                )
-                .join("")
-            }
-          `;
-
-
-          if (
-            perfumes.some(
-              (perfume) =>
-                String(
-                  perfume.id
-                ) ===
-                current
-            )
-          ) {
-            perfumeSelect.value =
-              current;
-          }
-        }
-
-
-        function selectedPerfume() {
-          return perfumes.find(
-            (perfume) =>
-              String(
-                perfume.id
-              ) ===
-              String(
-                perfumeSelect?.value ||
-                ""
-              )
-          );
-        }
-
-
-        function updateAssignmentPreview() {
           const perfume =
             selectedPerfume();
 
+
           const quantity =
-            Math.max(
-              0,
-              Number(
-                quantityInput?.value
-              ) || 0
+            Number(
+              quantityInput?.value
             );
-
-
-          setText(
-            "consignmentAvailableStock",
-            perfume
-              ? `${perfume.quantity} ${
-                  perfume.quantity ===
-                  1
-                    ? "unidad"
-                    : "unidades"
-                }`
-              : "—"
-          );
-
-
-          setText(
-            "consignmentPerfumePrice",
-            perfume
-              ? formatCurrency(
-                  perfume.price
-                )
-              : "—"
-          );
-
-
-          setText(
-            "consignmentAssignmentValue",
-            perfume
-              ? formatCurrency(
-                  perfume.price *
-                  quantity
-                )
-              : "—"
-          );
-        }
-
-
-        perfumeSelect
-          ?.addEventListener(
-            "change",
-            updateAssignmentPreview
-          );
-
-
-        quantityInput
-          ?.addEventListener(
-            "input",
-            updateAssignmentPreview
-          );
-
-
-        /* =================================
-           ASIGNAR
-        ================================= */
-
-        const assignForm =
-          document.getElementById(
-            "consignmentAssignForm"
-          );
-
-        const assignButton =
-          document.getElementById(
-            "assignConsignmentButton"
-          );
-
-
-        assignForm
-          ?.addEventListener(
-            "submit",
-            async (event) => {
-              event.preventDefault();
-
-
-              if (
-                assigningConsignment
-              ) {
-                return;
-              }
-
-
-              const sellerId =
-                assignSeller?.value ||
-                "";
-
-              const perfume =
-                selectedPerfume();
-
-              const quantity =
-                Number(
-                  quantityInput?.value
-                );
-
-
-              if (!sellerId) {
-                showToast(
-                  "Selecciona un vendedor."
-                );
-
-                return;
-              }
-
-
-              if (!perfume) {
-                showToast(
-                  "Selecciona un perfume."
-                );
-
-                return;
-              }
-
-
-              if (
-                !Number.isInteger(
-                  quantity
-                ) ||
-                quantity <= 0
-              ) {
-                showToast(
-                  "Escribe una cantidad válida."
-                );
-
-                return;
-              }
-
-
-              if (
-                quantity >
-                perfume.quantity
-              ) {
-                showToast(
-                  `Solo hay ${perfume.quantity} unidad(es) disponibles.`
-                );
-
-                return;
-              }
-
-
-              assigningConsignment =
-                true;
-
-              assignButton.disabled =
-                true;
-
-              assignButton.textContent =
-                "Asignando...";
-
-
-              try {
-                const {
-                  error
-                } =
-                  await supabaseClient
-                    .rpc(
-                      "assign_consignment",
-                      {
-                        p_seller_id:
-                          sellerId,
-
-                        p_perfume_id:
-                          perfume.id,
-
-                        p_quantity:
-                          quantity
-                      }
-                    );
-
-
-                if (error) {
-                  throw new Error(
-                    error.message
-                  );
-                }
-
-
-                await Promise.all([
-                  loadInventoryFromSupabase(),
-                  loadConsignmentData()
-                ]);
-
-
-                populateConsignmentPerfumes();
-
-                updateAssignmentPreview();
-
-
-                if (summarySeller) {
-                  summarySeller.value =
-                    sellerId;
-                }
-
-
-                renderConsignmentEverything();
-
-
-                if (quantityInput) {
-                  quantityInput.value =
-                    1;
-                }
-
-
-                updateAssignmentPreview();
-
-
-                showToast(
-                  "Mercancía asignada correctamente."
-                );
-
-              } catch (error) {
-                console.error(
-                  error
-                );
-
-
-                showToast(
-                  error.message ||
-                  "No se pudo asignar la mercancía."
-                );
-
-              } finally {
-                assigningConsignment =
-                  false;
-
-                assignButton.disabled =
-                  false;
-
-                assignButton.textContent =
-                  "Asignar mercancía";
-              }
-            }
-          );
-
-
-        /* =================================
-           RESUMEN
-        ================================= */
-
-        function currentSummary() {
-          const sellerId =
-            summarySeller?.value ||
-            "";
-
-
-          return consignmentSummary
-            .find(
-              (row) =>
-                String(
-                  row.seller_id
-                ) ===
-                sellerId
-            );
-        }
-
-
-        function renderSummary() {
-          const summary =
-            currentSummary();
-
-
-          setText(
-            "consignmentTotalAssigned",
-            Number(
-              summary?.total_assigned
-            ) || 0
-          );
-
-          setText(
-            "consignmentTotalSold",
-            Number(
-              summary?.total_sold
-            ) || 0
-          );
-
-          setText(
-            "consignmentTotalReturned",
-            Number(
-              summary?.total_returned
-            ) || 0
-          );
-
-          setText(
-            "consignmentTotalPending",
-            Number(
-              summary?.total_pending
-            ) || 0
-          );
-
-          setText(
-            "consignmentAssignedValue",
-            formatCurrency(
-              summary?.assigned_value
-            )
-          );
-
-          setText(
-            "consignmentSoldValue",
-            formatCurrency(
-              summary?.sold_value
-            )
-          );
-
-          setText(
-            "consignmentReturnedValue",
-            formatCurrency(
-              summary?.returned_value
-            )
-          );
-
-          setText(
-            "consignmentPendingValue",
-            formatCurrency(
-              summary?.pending_value
-            )
-          );
-        }
-
-
-        /* =================================
-           TABLA CONSIGNADA
-        ================================= */
-
-        const consignmentBody =
-          document.getElementById(
-            "consignmentTableBody"
-          );
-
-        const consignmentEmpty =
-          document.getElementById(
-            "consignmentTableEmpty"
-          );
-
-
-        function currentSellerConsignments() {
-          const sellerId =
-            summarySeller?.value ||
-            "";
 
 
           if (!sellerId) {
-            return [];
-          }
 
-
-          return consignments
-            .filter(
-              (row) =>
-                String(
-                  row.seller_id
-                ) ===
-                sellerId
-            )
-            .sort(
-              (a, b) =>
-                compareCodes(
-                  a.perfume_code,
-                  b.perfume_code
-                )
+            showToast(
+              "Selecciona un vendedor."
             );
-        }
 
-
-        function renderConsignmentTable() {
-          if (!consignmentBody) {
             return;
           }
 
 
-          const rows =
-            currentSellerConsignments();
+          if (!perfume) {
 
+            showToast(
+              "Selecciona un perfume."
+            );
 
-          consignmentBody.innerHTML =
-            "";
-
-
-          if (consignmentEmpty) {
-            consignmentEmpty.style.display =
-              rows.length === 0
-                ? "block"
-                : "none";
-
-
-            if (
-              rows.length === 0
-            ) {
-              consignmentEmpty.textContent =
-                summarySeller?.value
-                  ? "Este vendedor todavía no tiene mercancía consignada."
-                  : "Selecciona un vendedor para consultar su mercancía.";
-            }
-          }
-
-
-          rows.forEach(
-            (row) => {
-              const pending =
-                Number(
-                  row.quantity_pending
-                ) || 0;
-
-
-              const tr =
-                document.createElement(
-                  "tr"
-                );
-
-
-              tr.innerHTML = `
-                <td>
-                  <div class="consignment-product-cell">
-
-                    <strong>
-                      ${escapeHTML(
-                        row.perfume_name
-                      )}
-                    </strong>
-
-                    <span>
-                      ${escapeHTML(
-                        row.perfume_brand
-                      )}
-                      ·
-                      ${escapeHTML(
-                        formatPerfumeSize(
-                          row.perfume_size
-                        ) ||
-                        row.perfume_size
-                      )}
-                    </span>
-
-                    <small>
-                      ${escapeHTML(
-                        row.perfume_code
-                      )}
-                    </small>
-
-                  </div>
-                </td>
-
-                <td>
-                  ${
-                    Number(
-                      row.quantity_assigned
-                    ) || 0
-                  }
-                </td>
-
-                <td>
-                  ${
-                    Number(
-                      row.quantity_sold
-                    ) || 0
-                  }
-                </td>
-
-                <td>
-                  ${
-                    Number(
-                      row.quantity_returned
-                    ) || 0
-                  }
-                </td>
-
-                <td>
-                  <span class="consignment-pending">
-                    ${pending}
-                  </span>
-                </td>
-
-                <td>
-                  ${formatCurrency(
-                    row.pending_value
-                  )}
-                </td>
-
-                <td>
-                  <button
-                    class="consignment-return-button"
-                    data-return-seller="${escapeHTML(
-                      row.seller_id
-                    )}"
-                    data-return-perfume="${escapeHTML(
-                      row.perfume_id
-                    )}"
-                    type="button"
-                    ${
-                      pending <= 0
-                        ? "disabled"
-                        : ""
-                    }
-                  >
-                    Devolver
-                  </button>
-                </td>
-              `;
-
-
-              consignmentBody
-                .appendChild(
-                  tr
-                );
-            }
-          );
-        }
-
-
-        /* =================================
-           HISTORIAL
-        ================================= */
-
-        const historyList =
-          document.getElementById(
-            "consignmentHistoryList"
-          );
-
-        const historyEmpty =
-          document.getElementById(
-            "consignmentHistoryEmpty"
-          );
-
-
-        function renderConsignmentHistory() {
-          if (!historyList) {
             return;
           }
 
 
-          const sellerId =
-            summarySeller?.value ||
-            "";
+          if (
+            !Number.isInteger(
+              quantity
+            ) ||
+            quantity <= 0
+          ) {
+
+            showToast(
+              "Escribe una cantidad válida."
+            );
+
+            return;
+          }
 
 
-          const rows =
-            consignmentMovements
-              .filter(
-                (row) =>
-                  !sellerId ||
-                  String(
-                    row.seller_id
-                  ) ===
-                    sellerId
+          if (
+            quantity >
+            Number(
+              perfume.quantity
+            )
+          ) {
+
+            showToast(
+              `Solo hay ${
+                perfume.quantity
+              } unidad(es) disponibles.`
+            );
+
+            return;
+          }
+
+
+          assigningConsignment =
+            true;
+
+
+          assignButton.disabled =
+            true;
+
+          assignButton.textContent =
+            "Asignando...";
+
+
+          try {
+
+            const {
+              error
+            } =
+              await supabaseClient
+                .rpc(
+                  "assign_consignment",
+                  {
+                    p_seller_id:
+                      sellerId,
+
+                    p_perfume_id:
+                      perfume.id,
+
+                    p_quantity:
+                      quantity
+                  }
+                );
+
+
+            if (error) {
+              throw new Error(
+                error.message
               );
-
-
-          historyList.innerHTML =
-            "";
-
-
-          if (historyEmpty) {
-            historyEmpty.style.display =
-              rows.length === 0
-                ? "block"
-                : "none";
-          }
-
-
-          rows.forEach(
-            (row) => {
-              const item =
-                document.createElement(
-                  "div"
-                );
-
-
-              item.className =
-                "consignment-history-item";
-
-
-              const labels = {
-                assignment:
-                  "Asignación",
-
-                sale:
-                  "Venta",
-
-                return:
-                  "Devolución"
-              };
-
-
-              const sign =
-                row.movement_type ===
-                "assignment"
-                  ? "+"
-                  : "-";
-
-
-              item.innerHTML = `
-                <span
-                  class="
-                    consignment-history-type
-                    ${escapeHTML(
-                      row.movement_type
-                    )}
-                  "
-                >
-                  ${escapeHTML(
-                    labels[
-                      row.movement_type
-                    ] ||
-                    row.movement_type
-                  )}
-                </span>
-
-                <span class="consignment-history-seller">
-                  ${escapeHTML(
-                    row.seller_name ||
-                    "Vendedor"
-                  )}
-                </span>
-
-                <div class="consignment-history-product">
-
-                  <strong>
-                    ${escapeHTML(
-                      row.perfume_name
-                    )}
-                  </strong>
-
-                  <small>
-                    ${escapeHTML(
-                      row.perfume_code
-                    )}
-                    ·
-                    ${escapeHTML(
-                      formatPerfumeSize(
-                        row.perfume_size
-                      ) ||
-                      row.perfume_size
-                    )}
-                  </small>
-
-                </div>
-
-                <span class="consignment-history-quantity">
-                  ${sign}${
-                    Number(
-                      row.quantity
-                    ) || 0
-                  }
-                </span>
-
-                <span class="consignment-history-date">
-                  ${escapeHTML(
-                    formatSaleDate(
-                      row.created_at
-                    )
-                  )}
-                  ·
-                  ${escapeHTML(
-                    formatSaleTime(
-                      row.created_at
-                    )
-                  )}
-                </span>
-              `;
-
-
-              historyList
-                .appendChild(
-                  item
-                );
             }
-          );
+
+
+            await Promise.all([
+              loadInventoryFromSupabase(),
+              loadConsignmentData()
+            ]);
+
+
+            populateConsignmentPerfumes();
+
+
+            if (summarySeller) {
+              summarySeller.value =
+                sellerId;
+            }
+
+
+            renderConsignmentEverything();
+
+
+            if (quantityInput) {
+              quantityInput.value =
+                "1";
+            }
+
+
+            updateAssignmentPreview();
+
+
+            showToast(
+              "Mercancía asignada correctamente."
+            );
+
+          } catch (error) {
+
+            console.error(
+              "Error asignando consignación:",
+              error
+            );
+
+
+            showToast(
+              error.message ||
+              "No se pudo asignar la mercancía."
+            );
+
+          } finally {
+
+            assigningConsignment =
+              false;
+
+            assignButton.disabled =
+              false;
+
+            assignButton.textContent =
+              "Asignar mercancía";
+          }
         }
+      );
 
 
-        function renderConsignmentEverything() {
-          renderSummary();
-          renderConsignmentTable();
-          renderConsignmentHistory();
-        }
+    /* ======================================
+       RESUMEN CONSIGNACIÓN
+    ====================================== */
+
+    function currentSummary() {
+
+      const sellerId =
+        summarySeller?.value ||
+        "";
 
 
-        summarySeller
-          ?.addEventListener(
-            "change",
-            renderConsignmentEverything
-          );
+      return consignmentSummary.find(
+        (row) =>
+          String(
+            row.seller_id
+          ) ===
+          String(
+            sellerId
+          )
+      );
+    }
 
 
-        /* =================================
-           DEVOLUCIÓN
-        ================================= */
+    function renderSummary() {
 
-        const returnModal =
-          document.getElementById(
-            "returnConsignmentModal"
-          );
-
-        const returnQuantity =
-          document.getElementById(
-            "returnConsignmentQuantity"
-          );
-
-        const returnConfirm =
-          document.getElementById(
-            "confirmReturnConsignmentButton"
-          );
+      const summary =
+        currentSummary();
 
 
-        function openReturnModal(
-          row
+      safeText(
+        "consignmentTotalAssigned",
+        Number(
+          summary?.total_assigned
+        ) || 0
+      );
+
+      safeText(
+        "consignmentTotalSold",
+        Number(
+          summary?.total_sold
+        ) || 0
+      );
+
+      safeText(
+        "consignmentTotalReturned",
+        Number(
+          summary?.total_returned
+        ) || 0
+      );
+
+      safeText(
+        "consignmentTotalPending",
+        Number(
+          summary?.total_pending
+        ) || 0
+      );
+
+      safeText(
+        "consignmentAssignedValue",
+        formatCurrency(
+          summary?.assigned_value
+        )
+      );
+
+      safeText(
+        "consignmentSoldValue",
+        formatCurrency(
+          summary?.sold_value
+        )
+      );
+
+      safeText(
+        "consignmentReturnedValue",
+        formatCurrency(
+          summary?.returned_value
+        )
+      );
+
+      safeText(
+        "consignmentPendingValue",
+        formatCurrency(
+          summary?.pending_value
+        )
+      );
+    }
+
+
+    /* ======================================
+       TABLA CONSIGNADA
+    ====================================== */
+
+    const consignmentBody =
+      document.getElementById(
+        "consignmentTableBody"
+      );
+
+    const consignmentEmpty =
+      document.getElementById(
+        "consignmentTableEmpty"
+      );
+
+
+    function currentSellerConsignments() {
+
+      const sellerId =
+        summarySeller?.value ||
+        "";
+
+
+      if (!sellerId) {
+        return [];
+      }
+
+
+      return consignments
+        .filter(
+          (row) =>
+            String(
+              row.seller_id
+            ) ===
+            String(
+              sellerId
+            )
+        )
+        .sort(
+          (a, b) =>
+            compareCodes(
+              a.perfume_code,
+              b.perfume_code
+            )
+        );
+    }
+
+
+    function renderConsignmentTable() {
+
+      if (!consignmentBody) {
+        return;
+      }
+
+
+      const rows =
+        currentSellerConsignments();
+
+
+      consignmentBody.innerHTML =
+        "";
+
+
+      if (consignmentEmpty) {
+
+        consignmentEmpty.style.display =
+          rows.length === 0
+            ? "block"
+            : "none";
+
+
+        if (
+          rows.length === 0
         ) {
-          selectedReturn = {
-            ...row
-          };
 
+          consignmentEmpty.textContent =
+            summarySeller?.value
+              ?
+                "Este vendedor todavía no tiene mercancía consignada."
+              :
+                "Selecciona un vendedor para consultar su mercancía.";
+        }
+      }
+
+
+      rows.forEach(
+        (row) => {
 
           const pending =
             Number(
@@ -3608,328 +4881,1135 @@
             ) || 0;
 
 
-          setText(
-            "returnSellerName",
-            row.seller_name ||
-            "Vendedor"
+          const tr =
+            document.createElement(
+              "tr"
+            );
+
+
+          tr.innerHTML = `
+            <td>
+              <div class="consignment-product-cell">
+
+                <strong>
+                  ${escapeHTML(
+                    row.perfume_name ||
+                    "Perfume"
+                  )}
+                </strong>
+
+                <span>
+                  ${escapeHTML(
+                    row.perfume_brand ||
+                    ""
+                  )}
+                  ·
+                  ${escapeHTML(
+                    formatPerfumeSize(
+                      row.perfume_size
+                    ) ||
+                    row.perfume_size ||
+                    ""
+                  )}
+                </span>
+
+                <small>
+                  ${escapeHTML(
+                    row.perfume_code ||
+                    "—"
+                  )}
+                </small>
+
+              </div>
+            </td>
+
+            <td>
+              ${
+                Number(
+                  row.quantity_assigned
+                ) || 0
+              }
+            </td>
+
+            <td>
+              ${
+                Number(
+                  row.quantity_sold
+                ) || 0
+              }
+            </td>
+
+            <td>
+              ${
+                Number(
+                  row.quantity_returned
+                ) || 0
+              }
+            </td>
+
+            <td>
+              <span class="consignment-pending">
+                ${pending}
+              </span>
+            </td>
+
+            <td>
+              ${formatCurrency(
+                row.pending_value
+              )}
+            </td>
+
+            <td>
+              <button
+                class="consignment-return-button"
+                data-return-seller="${escapeHTML(
+                  row.seller_id
+                )}"
+                data-return-perfume="${escapeHTML(
+                  row.perfume_id
+                )}"
+                type="button"
+                ${
+                  pending <= 0
+                    ? "disabled"
+                    : ""
+                }
+              >
+                Devolver
+              </button>
+            </td>
+          `;
+
+
+          consignmentBody.appendChild(
+            tr
           );
-
-          setText(
-            "returnPerfumeName",
-            row.perfume_name ||
-            "—"
-          );
-
-          setText(
-            "returnPerfumeMeta",
-            `${
-              row.perfume_brand ||
-              ""
-            } · ${
-              formatPerfumeSize(
-                row.perfume_size
-              ) ||
-              row.perfume_size ||
-              ""
-            } · ${
-              row.perfume_code ||
-              ""
-            }`
-          );
-
-          setText(
-            "returnAvailableUnits",
-            `En poder del vendedor: ${pending} unidad(es)`
-          );
+        }
+      );
+    }
 
 
-          if (returnQuantity) {
-            returnQuantity.value =
-              1;
+    /* ======================================
+       HISTORIAL CONSIGNACIONES
+    ====================================== */
 
-            returnQuantity.max =
+    const historyList =
+      document.getElementById(
+        "consignmentHistoryList"
+      );
+
+    const historyEmpty =
+      document.getElementById(
+        "consignmentHistoryEmpty"
+      );
+
+
+    function renderConsignmentHistory() {
+
+      if (!historyList) {
+        return;
+      }
+
+
+      const sellerId =
+        summarySeller?.value ||
+        "";
+
+
+      const rows =
+        consignmentMovements
+          .filter(
+            (row) =>
+              !sellerId ||
               String(
-                pending
-              );
-          }
+                row.seller_id
+              ) ===
+              String(
+                sellerId
+              )
+          );
 
 
-          returnModal
-            ?.classList
-            .remove(
-              "hidden"
+      historyList.innerHTML =
+        "";
+
+
+      if (historyEmpty) {
+        historyEmpty.style.display =
+          rows.length === 0
+            ? "block"
+            : "none";
+      }
+
+
+      rows.forEach(
+        (row) => {
+
+          const type =
+            row.movement_type ||
+            "";
+
+
+          const label =
+            type === "assignment"
+              ?
+                "Entrega"
+              :
+            type === "sale"
+              ?
+                "Venta"
+              :
+            type === "return"
+              ?
+                "Devolución"
+              :
+                type;
+
+
+          const item =
+            document.createElement(
+              "div"
             );
 
-          returnModal
-            ?.setAttribute(
-              "aria-hidden",
-              "false"
+
+          item.className =
+            "consignment-history-item";
+
+
+          item.innerHTML = `
+            <div
+              class="
+                consignment-history-type
+                ${escapeHTML(type)}
+              "
+            >
+              ${escapeHTML(label)}
+            </div>
+
+            <div class="consignment-history-seller">
+              ${escapeHTML(
+                row.seller_name ||
+                "Vendedor"
+              )}
+            </div>
+
+            <div class="consignment-history-product">
+
+              <strong>
+                ${escapeHTML(
+                  row.perfume_name ||
+                  "Perfume"
+                )}
+              </strong>
+
+              <small>
+                ${escapeHTML(
+                  row.perfume_code ||
+                  "—"
+                )}
+              </small>
+
+            </div>
+
+            <div class="consignment-history-quantity">
+              ${
+                Number(
+                  row.quantity
+                ) || 0
+              }
+            </div>
+
+            <div class="consignment-history-date">
+              ${
+                row.created_at
+                  ?
+                    `${escapeHTML(
+                      formatSaleDate(
+                        row.created_at
+                      )
+                    )}<br>${escapeHTML(
+                      formatSaleTime(
+                        row.created_at
+                      )
+                    )}`
+                  :
+                    "—"
+              }
+            </div>
+          `;
+
+
+          historyList.appendChild(
+            item
+          );
+        }
+      );
+    }
+
+
+    /* ======================================
+       FINANCIERO
+    ====================================== */
+
+    const financialGrid =
+      document.getElementById(
+        "financialSellersGrid"
+      );
+
+    const financialEmpty =
+      document.getElementById(
+        "financialSellersEmpty"
+      );
+
+
+    function renderFinancialSummary() {
+
+      if (!financialGrid) {
+        return;
+      }
+
+
+      financialGrid.innerHTML =
+        "";
+
+
+      const rows =
+        [...financialSummary]
+          .sort(
+            (a, b) =>
+              String(
+                a.seller_name ||
+                ""
+              ).localeCompare(
+                String(
+                  b.seller_name ||
+                  ""
+                ),
+                "es",
+                {
+                  sensitivity:
+                    "base"
+                }
+              )
+          );
+
+
+      if (financialEmpty) {
+
+        financialEmpty.style.display =
+          rows.length === 0
+            ? "block"
+            : "none";
+      }
+
+
+      rows.forEach(
+        (row) => {
+
+          const card =
+            document.createElement(
+              "article"
             );
 
-          document.body
-            .classList
-            .add(
-              "modal-open"
-            );
+
+          card.className =
+            "financial-seller-card";
+
+
+          card.innerHTML = `
+            <div class="financial-seller-header">
+
+              <div>
+                <strong>
+                  ${escapeHTML(
+                    row.seller_name ||
+                    "Vendedor"
+                  )}
+                </strong>
+
+                <span>
+                  ${escapeHTML(
+                    row.seller_email ||
+                    "—"
+                  )}
+                </span>
+              </div>
+
+              <span class="financial-perfume-count">
+                ${
+                  Number(
+                    row.perfume_count
+                  ) || 0
+                }
+                perfume(s)
+              </span>
+
+            </div>
+
+            <div class="financial-unit-row">
+
+              <div class="financial-unit-item">
+                <span>Entregadas</span>
+                <strong>
+                  ${
+                    Number(
+                      row.quantity_assigned
+                    ) || 0
+                  }
+                </strong>
+              </div>
+
+              <div class="financial-unit-item">
+                <span>Vendidas</span>
+                <strong>
+                  ${
+                    Number(
+                      row.quantity_sold
+                    ) || 0
+                  }
+                </strong>
+              </div>
+
+              <div class="financial-unit-item">
+                <span>Devueltas</span>
+                <strong>
+                  ${
+                    Number(
+                      row.quantity_returned
+                    ) || 0
+                  }
+                </strong>
+              </div>
+
+              <div class="financial-unit-item">
+                <span>Pendientes</span>
+                <strong>
+                  ${
+                    Number(
+                      row.quantity_pending
+                    ) || 0
+                  }
+                </strong>
+              </div>
+
+            </div>
+
+            <div class="financial-money-grid">
+
+              <div class="financial-money-item">
+                <span>Entregado</span>
+                <strong>
+                  ${formatCurrency(
+                    row.assigned_value
+                  )}
+                </strong>
+              </div>
+
+              <div class="financial-money-item real">
+                <span>Vendido</span>
+                <strong>
+                  ${formatCurrency(
+                    row.sold_value
+                  )}
+                </strong>
+              </div>
+
+              <div class="financial-money-item pending">
+                <span>Pendiente</span>
+                <strong>
+                  ${formatCurrency(
+                    row.pending_value
+                  )}
+                </strong>
+              </div>
+
+            </div>
+
+            <div class="financial-seller-footer">
+
+              <button
+                class="financial-detail-button"
+                data-financial-detail="${escapeHTML(
+                  row.seller_id
+                )}"
+                type="button"
+              >
+                Ver detalle
+              </button>
+
+            </div>
+          `;
+
+
+          financialGrid.appendChild(
+            card
+          );
+        }
+      );
+    }
+
+
+    /* ======================================
+       MODAL FINANCIERO
+    ====================================== */
+
+    const financialDetailModal =
+      document.getElementById(
+        "financialDetailModal"
+      );
+
+    const financialDetailBody =
+      document.getElementById(
+        "financialDetailTableBody"
+      );
+
+    const financialDetailLoading =
+      document.getElementById(
+        "financialDetailLoading"
+      );
+
+    const financialDetailWrapper =
+      document.getElementById(
+        "financialDetailTableWrapper"
+      );
+
+    const financialDetailEmpty =
+      document.getElementById(
+        "financialDetailEmpty"
+      );
+
+
+    function closeFinancialDetailModal() {
+
+      financialDetailModal
+        ?.classList
+        .add("hidden");
+
+      financialDetailModal
+        ?.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+      document.body
+        .classList
+        .remove("modal-open");
+
+      financialDetail = [];
+    }
+
+
+    async function openFinancialDetail(
+      seller
+    ) {
+
+      if (
+        !seller?.seller_id
+      ) {
+        return;
+      }
+
+
+      safeText(
+        "financialDetailSellerName",
+        seller.seller_name ||
+        "Vendedor"
+      );
+
+      safeText(
+        "financialDetailSellerEmail",
+        seller.seller_email ||
+        "—"
+      );
+
+
+      financialDetailBody.innerHTML =
+        "";
+
+
+      financialDetailLoading
+        ?.classList
+        .remove("hidden");
+
+      financialDetailWrapper
+        ?.classList
+        .add("hidden");
+
+      financialDetailEmpty
+        ?.classList
+        .add("hidden");
+
+
+      financialDetailModal
+        ?.classList
+        .remove("hidden");
+
+      financialDetailModal
+        ?.setAttribute(
+          "aria-hidden",
+          "false"
+        );
+
+      document.body
+        .classList
+        .add("modal-open");
+
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.rpc(
+            "get_admin_seller_consignment_detail",
+            {
+              p_seller_id:
+                seller.seller_id
+            }
+          );
+
+
+        if (error) {
+          throw new Error(
+            error.message
+          );
         }
 
 
-        function closeReturnModal(
-          force = false
-        ) {
+        financialDetail =
+          data || [];
+
+
+        financialDetailEmpty
+          ?.classList
+          .toggle(
+            "hidden",
+            financialDetail.length >
+              0
+          );
+
+
+        financialDetailWrapper
+          ?.classList
+          .toggle(
+            "hidden",
+            financialDetail.length ===
+              0
+          );
+
+
+        financialDetail.forEach(
+          (row) => {
+
+            const tr =
+              document.createElement(
+                "tr"
+              );
+
+
+            tr.innerHTML = `
+              <td>
+                <div class="financial-detail-product">
+
+                  <strong>
+                    ${escapeHTML(
+                      row.perfume_name ||
+                      "Perfume"
+                    )}
+                  </strong>
+
+                  <span>
+                    ${escapeHTML(
+                      row.perfume_brand ||
+                      ""
+                    )}
+                    ·
+                    ${escapeHTML(
+                      formatPerfumeSize(
+                        row.perfume_size
+                      ) ||
+                      row.perfume_size ||
+                      ""
+                    )}
+                    ·
+                    ${escapeHTML(
+                      row.perfume_code ||
+                      "—"
+                    )}
+                  </span>
+
+                </div>
+              </td>
+
+              <td>
+                ${
+                  Number(
+                    row.quantity_assigned
+                  ) || 0
+                }
+              </td>
+
+              <td>
+                ${
+                  Number(
+                    row.quantity_sold
+                  ) || 0
+                }
+              </td>
+
+              <td>
+                ${
+                  Number(
+                    row.quantity_returned
+                  ) || 0
+                }
+              </td>
+
+              <td>
+                ${
+                  Number(
+                    row.quantity_pending
+                  ) || 0
+                }
+              </td>
+
+              <td>
+                ${formatCurrency(
+                  row.sold_value
+                )}
+              </td>
+
+              <td>
+                ${formatCurrency(
+                  row.pending_value
+                )}
+              </td>
+            `;
+
+
+            financialDetailBody
+              .appendChild(
+                tr
+              );
+          }
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Error detalle financiero:",
+          error
+        );
+
+
+        financialDetailWrapper
+          ?.classList
+          .add("hidden");
+
+        financialDetailEmpty
+          ?.classList
+          .remove("hidden");
+
+
+        showToast(
+          error.message ||
+          "No se pudo cargar el detalle financiero."
+        );
+
+      } finally {
+
+        financialDetailLoading
+          ?.classList
+          .add("hidden");
+      }
+    }
+
+
+    financialGrid
+      ?.addEventListener(
+        "click",
+        (event) => {
+
+          const button =
+            event.target.closest(
+              "[data-financial-detail]"
+            );
+
+
+          if (!button) {
+            return;
+          }
+
+
+          const seller =
+            financialSummary.find(
+              (row) =>
+                String(
+                  row.seller_id
+                ) ===
+                String(
+                  button.dataset
+                    .financialDetail
+                )
+            );
+
+
+          if (seller) {
+            openFinancialDetail(
+              seller
+            );
+          }
+        }
+      );
+
+
+    document
+      .querySelectorAll(
+        "[data-close-financial-detail]"
+      )
+      .forEach(
+        (element) => {
+
+          element.addEventListener(
+            "click",
+            closeFinancialDetailModal
+          );
+        }
+      );
+
+
+    document
+      .getElementById(
+        "closeFinancialDetailButton"
+      )
+      ?.addEventListener(
+        "click",
+        closeFinancialDetailModal
+      );
+
+
+    /* ======================================
+       RENDER CONSIGNACIONES
+    ====================================== */
+
+    function renderConsignmentEverything() {
+      renderFinancialSummary();
+      renderSummary();
+      renderConsignmentTable();
+      renderConsignmentHistory();
+    }
+
+
+    summarySeller
+      ?.addEventListener(
+        "change",
+        renderConsignmentEverything
+      );
+
+
+    /* ======================================
+       DEVOLUCIÓN
+    ====================================== */
+
+    const returnModal =
+      document.getElementById(
+        "returnConsignmentModal"
+      );
+
+    const returnQuantity =
+      document.getElementById(
+        "returnConsignmentQuantity"
+      );
+
+    const returnConfirm =
+      document.getElementById(
+        "confirmReturnConsignmentButton"
+      );
+
+
+    function openReturnModal(
+      row
+    ) {
+
+      selectedReturn =
+        row;
+
+
+      const pending =
+        Number(
+          row.quantity_pending
+        ) || 0;
+
+
+      safeText(
+        "returnSellerName",
+        row.seller_name ||
+        "Vendedor"
+      );
+
+      safeText(
+        "returnPerfumeName",
+        row.perfume_name ||
+        "Perfume"
+      );
+
+      safeText(
+        "returnPerfumeMeta",
+        `${
+          row.perfume_brand ||
+          ""
+        } · ${
+          formatPerfumeSize(
+            row.perfume_size
+          ) ||
+          row.perfume_size ||
+          ""
+        } · ${
+          row.perfume_code ||
+          "—"
+        }`
+      );
+
+      safeText(
+        "returnAvailableUnits",
+        `En poder del vendedor: ${pending} unidad(es)`
+      );
+
+
+      if (returnQuantity) {
+
+        returnQuantity.value =
+          "1";
+
+        returnQuantity.max =
+          String(
+            pending
+          );
+      }
+
+
+      returnModal
+        ?.classList
+        .remove("hidden");
+
+      returnModal
+        ?.setAttribute(
+          "aria-hidden",
+          "false"
+        );
+
+      document.body
+        .classList
+        .add("modal-open");
+    }
+
+
+    function closeReturnModal(
+      force = false
+    ) {
+
+      if (
+        returningConsignment &&
+        !force
+      ) {
+        return;
+      }
+
+
+      returnModal
+        ?.classList
+        .add("hidden");
+
+      returnModal
+        ?.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+      document.body
+        .classList
+        .remove("modal-open");
+
+
+      selectedReturn =
+        null;
+    }
+
+
+    consignmentBody
+      ?.addEventListener(
+        "click",
+        (event) => {
+
+          const button =
+            event.target.closest(
+              "[data-return-perfume]"
+            );
+
+
+          if (!button) {
+            return;
+          }
+
+
+          const row =
+            consignments.find(
+              (item) =>
+                String(
+                  item.seller_id
+                ) ===
+                  String(
+                    button.dataset
+                      .returnSeller
+                  ) &&
+                String(
+                  item.perfume_id
+                ) ===
+                  String(
+                    button.dataset
+                      .returnPerfume
+                  )
+            );
+
+
+          if (row) {
+            openReturnModal(
+              row
+            );
+          }
+        }
+      );
+
+
+    document
+      .querySelectorAll(
+        "[data-close-return-modal]"
+      )
+      .forEach(
+        (element) => {
+
+          element.addEventListener(
+            "click",
+            () =>
+              closeReturnModal()
+          );
+        }
+      );
+
+
+    document
+      .getElementById(
+        "cancelReturnConsignmentButton"
+      )
+      ?.addEventListener(
+        "click",
+        () =>
+          closeReturnModal()
+      );
+
+
+    returnConfirm
+      ?.addEventListener(
+        "click",
+        async () => {
+
           if (
-            returningConsignment &&
-            !force
+            returningConsignment ||
+            !selectedReturn
           ) {
             return;
           }
 
 
-          returnModal
-            ?.classList
-            .add(
-              "hidden"
+          const row = {
+            ...selectedReturn
+          };
+
+
+          const quantity =
+            Number(
+              returnQuantity?.value
             );
 
-          returnModal
-            ?.setAttribute(
-              "aria-hidden",
-              "true"
+
+          const available =
+            Number(
+              row.quantity_pending
+            ) || 0;
+
+
+          if (
+            !Number.isInteger(
+              quantity
+            ) ||
+            quantity <= 0 ||
+            quantity >
+              available
+          ) {
+
+            showToast(
+              "Escribe una cantidad válida para devolver."
             );
 
-          document.body
-            .classList
-            .remove(
-              "modal-open"
-            );
-
-          selectedReturn =
-            null;
-        }
+            return;
+          }
 
 
-        consignmentBody
-          ?.addEventListener(
-            "click",
-            (event) => {
-              const button =
-                event.target.closest(
-                  "[data-return-perfume]"
-                );
+          returningConsignment =
+            true;
 
 
-              if (!button) {
-                return;
-              }
+          returnConfirm.disabled =
+            true;
+
+          returnConfirm.textContent =
+            "Registrando...";
 
 
-              const row =
-                consignments.find(
-                  (item) =>
-                    String(
-                      item.seller_id
-                    ) ===
-                      String(
-                        button.dataset
-                          .returnSeller
-                      ) &&
-                    String(
-                      item.perfume_id
-                    ) ===
-                      String(
-                        button.dataset
-                          .returnPerfume
-                      )
-                );
-
-
-              if (row) {
-                openReturnModal(
-                  row
-                );
-              }
-            }
+          closeReturnModal(
+            true
           );
 
 
-        document
-          .querySelectorAll(
-            "[data-close-return-modal]"
-          )
-          .forEach(
-            (element) => {
-              element.addEventListener(
-                "click",
-                () =>
-                  closeReturnModal()
-              );
-            }
+          showToast(
+            "Registrando devolución..."
           );
 
 
-        document
-          .getElementById(
-            "cancelReturnConsignmentButton"
-          )
-          ?.addEventListener(
-            "click",
-            () =>
-              closeReturnModal()
-          );
-
-
-        returnConfirm
-          ?.addEventListener(
-            "click",
-            async () => {
-              if (
-                returningConsignment ||
-                !selectedReturn
-              ) {
-                return;
-              }
-
-
-              const row = {
-                ...selectedReturn
-              };
-
-
-              const quantity =
-                Number(
-                  returnQuantity?.value
-                );
-
-
-              const available =
-                Number(
-                  row.quantity_pending
-                ) || 0;
-
-
-              if (
-                !Number.isInteger(
-                  quantity
-                ) ||
-                quantity <= 0 ||
-                quantity >
-                  available
-              ) {
-                showToast(
-                  "Escribe una cantidad válida para devolver."
-                );
-
-                return;
-              }
-
-
-              returningConsignment =
-                true;
-
-              returnConfirm.disabled =
-                true;
-
-              returnConfirm.textContent =
-                "Registrando...";
-
-
-              closeReturnModal(
-                true
-              );
-
-
-              showToast(
-                "Registrando devolución..."
-              );
-
-
-              try {
-                const {
-                  error
-                } =
-                  await supabaseClient
-                    .rpc(
-                      "return_consignment",
-                      {
-                        p_seller_id:
-                          row.seller_id,
-
-                        p_perfume_id:
-                          row.perfume_id,
-
-                        p_quantity:
-                          quantity
-                      }
-                    );
-
-
-                if (error) {
-                  throw new Error(
-                    error.message
-                  );
-                }
-
-
-                await Promise.all([
-                  loadInventoryFromSupabase(),
-                  loadConsignmentData()
-                ]);
-
-
-                populateConsignmentPerfumes();
-
-                updateAssignmentPreview();
-
-                renderConsignmentEverything();
-
-
-                showToast(
-                  `${quantity} ${
-                    quantity === 1
-                      ? "unidad devuelta"
-                      : "unidades devueltas"
-                  } al inventario.`
-                );
-
-              } catch (error) {
-                console.error(
-                  error
-                );
-
-
-                showToast(
-                  error.message ||
-                  "No se pudo registrar la devolución."
-                );
-
-              } finally {
-                returningConsignment =
-                  false;
-
-                returnConfirm.disabled =
-                  false;
-
-                returnConfirm.textContent =
-                  "Registrar devolución";
-              }
-            }
-          );
-
-
-        /* =================================
-           REFRESH CONSIGNACIONES
-        ================================= */
-
-        async function refreshConsignments() {
           try {
+
+            const {
+              error
+            } =
+              await supabaseClient
+                .rpc(
+                  "return_consignment",
+                  {
+                    p_seller_id:
+                      row.seller_id,
+
+                    p_perfume_id:
+                      row.perfume_id,
+
+                    p_quantity:
+                      quantity
+                  }
+                );
+
+
+            if (error) {
+              throw new Error(
+                error.message
+              );
+            }
+
+
             await Promise.all([
               loadInventoryFromSupabase(),
-              loadSellerUsers(),
               loadConsignmentData()
             ]);
 
-
-            populateConsignmentSellers();
 
             populateConsignmentPerfumes();
 
@@ -3937,163 +6017,2147 @@
 
             renderConsignmentEverything();
 
+
+            showToast(
+              `${
+                quantity
+              } ${
+                quantity === 1
+                  ?
+                    "unidad devuelta"
+                  :
+                    "unidades devueltas"
+              } al inventario.`
+            );
+
           } catch (error) {
+
             console.error(
-              "Error cargando consignaciones:",
+              "Error devolución:",
               error
             );
 
 
             showToast(
               error.message ||
-              "No se pudieron cargar las consignaciones."
+              "No se pudo registrar la devolución."
             );
+
+          } finally {
+
+            returningConsignment =
+              false;
+
+            returnConfirm.disabled =
+              false;
+
+            returnConfirm.textContent =
+              "Registrar devolución";
           }
         }
+      );
 
 
-        /* =================================
-           FILTROS VENTAS
-        ================================= */
+    /* ======================================
+       REFRESH CONSIGNACIONES
+    ====================================== */
 
-        searchInput
-          ?.addEventListener(
-            "input",
-            renderSales
-          );
+    async function refreshConsignments() {
 
-        sellerFilter
-          ?.addEventListener(
-            "change",
-            renderSales
-          );
+      try {
 
-        dateFilter
-          ?.addEventListener(
-            "change",
-            renderSales
-          );
-
-        clearButton
-          ?.addEventListener(
-            "click",
-            () => {
-              if (searchInput) {
-                searchInput.value =
-                  "";
-              }
-
-              if (sellerFilter) {
-                sellerFilter.value =
-                  "Todos";
-              }
-
-              if (dateFilter) {
-                dateFilter.value =
-                  "";
-              }
-
-              renderSales();
-            }
-          );
+        await Promise.all([
+          loadInventoryFromSupabase(),
+          loadSellerUsers(),
+          loadConsignmentData()
+        ]);
 
 
-        /* =================================
-           ESCAPE
-        ================================= */
+        populateConsignmentSellers();
 
-        document.addEventListener(
-          "keydown",
-          (event) => {
-            if (
-              event.key !==
-              "Escape"
-            ) {
-              return;
-            }
+        populateConsignmentPerfumes();
 
+        updateAssignmentPreview();
 
-            if (
-              deleteModal &&
-              !deleteModal
-                .classList
-                .contains(
-                  "hidden"
-                )
-            ) {
-              closeDeleteSaleModal();
-            }
+        renderConsignmentEverything();
 
+      } catch (error) {
 
-            if (
-              returnModal &&
-              !returnModal
-                .classList
-                .contains(
-                  "hidden"
-                )
-            ) {
-              closeReturnModal();
-            }
-          }
+        console.error(
+          "Error cargando consignaciones:",
+          error
         );
 
 
-        /* =================================
-           CARGA INICIAL
-        ================================= */
+        showToast(
+          error.message ||
+          "No se pudieron cargar las consignaciones."
+        );
+      }
+    }
 
-        async function load() {
-          tableBody.innerHTML = `
-            <tr>
-              <td colspan="6">
-                <div class="sales-loading">
-                  Cargando ventas...
-                </div>
-              </td>
-            </tr>
+
+    /* =====================================================
+       NÓMINA SEMANAL
+    ===================================================== */
+
+    let payrollWeekRows = [];
+    let payrollHistory = [];
+    let payrollSelectedSeller = null;
+    let payrollPaySeller = null;
+    let payrollPayProcessing = false;
+    let payrollLoadingState = false;
+
+
+    const payrollWeekLabel =
+      document.getElementById(
+        "payrollWeekLabel"
+      );
+
+    const payrollSellersGrid =
+      document.getElementById(
+        "payrollSellersGrid"
+      );
+
+    const payrollEmpty =
+      document.getElementById(
+        "payrollEmpty"
+      );
+
+    const payrollLoading =
+      document.getElementById(
+        "payrollLoading"
+      );
+
+    const payrollHistoryBody =
+      document.getElementById(
+        "payrollHistoryBody"
+      );
+
+    const payrollHistoryEmpty =
+      document.getElementById(
+        "payrollHistoryEmpty"
+      );
+
+
+    /* ======================================
+       FECHAS NÓMINA
+    ====================================== */
+
+    function payrollDateKey(
+      date
+    ) {
+
+      const year =
+        date.getFullYear();
+
+      const month =
+        String(
+          date.getMonth() + 1
+        ).padStart(
+          2,
+          "0"
+        );
+
+      const day =
+        String(
+          date.getDate()
+        ).padStart(
+          2,
+          "0"
+        );
+
+
+      return `${year}-${month}-${day}`;
+    }
+
+
+    function payrollParseDate(
+      value
+    ) {
+
+      const parts =
+        String(
+          value || ""
+        )
+          .split("-")
+          .map(Number);
+
+
+      if (
+        parts.length !== 3 ||
+        parts.some(
+          (part) =>
+            !Number.isFinite(
+              part
+            )
+        )
+      ) {
+        return null;
+      }
+
+
+      return new Date(
+        parts[0],
+        parts[1] - 1,
+        parts[2],
+        12,
+        0,
+        0,
+        0
+      );
+    }
+
+
+    function payrollGetMonday(
+      value = new Date()
+    ) {
+
+      const date =
+        value instanceof Date
+          ?
+            new Date(
+              value.getFullYear(),
+              value.getMonth(),
+              value.getDate(),
+              12
+            )
+          :
+            payrollParseDate(
+              value
+            );
+
+
+      if (!date) {
+        return new Date();
+      }
+
+
+      const day =
+        date.getDay();
+
+
+      const difference =
+        day === 0
+          ? -6
+          : 1 - day;
+
+
+      date.setDate(
+        date.getDate() +
+        difference
+      );
+
+
+      return date;
+    }
+
+
+    let payrollWeekStart =
+      payrollGetMonday(
+        new Date()
+      );
+
+
+    function payrollWeekEndDate() {
+
+      const date =
+        new Date(
+          payrollWeekStart
+        );
+
+
+      date.setDate(
+        date.getDate() + 6
+      );
+
+
+      return date;
+    }
+
+
+    function payrollFormatShortDate(
+      date
+    ) {
+
+      return new Intl
+        .DateTimeFormat(
+          "es-MX",
+          {
+            day: "2-digit",
+            month: "short"
+          }
+        )
+        .format(date);
+    }
+
+
+    function payrollFormatFullDate(
+      value
+    ) {
+
+      const date =
+        value instanceof Date
+          ?
+            value
+          :
+            payrollParseDate(
+              value
+            );
+
+
+      if (!date) {
+        return "—";
+      }
+
+
+      return new Intl
+        .DateTimeFormat(
+          "es-MX",
+          {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          }
+        )
+        .format(date);
+    }
+
+
+    function payrollFormatWeekRange() {
+
+      return `${
+        payrollFormatShortDate(
+          payrollWeekStart
+        )
+      } — ${
+        payrollFormatFullDate(
+          payrollWeekEndDate()
+        )
+      }`;
+    }
+
+
+    function payrollSetWeekLabel() {
+
+      if (payrollWeekLabel) {
+
+        payrollWeekLabel.textContent =
+          payrollFormatWeekRange();
+      }
+    }
+
+
+    /* ======================================
+       NIVEL COMISIÓN
+    ====================================== */
+
+    function payrollLevelLabel(
+      salesCount
+    ) {
+
+      const quantity =
+        Number(
+          salesCount
+        ) || 0;
+
+
+      if (
+        quantity <= 0
+      ) {
+        return "Sin ventas";
+      }
+
+
+      if (
+        quantity <= 3
+      ) {
+        return "1–3 unidades";
+      }
+
+
+      if (
+        quantity <= 5
+      ) {
+        return "4–5 unidades";
+      }
+
+
+      return "6+ unidades";
+    }
+
+
+    /* ======================================
+       CARGAR SEMANA
+    ====================================== */
+
+    async function loadPayrollWeek() {
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .rpc(
+            "get_admin_commission_week",
+            {
+              p_week_start:
+                payrollDateKey(
+                  payrollWeekStart
+                )
+            }
+          );
+
+
+      if (error) {
+
+        console.error(
+          "Error get_admin_commission_week:",
+          error
+        );
+
+
+        throw new Error(
+          error.message ||
+          "No se pudo cargar la nómina semanal."
+        );
+      }
+
+
+      payrollWeekRows =
+        data || [];
+    }
+
+
+    /* ======================================
+       CARGAR HISTORIAL NÓMINA
+    ====================================== */
+
+    async function loadPayrollHistory() {
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .rpc(
+            "get_admin_commission_payroll_history"
+          );
+
+
+      if (error) {
+
+        console.error(
+          "Error get_admin_commission_payroll_history:",
+          error
+        );
+
+
+        throw new Error(
+          error.message ||
+          "No se pudo cargar el historial de nóminas."
+        );
+      }
+
+
+      payrollHistory =
+        data || [];
+    }
+
+
+    /* ======================================
+       ESTADÍSTICAS NÓMINA
+    ====================================== */
+
+    function renderPayrollStatistics() {
+
+      const sellers =
+        payrollWeekRows.length;
+
+
+      const units =
+        payrollWeekRows.reduce(
+          (
+            total,
+            row
+          ) =>
+            total +
+            (
+              Number(
+                row.sales_count
+              ) || 0
+            ),
+          0
+        );
+
+
+      const salesTotal =
+        payrollWeekRows.reduce(
+          (
+            total,
+            row
+          ) =>
+            total +
+            (
+              Number(
+                row.sales_total
+              ) || 0
+            ),
+          0
+        );
+
+
+      const commissionTotal =
+        payrollWeekRows.reduce(
+          (
+            total,
+            row
+          ) =>
+            total +
+            (
+              Number(
+                row.commission_total
+              ) || 0
+            ),
+          0
+        );
+
+
+      safeText(
+        "payrollSellerCount",
+        sellers
+      );
+
+      safeText(
+        "payrollUnitsTotal",
+        units
+      );
+
+      safeText(
+        "payrollSalesTotal",
+        formatCurrency(
+          salesTotal
+        )
+      );
+
+      safeText(
+        "payrollCommissionTotal",
+        formatCurrency(
+          commissionTotal
+        )
+      );
+    }
+
+
+    /* ======================================
+       TARJETAS NÓMINA
+    ====================================== */
+
+    function renderPayrollSellers() {
+
+      if (!payrollSellersGrid) {
+        return;
+      }
+
+
+      payrollSellersGrid.innerHTML =
+        "";
+
+
+      const rows =
+        [...payrollWeekRows]
+          .sort(
+            (a, b) =>
+              String(
+                a.seller_name ||
+                ""
+              ).localeCompare(
+                String(
+                  b.seller_name ||
+                  ""
+                ),
+                "es",
+                {
+                  sensitivity:
+                    "base"
+                }
+              )
+          );
+
+
+      payrollEmpty
+        ?.classList
+        .toggle(
+          "hidden",
+          rows.length > 0
+        );
+
+
+      rows.forEach(
+        (row) => {
+
+          const salesCount =
+            Number(
+              row.sales_count
+            ) || 0;
+
+
+          const salesTotal =
+            Number(
+              row.sales_total
+            ) || 0;
+
+
+          const consignmentCount =
+            Number(
+              row.consignment_sales_count
+            ) || 0;
+
+
+          const consignmentTotal =
+            Number(
+              row.consignment_sales_total
+            ) || 0;
+
+
+          const inventoryCount =
+            Number(
+              row.inventory_sales_count
+            ) || 0;
+
+
+          const inventoryTotal =
+            Number(
+              row.inventory_sales_total
+            ) || 0;
+
+
+          const commissionPerUnit =
+            Number(
+              row.commission_per_unit
+            ) || 0;
+
+
+          const commissionTotal =
+            Number(
+              row.commission_total
+            ) || 0;
+
+
+          const status =
+            normalizeStatus(row);
+
+
+          const paid =
+            status === "paid";
+
+
+          const statusText =
+            paid
+              ?
+                "Pagado"
+              :
+            status === "pending"
+              ?
+                "Pendiente"
+              :
+                "Semana abierta";
+
+
+          const card =
+            document.createElement(
+              "article"
+            );
+
+
+          card.className =
+            `payroll-seller-card${
+              paid
+                ? " is-paid"
+                : ""
+            }`;
+
+
+          card.innerHTML = `
+            <div class="payroll-seller-header">
+
+              <div class="payroll-seller-name">
+
+                <strong>
+                  ${escapeHTML(
+                    row.seller_name ||
+                    "Vendedor"
+                  )}
+                </strong>
+
+                <span>
+                  ${escapeHTML(
+                    row.seller_email ||
+                    "—"
+                  )}
+                </span>
+
+              </div>
+
+              <span
+                class="
+                  payroll-status
+                  ${escapeHTML(
+                    paid
+                      ?
+                        "paid"
+                      :
+                      status ===
+                        "pending"
+                        ?
+                          "pending"
+                        :
+                          "open"
+                  )}
+                "
+              >
+                ${escapeHTML(
+                  statusText
+                )}
+              </span>
+
+            </div>
+
+
+            <div class="payroll-unit-grid">
+
+              <div class="payroll-unit-item">
+                <span>Total unidades</span>
+
+                <strong>
+                  ${salesCount}
+                </strong>
+              </div>
+
+
+              <div class="payroll-unit-item">
+
+                <span>
+                  Consignación
+                </span>
+
+                <strong>
+                  ${consignmentCount}
+                </strong>
+
+                <small>
+                  ${formatCurrency(
+                    consignmentTotal
+                  )}
+                </small>
+
+              </div>
+
+
+              <div class="payroll-unit-item">
+
+                <span>
+                  Inventario
+                </span>
+
+                <strong>
+                  ${inventoryCount}
+                </strong>
+
+                <small>
+                  ${formatCurrency(
+                    inventoryTotal
+                  )}
+                </small>
+
+              </div>
+
+            </div>
+
+
+            <div class="payroll-level-box">
+
+              <div>
+
+                <span>
+                  Nivel alcanzado
+                </span>
+
+                <strong>
+                  ${escapeHTML(
+                    payrollLevelLabel(
+                      salesCount
+                    )
+                  )}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Comisión por unidad
+                </span>
+
+                <strong>
+                  ${formatCurrency(
+                    commissionPerUnit
+                  )}
+                  c/u
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <div class="payroll-total-box">
+
+              <div>
+
+                <span>
+                  Total vendido
+                </span>
+
+                <strong>
+                  ${formatCurrency(
+                    salesTotal
+                  )}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Comisión a pagar
+                </span>
+
+                <strong>
+                  ${formatCurrency(
+                    commissionTotal
+                  )}
+                </strong>
+
+              </div>
+
+
+              <div class="payroll-seller-actions">
+
+                <button
+                  class="payroll-detail-button"
+                  data-payroll-detail="${escapeHTML(
+                    row.seller_id
+                  )}"
+                  type="button"
+                >
+                  Ver detalle
+                </button>
+
+
+                <button
+                  class="payroll-pay-button"
+                  data-payroll-pay="${escapeHTML(
+                    row.seller_id
+                  )}"
+                  type="button"
+                  ${
+                    paid ||
+                    salesCount <= 0
+                      ?
+                        "disabled"
+                      :
+                        ""
+                  }
+                >
+                  ${
+                    paid
+                      ?
+                        "Pagado"
+                      :
+                        "Marcar pagado"
+                  }
+                </button>
+
+              </div>
+
+            </div>
+
+
+            ${
+              paid &&
+              row.paid_at
+                ?
+                  `
+                    <div
+                      style="
+                        margin-top:12px;
+                        color:#7d9383;
+                        font-size:.7rem;
+                      "
+                    >
+                      Pagado:
+                      ${escapeHTML(
+                        formatSaleDate(
+                          row.paid_at
+                        )
+                      )}
+                      ·
+                      ${escapeHTML(
+                        formatSaleTime(
+                          row.paid_at
+                        )
+                      )}
+                    </div>
+                  `
+                :
+                  ""
+            }
           `;
 
 
-          if (salesEmpty) {
-            salesEmpty.style.display =
-              "none";
+          payrollSellersGrid
+            .appendChild(
+              card
+            );
+        }
+      );
+    }
+
+
+    /* ======================================
+       HISTORIAL NÓMINA
+    ====================================== */
+
+    function renderPayrollHistory() {
+
+      if (!payrollHistoryBody) {
+        return;
+      }
+
+
+      payrollHistoryBody.innerHTML =
+        "";
+
+
+      payrollHistoryEmpty
+        ?.classList
+        .toggle(
+          "hidden",
+          payrollHistory.length >
+            0
+        );
+
+
+      payrollHistory.forEach(
+        (row) => {
+
+          const tr =
+            document.createElement(
+              "tr"
+            );
+
+
+          const paidAt =
+            row.paid_at
+              ?
+                `${
+                  formatSaleDate(
+                    row.paid_at
+                  )
+                } · ${
+                  formatSaleTime(
+                    row.paid_at
+                  )
+                }`
+              :
+                "—";
+
+
+          tr.innerHTML = `
+            <td>
+
+              <div class="sales-seller-cell">
+
+                <strong>
+                  ${escapeHTML(
+                    row.seller_name ||
+                    "Vendedor"
+                  )}
+                </strong>
+
+                <span>
+                  ${escapeHTML(
+                    row.seller_email ||
+                    "—"
+                  )}
+                </span>
+
+              </div>
+
+            </td>
+
+            <td>
+              ${escapeHTML(
+                payrollFormatFullDate(
+                  row.week_start
+                )
+              )}
+              —
+              ${escapeHTML(
+                payrollFormatFullDate(
+                  row.week_end
+                )
+              )}
+            </td>
+
+            <td>
+              ${
+                Number(
+                  row.sales_count
+                ) || 0
+              }
+            </td>
+
+            <td>
+              ${formatCurrency(
+                row.sales_total
+              )}
+            </td>
+
+            <td>
+              ${formatCurrency(
+                row.commission_per_unit
+              )}
+            </td>
+
+            <td>
+              <strong>
+                ${formatCurrency(
+                  row.commission_total
+                )}
+              </strong>
+            </td>
+
+            <td>
+
+              <span
+                class="${
+                  row.status ===
+                  "paid"
+                    ?
+                      "payroll-history-status-paid"
+                    :
+                      ""
+                }"
+              >
+                ${
+                  row.status ===
+                  "paid"
+                    ?
+                      "Pagado"
+                    :
+                      "Pendiente"
+                }
+              </span>
+
+            </td>
+
+            <td>
+              ${escapeHTML(
+                paidAt
+              )}
+            </td>
+          `;
+
+
+          payrollHistoryBody
+            .appendChild(
+              tr
+            );
+        }
+      );
+    }
+
+
+    function renderPayrollEverything() {
+      payrollSetWeekLabel();
+      renderPayrollStatistics();
+      renderPayrollSellers();
+      renderPayrollHistory();
+    }
+
+
+    /* ======================================
+       REFRESH NÓMINA
+    ====================================== */
+
+    async function refreshPayroll() {
+
+      if (
+        payrollLoadingState
+      ) {
+        return;
+      }
+
+
+      payrollLoadingState =
+        true;
+
+
+      payrollLoading
+        ?.classList
+        .remove("hidden");
+
+
+      payrollEmpty
+        ?.classList
+        .add("hidden");
+
+
+      payrollSetWeekLabel();
+
+
+      try {
+
+        await Promise.all([
+          loadPayrollWeek(),
+          loadPayrollHistory()
+        ]);
+
+
+        renderPayrollEverything();
+
+      } catch (error) {
+
+        console.error(
+          "Error cargando nómina:",
+          error
+        );
+
+
+        payrollWeekRows =
+          [];
+
+
+        renderPayrollEverything();
+
+
+        showToast(
+          error.message ||
+          "No se pudo cargar la nómina semanal."
+        );
+
+      } finally {
+
+        payrollLoadingState =
+          false;
+
+
+        payrollLoading
+          ?.classList
+          .add("hidden");
+      }
+    }
+
+
+    /* ======================================
+       CAMBIO DE SEMANA
+    ====================================== */
+
+    document
+      .getElementById(
+        "payrollPreviousWeek"
+      )
+      ?.addEventListener(
+        "click",
+        async () => {
+
+          payrollWeekStart.setDate(
+            payrollWeekStart.getDate() -
+            7
+          );
+
+
+          payrollWeekStart =
+            payrollGetMonday(
+              payrollWeekStart
+            );
+
+
+          await refreshPayroll();
+        }
+      );
+
+
+    document
+      .getElementById(
+        "payrollNextWeek"
+      )
+      ?.addEventListener(
+        "click",
+        async () => {
+
+          payrollWeekStart.setDate(
+            payrollWeekStart.getDate() +
+            7
+          );
+
+
+          payrollWeekStart =
+            payrollGetMonday(
+              payrollWeekStart
+            );
+
+
+          await refreshPayroll();
+        }
+      );
+
+
+    document
+      .getElementById(
+        "payrollCurrentWeek"
+      )
+      ?.addEventListener(
+        "click",
+        async () => {
+
+          payrollWeekStart =
+            payrollGetMonday(
+              new Date()
+            );
+
+
+          await refreshPayroll();
+        }
+      );
+
+
+    /* ======================================
+       MODAL DETALLE NÓMINA
+    ====================================== */
+
+    const payrollDetailModal =
+      document.getElementById(
+        "payrollDetailModal"
+      );
+
+    const payrollDetailLoading =
+      document.getElementById(
+        "payrollDetailLoading"
+      );
+
+    const payrollDetailWrapper =
+      document.getElementById(
+        "payrollDetailWrapper"
+      );
+
+    const payrollDetailBody =
+      document.getElementById(
+        "payrollDetailBody"
+      );
+
+    const payrollDetailEmpty =
+      document.getElementById(
+        "payrollDetailEmpty"
+      );
+
+
+    function closePayrollDetailModal() {
+
+      payrollDetailModal
+        ?.classList
+        .add("hidden");
+
+
+      payrollDetailModal
+        ?.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+
+      document.body
+        .classList
+        .remove("modal-open");
+
+
+      payrollSelectedSeller =
+        null;
+    }
+
+
+    async function openPayrollDetail(
+      seller
+    ) {
+
+      if (
+        !seller?.seller_id
+      ) {
+        return;
+      }
+
+
+      payrollSelectedSeller = {
+        ...seller
+      };
+
+
+      safeText(
+        "payrollDetailSellerName",
+        seller.seller_name ||
+        "Vendedor"
+      );
+
+
+      safeText(
+        "payrollDetailSellerMeta",
+        `${
+          payrollFormatWeekRange()
+        } · ${
+          Number(
+            seller.sales_count
+          ) || 0
+        } unidad(es) · ${
+          formatCurrency(
+            seller.commission_per_unit
+          )
+        } por unidad`
+      );
+
+
+      payrollDetailBody.innerHTML =
+        "";
+
+
+      payrollDetailLoading
+        ?.classList
+        .remove("hidden");
+
+
+      payrollDetailWrapper
+        ?.classList
+        .add("hidden");
+
+
+      payrollDetailEmpty
+        ?.classList
+        .add("hidden");
+
+
+      payrollDetailModal
+        ?.classList
+        .remove("hidden");
+
+
+      payrollDetailModal
+        ?.setAttribute(
+          "aria-hidden",
+          "false"
+        );
+
+
+      document.body
+        .classList
+        .add("modal-open");
+
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .rpc(
+              "get_admin_commission_detail",
+              {
+                p_seller_id:
+                  seller.seller_id,
+
+                p_week_start:
+                  payrollDateKey(
+                    payrollWeekStart
+                  )
+              }
+            );
+
+
+        if (error) {
+          throw new Error(
+            error.message
+          );
+        }
+
+
+        const rows =
+          data || [];
+
+
+        payrollDetailEmpty
+          ?.classList
+          .toggle(
+            "hidden",
+            rows.length > 0
+          );
+
+
+        payrollDetailWrapper
+          ?.classList
+          .toggle(
+            "hidden",
+            rows.length === 0
+          );
+
+
+        rows.forEach(
+          (row) => {
+
+            const tr =
+              document.createElement(
+                "tr"
+              );
+
+
+            tr.innerHTML = `
+              <td>
+
+                <div class="payroll-product">
+
+                  <strong>
+                    ${escapeHTML(
+                      row.perfume_name ||
+                      "Perfume"
+                    )}
+                  </strong>
+
+                  <span>
+                    ${escapeHTML(
+                      row.perfume_brand ||
+                      ""
+                    )}
+                    ·
+                    ${escapeHTML(
+                      row.perfume_code ||
+                      "—"
+                    )}
+                  </span>
+
+                </div>
+
+              </td>
+
+              <td>
+
+                <span class="payroll-source-badge">
+                  ${escapeHTML(
+                    sourceLabel(
+                      row.sale_source
+                    )
+                  )}
+                </span>
+
+              </td>
+
+              <td>
+                ${formatCurrency(
+                  row.sale_price
+                )}
+              </td>
+
+              <td>
+                ${formatCurrency(
+                  row.commission_per_unit ??
+                  row.commission_amount
+                )}
+              </td>
+
+              <td>
+                ${
+                  row.sold_at
+                    ?
+                      escapeHTML(
+                        formatSaleDate(
+                          row.sold_at
+                        )
+                      )
+                    :
+                      "—"
+                }
+              </td>
+
+              <td>
+                ${
+                  row.sold_at
+                    ?
+                      escapeHTML(
+                        formatSaleTime(
+                          row.sold_at
+                        )
+                      )
+                    :
+                      "—"
+                }
+              </td>
+            `;
+
+
+            payrollDetailBody
+              .appendChild(
+                tr
+              );
+          }
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Error detalle nómina:",
+          error
+        );
+
+
+        payrollDetailWrapper
+          ?.classList
+          .add("hidden");
+
+
+        payrollDetailEmpty
+          ?.classList
+          .remove("hidden");
+
+
+        showToast(
+          error.message ||
+          "No se pudo cargar el detalle."
+        );
+
+      } finally {
+
+        payrollDetailLoading
+          ?.classList
+          .add("hidden");
+      }
+    }
+
+
+    document
+      .querySelectorAll(
+        "[data-close-payroll-detail]"
+      )
+      .forEach(
+        (element) => {
+
+          element.addEventListener(
+            "click",
+            closePayrollDetailModal
+          );
+        }
+      );
+
+
+    document
+      .getElementById(
+        "closePayrollDetailButton"
+      )
+      ?.addEventListener(
+        "click",
+        closePayrollDetailModal
+      );
+
+
+    /* ======================================
+       MODAL PAGAR NÓMINA
+    ====================================== */
+
+    const payrollPayModal =
+      document.getElementById(
+        "payrollPayModal"
+      );
+
+    const payrollPayNotes =
+      document.getElementById(
+        "payrollPayNotes"
+      );
+
+    const payrollPayConfirm =
+      document.getElementById(
+        "confirmPayrollPayButton"
+      );
+
+
+    function closePayrollPayModal(
+      force = false
+    ) {
+
+      if (
+        payrollPayProcessing &&
+        !force
+      ) {
+        return;
+      }
+
+
+      payrollPayModal
+        ?.classList
+        .add("hidden");
+
+
+      payrollPayModal
+        ?.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+
+      document.body
+        .classList
+        .remove("modal-open");
+
+
+      payrollPaySeller =
+        null;
+
+
+      if (payrollPayNotes) {
+        payrollPayNotes.value =
+          "";
+      }
+    }
+
+
+    function openPayrollPayModal(
+      seller
+    ) {
+
+      if (
+        !seller?.seller_id
+      ) {
+        return;
+      }
+
+
+      const salesCount =
+        Number(
+          seller.sales_count
+        ) || 0;
+
+
+      if (
+        salesCount <= 0
+      ) {
+
+        showToast(
+          "Este vendedor no tiene ventas para pagar."
+        );
+
+        return;
+      }
+
+
+      if (
+        normalizeStatus(
+          seller
+        ) === "paid"
+      ) {
+
+        showToast(
+          "Esta nómina ya fue pagada."
+        );
+
+        return;
+      }
+
+
+      payrollPaySeller = {
+        ...seller
+      };
+
+
+      safeText(
+        "payrollPaySeller",
+        seller.seller_name ||
+        "Vendedor"
+      );
+
+
+      safeText(
+        "payrollPayWeek",
+        payrollFormatWeekRange()
+      );
+
+
+      safeText(
+        "payrollPayUnits",
+        salesCount
+      );
+
+
+      safeText(
+        "payrollPayUnitCommission",
+        formatCurrency(
+          seller.commission_per_unit
+        )
+      );
+
+
+      safeText(
+        "payrollPayTotal",
+        formatCurrency(
+          seller.commission_total
+        )
+      );
+
+
+      if (payrollPayNotes) {
+        payrollPayNotes.value =
+          "";
+      }
+
+
+      payrollPayModal
+        ?.classList
+        .remove("hidden");
+
+
+      payrollPayModal
+        ?.setAttribute(
+          "aria-hidden",
+          "false"
+        );
+
+
+      document.body
+        .classList
+        .add("modal-open");
+    }
+
+
+    document
+      .querySelectorAll(
+        "[data-close-payroll-pay]"
+      )
+      .forEach(
+        (element) => {
+
+          element.addEventListener(
+            "click",
+            () =>
+              closePayrollPayModal()
+          );
+        }
+      );
+
+
+    document
+      .getElementById(
+        "cancelPayrollPayButton"
+      )
+      ?.addEventListener(
+        "click",
+        () =>
+          closePayrollPayModal()
+      );
+
+
+    payrollPayConfirm
+      ?.addEventListener(
+        "click",
+        async () => {
+
+          if (
+            payrollPayProcessing ||
+            !payrollPaySeller
+          ) {
+            return;
           }
 
 
-          try {
-            await loadAdminSales();
+          const seller = {
+            ...payrollPaySeller
+          };
 
-            renderSalesEverything();
+
+          payrollPayProcessing =
+            true;
+
+
+          payrollPayConfirm.disabled =
+            true;
+
+
+          payrollPayConfirm.textContent =
+            "Pagando...";
+
+
+          const notes =
+            payrollPayNotes?.value
+              ?.trim() ||
+            null;
+
+
+          closePayrollPayModal(
+            true
+          );
+
+
+          showToast(
+            "Registrando pago de nómina..."
+          );
+
+
+          try {
+
+            const {
+              error
+            } =
+              await supabaseClient
+                .rpc(
+                  "mark_commission_payroll_paid",
+                  {
+                    p_seller_id:
+                      seller.seller_id,
+
+                    p_week_start:
+                      payrollDateKey(
+                        payrollWeekStart
+                      ),
+
+                    p_notes:
+                      notes
+                  }
+                );
+
+
+            if (error) {
+              throw new Error(
+                error.message
+              );
+            }
+
+
+            await Promise.all([
+              loadPayrollWeek(),
+              loadPayrollHistory()
+            ]);
+
+
+            renderPayrollEverything();
+
+
+            showToast(
+              `Nómina pagada: ${
+                seller.seller_name ||
+                "Vendedor"
+              }.`
+            );
 
           } catch (error) {
+
             console.error(
-              "Error cargando ventas:",
+              "Error pagando nómina:",
               error
             );
 
 
-            tableBody.innerHTML =
-              "";
+            showToast(
+              error.message ||
+              "No se pudo registrar el pago."
+            );
+
+          } finally {
+
+            payrollPayProcessing =
+              false;
 
 
-            if (salesEmpty) {
-              salesEmpty.style.display =
-                "block";
+            payrollPayConfirm.disabled =
+              false;
+
+
+            payrollPayConfirm.textContent =
+              "Confirmar pago";
+          }
+        }
+      );
+
+
+    /* ======================================
+       ACCIONES TARJETAS NÓMINA
+    ====================================== */
+
+    payrollSellersGrid
+      ?.addEventListener(
+        "click",
+        (event) => {
+
+          const detailButton =
+            event.target.closest(
+              "[data-payroll-detail]"
+            );
+
+
+          if (detailButton) {
+
+            const seller =
+              payrollWeekRows.find(
+                (row) =>
+                  String(
+                    row.seller_id
+                  ) ===
+                  String(
+                    detailButton.dataset
+                      .payrollDetail
+                  )
+              );
+
+
+            if (seller) {
+              openPayrollDetail(
+                seller
+              );
             }
 
 
-            showToast(
-              error.message ||
-              "No se pudieron cargar las ventas."
+            return;
+          }
+
+
+          const payButton =
+            event.target.closest(
+              "[data-payroll-pay]"
+            );
+
+
+          if (!payButton) {
+            return;
+          }
+
+
+          const seller =
+            payrollWeekRows.find(
+              (row) =>
+                String(
+                  row.seller_id
+                ) ===
+                String(
+                  payButton.dataset
+                    .payrollPay
+                )
+            );
+
+
+          if (seller) {
+            openPayrollPayModal(
+              seller
             );
           }
         }
+      );
 
 
-        load();
-      };
-  </script>
+    /* ======================================
+       FILTROS VENTAS
+       UNA SOLA VEZ
+    ====================================== */
 
-</body>
-</html>
+    searchInput
+      ?.addEventListener(
+        "input",
+        renderSales
+      );
+
+
+    sellerFilter
+      ?.addEventListener(
+        "change",
+        renderSales
+      );
+
+
+    dateFilter
+      ?.addEventListener(
+        "change",
+        renderSales
+      );
+
+
+    clearButton
+      ?.addEventListener(
+        "click",
+        () => {
+
+          if (searchInput) {
+            searchInput.value =
+              "";
+          }
+
+
+          if (sellerFilter) {
+            sellerFilter.value =
+              "Todos";
+          }
+
+
+          if (dateFilter) {
+            dateFilter.value =
+              "";
+          }
+
+
+          renderSales();
+        }
+      );
+
+
+    /* ======================================
+       ESCAPE - TODOS LOS MODALES
+    ====================================== */
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+
+        if (
+          event.key !==
+          "Escape"
+        ) {
+          return;
+        }
+
+
+        if (
+          deleteModal &&
+          !deleteModal
+            .classList
+            .contains(
+              "hidden"
+            )
+        ) {
+          closeDeleteSaleModal();
+        }
+
+
+        if (
+          returnModal &&
+          !returnModal
+            .classList
+            .contains(
+              "hidden"
+            )
+        ) {
+          closeReturnModal();
+        }
+
+
+        if (
+          financialDetailModal &&
+          !financialDetailModal
+            .classList
+            .contains(
+              "hidden"
+            )
+        ) {
+          closeFinancialDetailModal();
+        }
+
+
+        if (
+          payrollDetailModal &&
+          !payrollDetailModal
+            .classList
+            .contains(
+              "hidden"
+            )
+        ) {
+          closePayrollDetailModal();
+        }
+
+
+        if (
+          payrollPayModal &&
+          !payrollPayModal
+            .classList
+            .contains(
+              "hidden"
+            )
+        ) {
+          closePayrollPayModal();
+        }
+      }
+    );
+
+
+    /* ======================================
+       CARGA INICIAL
+    ====================================== */
+
+    async function load() {
+
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6">
+
+            <div class="sales-loading">
+              Cargando ventas...
+            </div>
+
+          </td>
+        </tr>
+      `;
+
+
+      if (salesEmpty) {
+        salesEmpty.style.display =
+          "none";
+      }
+
+
+      try {
+
+        await loadAdminSales();
+
+
+        renderSalesEverything();
+
+
+        /*
+         * Dejamos preparada la etiqueta
+         * de la semana aunque todavía
+         * no se abra la pestaña.
+         */
+
+        payrollSetWeekLabel();
+
+      } catch (error) {
+
+        console.error(
+          "Error cargando ventas:",
+          error
+        );
+
+
+        tableBody.innerHTML =
+          "";
+
+
+        if (salesEmpty) {
+          salesEmpty.style.display =
+            "block";
+        }
+
+
+        showToast(
+          error.message ||
+          "No se pudieron cargar las ventas."
+        );
+      }
+    }
+
+
+    load();
+  };
+</script>

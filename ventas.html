@@ -2303,10 +2303,17 @@
       <div class="payroll-stats-grid">
 
         <article class="payroll-stat-card">
-          <span>Vendedores</span>
-          <strong id="payrollSellerCount">0</strong>
-          <small>Con seguimiento esta semana</small>
-        </article>
+  <span>Estado de nómina</span>
+
+  <strong id="payrollStatusSummary">
+    0 pendientes · 0 pagados
+  </strong>
+
+  <small>
+    Comisiones:
+    <span id="payrollCommissionTotal">$0.00</span>
+  </small>
+</article>
 
         <article class="payroll-stat-card">
           <span>Unidades vendidas</span>
@@ -6469,85 +6476,127 @@ initializeSalesPage =
        ESTADÍSTICAS NÓMINA
     ====================================== */
 
-    function renderPayrollStatistics() {
+   function renderPayrollStatistics() {
 
-      const sellers =
-        payrollWeekRows.length;
-
-
-      const units =
-        payrollWeekRows.reduce(
-          (
-            total,
-            row
-          ) =>
-            total +
-            (
-              Number(
-                row.sales_count
-              ) || 0
-            ),
-          0
-        );
+  const sellers =
+    payrollWeekRows.length;
 
 
-      const salesTotal =
-        payrollWeekRows.reduce(
-          (
-            total,
-            row
-          ) =>
-            total +
-            (
-              Number(
-                row.sales_total
-              ) || 0
-            ),
-          0
-        );
+  const units =
+    payrollWeekRows.reduce(
+      (total, row) =>
+        total +
+        (
+          Number(
+            row.sales_count
+          ) || 0
+        ),
+      0
+    );
 
 
-      const commissionTotal =
-        payrollWeekRows.reduce(
-          (
-            total,
-            row
-          ) =>
-            total +
-            (
-              Number(
-                row.commission_total
-              ) || 0
-            ),
-          0
-        );
+  const salesTotal =
+    payrollWeekRows.reduce(
+      (total, row) =>
+        total +
+        (
+          Number(
+            row.sales_total
+          ) || 0
+        ),
+      0
+    );
 
 
-      safeText(
-        "payrollSellerCount",
-        sellers
-      );
+  const commissionTotal =
+    payrollWeekRows.reduce(
+      (total, row) =>
+        total +
+        (
+          Number(
+            row.commission_total
+          ) || 0
+        ),
+      0
+    );
 
-      safeText(
-        "payrollUnitsTotal",
-        units
-      );
 
-      safeText(
-        "payrollSalesTotal",
-        formatCurrency(
-          salesTotal
-        )
-      );
+  /*
+   * Solo contamos como nómina pendiente/pagada
+   * a vendedores que realmente tuvieron
+   * al menos una venta durante la semana.
+   *
+   * Así un vendedor con 0 ventas no aparece
+   * incorrectamente como "pendiente de pago".
+   */
+  const sellersWithSales =
+    payrollWeekRows.filter(
+      (row) =>
+        (
+          Number(
+            row.sales_count
+          ) || 0
+        ) > 0
+    );
 
-      safeText(
-        "payrollCommissionTotal",
-        formatCurrency(
-          commissionTotal
-        )
-      );
-    }
 
+  const paidCount =
+    sellersWithSales.filter(
+      (row) =>
+        normalizeStatus(row) ===
+        "paid"
+    ).length;
+
+
+  const pendingCount =
+    sellersWithSales.filter(
+      (row) =>
+        normalizeStatus(row) !==
+        "paid"
+    ).length;
+
+
+  safeText(
+    "payrollSellerCount",
+    sellers
+  );
+
+
+  safeText(
+    "payrollUnitsTotal",
+    units
+  );
+
+
+  safeText(
+    "payrollSalesTotal",
+    formatCurrency(
+      salesTotal
+    )
+  );
+
+
+  safeText(
+    "payrollStatusSummary",
+    `${pendingCount} ${
+      pendingCount === 1
+        ? "pendiente"
+        : "pendientes"
+    } · ${paidCount} ${
+      paidCount === 1
+        ? "pagado"
+        : "pagados"
+    }`
+  );
+
+
+  safeText(
+    "payrollCommissionTotal",
+    formatCurrency(
+      commissionTotal
+    )
+  );
+}
 
     /* ======================================
        TARJETAS NÓMINA

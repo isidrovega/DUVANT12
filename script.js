@@ -564,6 +564,7 @@ function showToast(message) {
 /* ======================================
    MAPEO PERFUMES
 ====================================== */
+
 function mapPerfumeFromDatabase(
   row
 ) {
@@ -606,6 +607,53 @@ function mapPerfumeFromDatabase(
     imagePath:
       row.image_path ||
       "",
+
+
+    /* ==============================
+       TIENDA ONLINE
+    ============================== */
+
+    storePublished:
+      Boolean(
+        row.store_published
+      ),
+
+    storeDescription:
+      row.store_description ||
+      "",
+
+    storeNotes:
+      Array.isArray(
+        row.store_notes
+      )
+        ? row.store_notes
+        : [],
+
+    storeBadge:
+      row.store_badge ||
+      "",
+
+    storeFeatured:
+      Boolean(
+        row.store_featured
+      ),
+
+    storeBestseller:
+      Boolean(
+        row.store_bestseller
+      ),
+
+    storeDisplayOrder:
+      Number.isFinite(
+        Number(
+          row.store_display_order
+        )
+      )
+        ? Number(
+            row.store_display_order
+          )
+        : 0,
+
 
     createdAt:
       row.created_at,
@@ -1176,6 +1224,13 @@ async function loadInventoryFromSupabase() {
         quantity,
         code,
         image_path,
+        store_published,
+        store_description,
+        store_notes,
+        store_badge,
+        store_featured,
+        store_bestseller,
+        store_display_order,
         created_at,
         updated_at
       `);
@@ -1186,7 +1241,6 @@ async function loadInventoryFromSupabase() {
       "Error cargando inventario:",
       error
     );
-
 
     throw error;
   }
@@ -1208,7 +1262,6 @@ async function loadInventoryFromSupabase() {
 
   return perfumes;
 }
-
 /* ======================================
    AGREGAR PERFUME
 ====================================== */
@@ -1241,7 +1294,53 @@ async function addPerfumeToSupabase(
       perfume.quantity,
 
     code:
-      perfume.code
+      perfume.code,
+
+
+    /* ==============================
+       TIENDA ONLINE
+    ============================== */
+
+    store_published:
+      Boolean(
+        perfume.storePublished
+      ),
+
+    store_description:
+      perfume.storeDescription ||
+      null,
+
+    store_notes:
+      Array.isArray(
+        perfume.storeNotes
+      )
+        ? perfume.storeNotes
+        : [],
+
+    store_badge:
+      perfume.storeBadge ||
+      null,
+
+    store_featured:
+      Boolean(
+        perfume.storeFeatured
+      ),
+
+    store_bestseller:
+      Boolean(
+        perfume.storeBestseller
+      ),
+
+    store_display_order:
+      Number.isInteger(
+        Number(
+          perfume.storeDisplayOrder
+        )
+      )
+        ? Number(
+            perfume.storeDisplayOrder
+          )
+        : 0
   };
 
 
@@ -1283,8 +1382,6 @@ async function addPerfumeToSupabase(
     data
   );
 }
-
-
 /* ======================================
    ACTUALIZAR PERFUME
 ====================================== */
@@ -1327,13 +1424,10 @@ async function updatePerfumeInSupabase(
   };
 
 
-  /*
-   * Solo modificamos image_path cuando
-   * explícitamente recibimos imagePath.
-   *
-   * Así una importación por Excel NO
-   * borra accidentalmente las imágenes.
-   */
+  /* ==============================
+     IMAGEN
+  ============================== */
+
   if (
     Object.prototype
       .hasOwnProperty
@@ -1348,6 +1442,128 @@ async function updatePerfumeInSupabase(
   }
 
 
+  /* ==============================
+     TIENDA ONLINE
+
+     Solamente actualizamos estos
+     campos cuando vienen explícitos.
+
+     Esto evita que una importación
+     Excel borre la configuración
+     comercial existente.
+  ============================== */
+
+  if (
+    Object.prototype
+      .hasOwnProperty
+      .call(
+        perfume,
+        "storePublished"
+      )
+  ) {
+    payload.store_published =
+      Boolean(
+        perfume.storePublished
+      );
+  }
+
+
+  if (
+    Object.prototype
+      .hasOwnProperty
+      .call(
+        perfume,
+        "storeDescription"
+      )
+  ) {
+    payload.store_description =
+      perfume.storeDescription ||
+      null;
+  }
+
+
+  if (
+    Object.prototype
+      .hasOwnProperty
+      .call(
+        perfume,
+        "storeNotes"
+      )
+  ) {
+    payload.store_notes =
+      Array.isArray(
+        perfume.storeNotes
+      )
+        ? perfume.storeNotes
+        : [];
+  }
+
+
+  if (
+    Object.prototype
+      .hasOwnProperty
+      .call(
+        perfume,
+        "storeBadge"
+      )
+  ) {
+    payload.store_badge =
+      perfume.storeBadge ||
+      null;
+  }
+
+
+  if (
+    Object.prototype
+      .hasOwnProperty
+      .call(
+        perfume,
+        "storeFeatured"
+      )
+  ) {
+    payload.store_featured =
+      Boolean(
+        perfume.storeFeatured
+      );
+  }
+
+
+  if (
+    Object.prototype
+      .hasOwnProperty
+      .call(
+        perfume,
+        "storeBestseller"
+      )
+  ) {
+    payload.store_bestseller =
+      Boolean(
+        perfume.storeBestseller
+      );
+  }
+
+
+  if (
+    Object.prototype
+      .hasOwnProperty
+      .call(
+        perfume,
+        "storeDisplayOrder"
+      )
+  ) {
+    payload.store_display_order =
+      Number.isInteger(
+        Number(
+          perfume.storeDisplayOrder
+        )
+      )
+        ? Number(
+            perfume.storeDisplayOrder
+          )
+        : 0;
+  }
+
+
   const {
     data,
     error
@@ -1359,43 +1575,6 @@ async function updatePerfumeInSupabase(
       .update(
         payload
       )
-      .eq(
-        "id",
-        id
-      )
-      .select()
-      .single();
-
-
-  if (error) {
-    throw error;
-  }
-
-
-  return mapPerfumeFromDatabase(
-    data
-  );
-}
-/* ======================================
-   CAMBIAR STOCK
-====================================== */
-
-async function updateStockInSupabase(
-  id,
-  newQuantity
-) {
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from(
-        "perfumes"
-      )
-      .update({
-        quantity:
-          newQuantity
-      })
       .eq(
         "id",
         id
@@ -1573,6 +1752,45 @@ function updateDashboard() {
 
 
 /* ======================================
+   CAMBIAR STOCK
+====================================== */
+
+async function updateStockInSupabase(
+  id,
+  newQuantity
+) {
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "perfumes"
+      )
+      .update({
+        quantity:
+          newQuantity
+      })
+      .eq(
+        "id",
+        id
+      )
+      .select()
+      .single();
+
+
+  if (error) {
+    throw error;
+  }
+
+
+  return mapPerfumeFromDatabase(
+    data
+  );
+}
+
+
+/* ======================================
    PÁGINA INVENTARIO
 ====================================== */
 
@@ -1654,6 +1872,46 @@ function initializeInventoryPage() {
     );
 
 
+  /* ======================================
+     TIENDA ONLINE
+  ====================================== */
+
+  const storePublishedInput =
+    document.getElementById(
+      "storePublished"
+    );
+
+  const storeDescriptionInput =
+    document.getElementById(
+      "storeDescription"
+    );
+
+  const storeNotesInput =
+    document.getElementById(
+      "storeNotes"
+    );
+
+  const storeBadgeInput =
+    document.getElementById(
+      "storeBadge"
+    );
+
+  const storeFeaturedInput =
+    document.getElementById(
+      "storeFeatured"
+    );
+
+  const storeBestsellerInput =
+    document.getElementById(
+      "storeBestseller"
+    );
+
+  const storeDisplayOrderInput =
+    document.getElementById(
+      "storeDisplayOrder"
+    );
+
+
   let selectedImageFile =
     null;
 
@@ -1685,17 +1943,23 @@ function initializeInventoryPage() {
   }
 
 
-  function revokeLocalPreview() {
-    if (
-      localPreviewUrl
-    ) {
-      URL.revokeObjectURL(
-        localPreviewUrl
-      );
+  /* ======================================
+     IMAGEN
+  ====================================== */
 
-      localPreviewUrl =
-        "";
+  function revokeLocalPreview() {
+    if (!localPreviewUrl) {
+      return;
     }
+
+
+    URL.revokeObjectURL(
+      localPreviewUrl
+    );
+
+
+    localPreviewUrl =
+      "";
   }
 
 
@@ -1910,6 +2174,10 @@ function initializeInventoryPage() {
     );
 
 
+  /* ======================================
+     UTILIDADES INVENTARIO
+  ====================================== */
+
   function stockClass(
     quantity
   ) {
@@ -1928,6 +2196,28 @@ function initializeInventoryPage() {
 
 
     return "good";
+  }
+
+
+  function parseStoreNotes(
+    value
+  ) {
+    return [
+      ...new Set(
+        String(
+          value ||
+          ""
+        )
+          .split(
+            /[\n,]+/
+          )
+          .map(
+            note =>
+              note.trim()
+          )
+          .filter(Boolean)
+      )
+    ];
   }
 
 
@@ -1955,17 +2245,23 @@ function initializeInventoryPage() {
             );
 
 
-          return (
+          const matchesSearch =
             text.includes(
               query
-            ) &&
-            (
-              !category ||
-              category.value ===
-                "Todos" ||
-              perfume.category ===
-                category.value
-            )
+            );
+
+
+          const matchesCategory =
+            !category ||
+            category.value ===
+              "Todos" ||
+            perfume.category ===
+              category.value;
+
+
+          return (
+            matchesSearch &&
+            matchesCategory
           );
         }
       )
@@ -1978,6 +2274,10 @@ function initializeInventoryPage() {
       );
   }
 
+
+  /* ======================================
+     RENDER INVENTARIO
+  ====================================== */
 
   function render() {
     if (!body) {
@@ -2009,6 +2309,25 @@ function initializeInventoryPage() {
           ) || 0;
 
 
+        const storeExtraText =
+          [
+            perfume.storeFeatured
+              ? "Destacado"
+              : "",
+
+            perfume.storeBestseller
+              ? "Más vendido"
+              : ""
+          ]
+            .filter(Boolean)
+            .join(" · ");
+
+
+        const storeStatusText =
+          storeExtraText ||
+          "Tienda online";
+
+
         const row =
           document.createElement(
             "tr"
@@ -2017,7 +2336,9 @@ function initializeInventoryPage() {
 
         row.innerHTML = `
           <td>
+
             <div class="product-name">
+
               <strong>
                 ${escapeHTML(
                   perfume.name
@@ -2030,8 +2351,11 @@ function initializeInventoryPage() {
                   perfume.code
                 )}
               </small>
+
             </div>
+
           </td>
+
 
           <td>
             ${escapeHTML(
@@ -2039,13 +2363,17 @@ function initializeInventoryPage() {
             )}
           </td>
 
+
           <td>
+
             <span class="category-badge">
               ${escapeHTML(
                 perfume.category
               )}
             </span>
+
           </td>
+
 
           <td>
             ${escapeHTML(
@@ -2056,8 +2384,11 @@ function initializeInventoryPage() {
             )}
           </td>
 
+
           <td>
+
             <div class="stock-control">
+
               <button
                 class="stock-button"
                 data-action="decrease"
@@ -2068,6 +2399,7 @@ function initializeInventoryPage() {
               >
                 −
               </button>
+
 
               <span
                 class="
@@ -2080,6 +2412,7 @@ function initializeInventoryPage() {
                 ${quantity}
               </span>
 
+
               <button
                 class="stock-button"
                 data-action="increase"
@@ -2090,8 +2423,11 @@ function initializeInventoryPage() {
               >
                 +
               </button>
+
             </div>
+
           </td>
+
 
           <td>
             ${formatCurrency(
@@ -2099,11 +2435,13 @@ function initializeInventoryPage() {
             )}
           </td>
 
+
           <td>
             ${formatCurrency(
               perfume.price
             )}
           </td>
+
 
           <td>
             ${formatCurrency(
@@ -2112,8 +2450,50 @@ function initializeInventoryPage() {
             )}
           </td>
 
+
           <td>
+
+            <div class="inventory-store-status">
+
+              <span
+                class="
+                  inventory-store-dot
+                  ${
+                    perfume.storePublished
+                      ? "published"
+                      : "hidden-store"
+                  }
+                "
+              ></span>
+
+
+              <div>
+
+                <strong>
+                  ${
+                    perfume.storePublished
+                      ? "Publicado"
+                      : "Oculto"
+                  }
+                </strong>
+
+                <small>
+                  ${escapeHTML(
+                    storeStatusText
+                  )}
+                </small>
+
+              </div>
+
+            </div>
+
+          </td>
+
+
+          <td>
+
             <div class="actions">
+
               <button
                 class="action-button edit-button"
                 data-action="edit"
@@ -2124,6 +2504,7 @@ function initializeInventoryPage() {
               >
                 Editar
               </button>
+
 
               <button
                 class="action-button delete-button"
@@ -2136,7 +2517,9 @@ function initializeInventoryPage() {
               >
                 ×
               </button>
+
             </div>
+
           </td>
         `;
 
@@ -2151,6 +2534,10 @@ function initializeInventoryPage() {
     updateDashboard();
   }
 
+
+  /* ======================================
+     DATOS DEL FORMULARIO
+  ====================================== */
 
   function getData() {
     return {
@@ -2219,10 +2606,57 @@ function initializeInventoryPage() {
             "code"
           )
           .value
-          .trim()
+          .trim(),
+
+      storePublished:
+        Boolean(
+          storePublishedInput
+            ?.checked
+        ),
+
+      storeDescription:
+        storeDescriptionInput
+          ?.value
+          .trim() ||
+        "",
+
+      storeNotes:
+        parseStoreNotes(
+          storeNotesInput
+            ?.value
+        ),
+
+      storeBadge:
+        storeBadgeInput
+          ?.value
+          .trim() ||
+        "",
+
+      storeFeatured:
+        Boolean(
+          storeFeaturedInput
+            ?.checked
+        ),
+
+      storeBestseller:
+        Boolean(
+          storeBestsellerInput
+            ?.checked
+        ),
+
+      storeDisplayOrder:
+        Number(
+          storeDisplayOrderInput
+            ?.value ||
+          0
+        )
     };
   }
 
+
+  /* ======================================
+     VALIDACIÓN
+  ====================================== */
 
   function validate(
     data
@@ -2245,6 +2679,7 @@ function initializeInventoryPage() {
       showToast(
         "Escribe un tamaño válido en ML."
       );
+
 
       sizeInput
         ?.focus();
@@ -2271,6 +2706,7 @@ function initializeInventoryPage() {
       showToast(
         "El tamaño debe ser un número mayor que 0."
       );
+
 
       sizeInput
         ?.focus();
@@ -2398,6 +2834,37 @@ function initializeInventoryPage() {
 
 
     if (
+      !Number.isInteger(
+        data.storeDisplayOrder
+      ) ||
+      data.storeDisplayOrder < 0
+    ) {
+      showToast(
+        "El orden de tienda debe ser un número entero igual o mayor a 0."
+      );
+
+
+      storeDisplayOrderInput
+        ?.focus();
+
+
+      return false;
+    }
+
+
+    if (
+      data.storePublished &&
+      data.price <= 0
+    ) {
+      showToast(
+        "Un perfume publicado debe tener precio de venta."
+      );
+
+      return false;
+    }
+
+
+    if (
       selectedImageFile
     ) {
       const validation =
@@ -2422,6 +2889,10 @@ function initializeInventoryPage() {
   }
 
 
+  /* ======================================
+     RESET FORMULARIO
+  ====================================== */
+
   function resetForm() {
     form.reset();
 
@@ -2444,7 +2915,63 @@ function initializeInventoryPage() {
       quantityInput
     ) {
       quantityInput.value =
-        1;
+        "1";
+    }
+
+
+    if (
+      storePublishedInput
+    ) {
+      storePublishedInput.checked =
+        false;
+    }
+
+
+    if (
+      storeDescriptionInput
+    ) {
+      storeDescriptionInput.value =
+        "";
+    }
+
+
+    if (
+      storeNotesInput
+    ) {
+      storeNotesInput.value =
+        "";
+    }
+
+
+    if (
+      storeBadgeInput
+    ) {
+      storeBadgeInput.value =
+        "";
+    }
+
+
+    if (
+      storeFeaturedInput
+    ) {
+      storeFeaturedInput.checked =
+        false;
+    }
+
+
+    if (
+      storeBestsellerInput
+    ) {
+      storeBestsellerInput.checked =
+        false;
+    }
+
+
+    if (
+      storeDisplayOrderInput
+    ) {
+      storeDisplayOrderInput.value =
+        "0";
     }
 
 
@@ -2467,6 +2994,10 @@ function initializeInventoryPage() {
   }
 
 
+  /* ======================================
+     GUARDAR
+  ====================================== */
+
   form.addEventListener(
     "submit",
     async (
@@ -2488,6 +3019,12 @@ function initializeInventoryPage() {
       }
 
 
+      const isEditing =
+        Boolean(
+          editingId?.value
+        );
+
+
       if (
         submitButton
       ) {
@@ -2495,7 +3032,7 @@ function initializeInventoryPage() {
           true;
 
         submitButton.textContent =
-          editingId?.value
+          isEditing
             ? "Guardando..."
             : "Agregando...";
       }
@@ -2506,14 +3043,12 @@ function initializeInventoryPage() {
 
 
       try {
-        /*
-         * ==============================
-         * EDITAR
-         * ==============================
-         */
+        /* =================================
+           EDITAR
+        ================================= */
 
         if (
-          editingId?.value
+          isEditing
         ) {
           const perfumeId =
             editingId.value;
@@ -2558,16 +3093,13 @@ function initializeInventoryPage() {
               perfumeId,
               {
                 ...perfumeData,
+
                 imagePath:
                   finalImagePath
               }
             );
 
 
-          /*
-           * Una vez que la BD fue actualizada,
-           * borramos la imagen anterior.
-           */
           if (
             oldImagePath &&
             oldImagePath !==
@@ -2591,7 +3123,7 @@ function initializeInventoryPage() {
 
           const index =
             perfumes.findIndex(
-              (item) =>
+              item =>
                 String(
                   item.id
                 ) ===
@@ -2620,16 +3152,9 @@ function initializeInventoryPage() {
           );
 
         } else {
-          /*
-           * ==============================
-           * CREAR
-           * ==============================
-           *
-           * Primero creamos el perfume.
-           * Después, si hay foto, la subimos
-           * usando su UUID y actualizamos
-           * image_path.
-           */
+          /* =================================
+             CREAR
+          ================================= */
 
           let created =
             await addPerfumeToSupabase(
@@ -2667,10 +3192,6 @@ function initializeInventoryPage() {
             } catch (
               imageError
             ) {
-              /*
-               * Si la foto falla no dejamos
-               * un archivo huérfano.
-               */
               if (
                 uploadedImagePath
               ) {
@@ -2678,6 +3199,7 @@ function initializeInventoryPage() {
                   await deletePerfumeImage(
                     uploadedImagePath
                   );
+
                 } catch (
                   cleanupError
                 ) {
@@ -2723,17 +3245,12 @@ function initializeInventoryPage() {
         );
 
 
-        /*
-         * Si subimos una nueva imagen durante
-         * una edición y luego falla la BD,
-         * eliminamos esa imagen nueva.
-         */
         if (
           uploadedImagePath
         ) {
           const imageStillInDatabase =
             perfumes.some(
-              (perfume) =>
+              perfume =>
                 perfume.imagePath ===
                 uploadedImagePath
             );
@@ -2746,6 +3263,7 @@ function initializeInventoryPage() {
               await deletePerfumeImage(
                 uploadedImagePath
               );
+
             } catch (
               cleanupError
             ) {
@@ -2791,12 +3309,20 @@ function initializeInventoryPage() {
   );
 
 
+  /* ======================================
+     CANCELAR EDICIÓN
+  ====================================== */
+
   cancelButton
     ?.addEventListener(
       "click",
       resetForm
     );
 
+
+  /* ======================================
+     ACCIONES TABLA
+  ====================================== */
 
   body
     ?.addEventListener(
@@ -2817,7 +3343,7 @@ function initializeInventoryPage() {
 
         const perfume =
           perfumes.find(
-            (item) =>
+            item =>
               String(
                 item.id
               ) ===
@@ -2836,6 +3362,10 @@ function initializeInventoryPage() {
           button.dataset.action;
 
 
+        /* ===============================
+           STOCK
+        =============================== */
+
         if (
           action ===
             "increase" ||
@@ -2851,10 +3381,8 @@ function initializeInventoryPage() {
           const newQuantity =
             action ===
             "increase"
-              ? currentQuantity +
-                1
-              : currentQuantity -
-                1;
+              ? currentQuantity + 1
+              : currentQuantity - 1;
 
 
           if (
@@ -2886,6 +3414,7 @@ function initializeInventoryPage() {
             error
           ) {
             console.error(
+              "Error actualizando stock:",
               error
             );
 
@@ -2903,6 +3432,10 @@ function initializeInventoryPage() {
           return;
         }
 
+
+        /* ===============================
+           ELIMINAR
+        =============================== */
 
         if (
           action ===
@@ -2952,7 +3485,7 @@ function initializeInventoryPage() {
 
             perfumes =
               perfumes.filter(
-                (item) =>
+                item =>
                   String(
                     item.id
                   ) !==
@@ -2973,6 +3506,7 @@ function initializeInventoryPage() {
             error
           ) {
             console.error(
+              "Error eliminando perfume:",
               error
             );
 
@@ -2981,12 +3515,20 @@ function initializeInventoryPage() {
               error.message ||
               "No se pudo eliminar el perfume."
             );
+
+          } finally {
+            button.disabled =
+              false;
           }
 
 
           return;
         }
 
+
+        /* ===============================
+           EDITAR
+        =============================== */
 
         if (
           action ===
@@ -3000,28 +3542,64 @@ function initializeInventoryPage() {
           }
 
 
-          document
-            .getElementById(
+          const nameInput =
+            document.getElementById(
               "name"
-            )
-            .value =
-              perfume.name;
+            );
 
-
-          document
-            .getElementById(
+          const brandInput =
+            document.getElementById(
               "brand"
-            )
-            .value =
-              perfume.brand;
+            );
 
-
-          document
-            .getElementById(
+          const categoryInput =
+            document.getElementById(
               "category"
-            )
-            .value =
+            );
+
+          const purchasePriceInput =
+            document.getElementById(
+              "purchasePrice"
+            );
+
+          const priceInput =
+            document.getElementById(
+              "price"
+            );
+
+          const quantityInput =
+            document.getElementById(
+              "quantity"
+            );
+
+          const codeInput =
+            document.getElementById(
+              "code"
+            );
+
+
+          if (
+            nameInput
+          ) {
+            nameInput.value =
+              perfume.name;
+          }
+
+
+          if (
+            brandInput
+          ) {
+            brandInput.value =
+              perfume.brand;
+          }
+
+
+          if (
+            categoryInput
+          ) {
+            categoryInput.value =
               perfume.category;
+          }
 
 
           if (
@@ -3034,41 +3612,118 @@ function initializeInventoryPage() {
           }
 
 
-          document
-            .getElementById(
-              "purchasePrice"
-            )
-            .value =
+          if (
+            purchasePriceInput
+          ) {
+            purchasePriceInput.value =
               perfume.purchasePrice;
+          }
 
 
-          document
-            .getElementById(
-              "price"
-            )
-            .value =
+          if (
+            priceInput
+          ) {
+            priceInput.value =
               perfume.price;
+          }
 
 
-          document
-            .getElementById(
-              "quantity"
-            )
-            .value =
+          if (
+            quantityInput
+          ) {
+            quantityInput.value =
               perfume.quantity;
+          }
 
 
-          document
-            .getElementById(
-              "code"
-            )
-            .value =
+          if (
+            codeInput
+          ) {
+            codeInput.value =
               perfume.code;
+          }
 
 
           loadExistingImage(
             perfume.imagePath
           );
+
+
+          /* ===============================
+             TIENDA ONLINE
+          =============================== */
+
+          if (
+            storePublishedInput
+          ) {
+            storePublishedInput.checked =
+              Boolean(
+                perfume.storePublished
+              );
+          }
+
+
+          if (
+            storeDescriptionInput
+          ) {
+            storeDescriptionInput.value =
+              perfume.storeDescription ||
+              "";
+          }
+
+
+          if (
+            storeNotesInput
+          ) {
+            storeNotesInput.value =
+              Array.isArray(
+                perfume.storeNotes
+              )
+                ? perfume.storeNotes.join(
+                    ", "
+                  )
+                : "";
+          }
+
+
+          if (
+            storeBadgeInput
+          ) {
+            storeBadgeInput.value =
+              perfume.storeBadge ||
+              "";
+          }
+
+
+          if (
+            storeFeaturedInput
+          ) {
+            storeFeaturedInput.checked =
+              Boolean(
+                perfume.storeFeatured
+              );
+          }
+
+
+          if (
+            storeBestsellerInput
+          ) {
+            storeBestsellerInput.checked =
+              Boolean(
+                perfume.storeBestseller
+              );
+          }
+
+
+          if (
+            storeDisplayOrderInput
+          ) {
+            storeDisplayOrderInput.value =
+              String(
+                perfume.storeDisplayOrder ??
+                0
+              );
+          }
 
 
           if (
@@ -3098,6 +3753,10 @@ function initializeInventoryPage() {
     );
 
 
+  /* ======================================
+     FILTROS
+  ====================================== */
+
   search
     ?.addEventListener(
       "input",
@@ -3111,6 +3770,10 @@ function initializeInventoryPage() {
       render
     );
 
+
+  /* ======================================
+     EXPORTAR CSV
+  ====================================== */
 
   exportButton
     ?.addEventListener(
@@ -3147,7 +3810,7 @@ function initializeInventoryPage() {
           ],
 
           ...orderedPerfumes.map(
-            (perfume) => [
+            perfume => [
               perfume.code,
               perfume.name,
               perfume.brand,
@@ -3167,10 +3830,10 @@ function initializeInventoryPage() {
         const csv =
           rows
             .map(
-              (row) =>
+              row =>
                 row
                   .map(
-                    (value) =>
+                    value =>
                       `"${String(
                         value
                       ).replaceAll(
@@ -3219,10 +3882,9 @@ function initializeInventoryPage() {
           "inventario-duvant12.csv";
 
 
-        document.body
-          .appendChild(
-            link
-          );
+        document.body.appendChild(
+          link
+        );
 
 
         link.click();
@@ -3236,6 +3898,10 @@ function initializeInventoryPage() {
       }
     );
 
+
+  /* ======================================
+     EXCEL
+  ====================================== */
 
   initializeExcelImport(
     render

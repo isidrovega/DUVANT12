@@ -426,6 +426,188 @@
 
 </div>
 
+<!-- =====================================
+     TIENDA ONLINE
+====================================== -->
+
+<section class="store-settings">
+
+  <div class="store-settings-header">
+
+    <div>
+      <span class="section-eyebrow">
+        Tienda Online
+      </span>
+
+      <h3>
+        Información comercial
+      </h3>
+
+      <p>
+        Controla cómo aparecerá este perfume
+        en la tienda pública DUVANT 12.
+      </p>
+    </div>
+
+
+    <label class="store-publish-switch">
+
+      <input
+        id="storePublished"
+        type="checkbox"
+      >
+
+      <span class="store-switch-track">
+        <span></span>
+      </span>
+
+      <div>
+        <strong>
+          Publicar en tienda
+        </strong>
+
+        <small>
+          Visible para clientes
+        </small>
+      </div>
+
+    </label>
+
+  </div>
+
+
+  <div class="store-settings-grid">
+
+    <div class="field store-field-wide">
+
+      <label for="storeDescription">
+        Descripción comercial
+      </label>
+
+      <textarea
+        id="storeDescription"
+        rows="5"
+        maxlength="1200"
+        placeholder="Ej. Una fragancia intensa y elegante con una presencia profunda..."
+      ></textarea>
+
+      <span class="store-field-help">
+        Esta descripción aparecerá en la página del perfume.
+      </span>
+
+    </div>
+
+
+    <div class="field store-field-wide">
+
+      <label for="storeNotes">
+        Notas / Perfil
+      </label>
+
+      <textarea
+        id="storeNotes"
+        rows="3"
+        placeholder="Ej. Amaderado, Ámbar, Especiado"
+      ></textarea>
+
+      <span class="store-field-help">
+        Separa cada nota con coma o salto de línea.
+      </span>
+
+    </div>
+
+
+    <div class="field">
+
+      <label for="storeBadge">
+        Badge
+      </label>
+
+      <input
+        id="storeBadge"
+        type="text"
+        maxlength="40"
+        placeholder="Ej. Nuevo"
+      >
+
+      <span class="store-field-help">
+        Opcional: Nuevo, Top, Exclusivo...
+      </span>
+
+    </div>
+
+
+    <div class="field">
+
+      <label for="storeDisplayOrder">
+        Orden de aparición
+      </label>
+
+      <input
+        id="storeDisplayOrder"
+        type="number"
+        min="0"
+        step="1"
+        value="0"
+      >
+
+      <span class="store-field-help">
+        Menor número = mayor prioridad.
+      </span>
+
+    </div>
+
+
+    <div class="store-options">
+
+      <label class="store-option-card">
+
+        <input
+          id="storeFeatured"
+          type="checkbox"
+        >
+
+        <span class="store-option-check"></span>
+
+        <div>
+          <strong>
+            Selección DUVANT 12
+          </strong>
+
+          <small>
+            Mostrar como producto destacado.
+          </small>
+        </div>
+
+      </label>
+
+
+      <label class="store-option-card">
+
+        <input
+          id="storeBestseller"
+          type="checkbox"
+        >
+
+        <span class="store-option-check"></span>
+
+        <div>
+          <strong>
+            Más vendido
+          </strong>
+
+          <small>
+            Mostrar en la sección de favoritos.
+          </small>
+        </div>
+
+      </label>
+
+    </div>
+
+  </div>
+
+</section>
 
           <div class="form-actions">
 
@@ -597,16 +779,17 @@
             <thead>
 
               <tr>
-                <th>Producto</th>
-                <th>Marca</th>
-                <th>Categoría</th>
-                <th>Tamaño</th>
-                <th>Stock</th>
-                <th>Compra</th>
-                <th>Venta</th>
-                <th>Valor</th>
-                <th>Acciones</th>
-              </tr>
+    <th>Producto</th>
+    <th>Marca</th>
+    <th>Categoría</th>
+    <th>Tamaño</th>
+    <th>Stock</th>
+    <th>Compra</th>
+    <th>Venta</th>
+    <th>Valor</th>
+    <th>Tienda</th>
+    <th>Acciones</th>
+  </tr>
 
             </thead>
 

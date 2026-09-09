@@ -3646,113 +3646,171 @@ initializeSalesPage =
        FILTRAR VENTAS
     ====================================== */
 
-    function filteredSales() {
+function filteredSales() {
 
-      const search =
-        String(
-          searchInput?.value ||
-          ""
-        )
-          .trim()
+  const searchValue =
+    String(
+      searchInput?.value || ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const sellerValue =
+    sellerFilter?.value ||
+    "Todos";
+
+
+  const dateValue =
+    dateFilter?.value ||
+    "";
+
+
+  return adminSales.filter(
+    (sale) => {
+
+      /* ======================================
+         BUSCADOR
+      ====================================== */
+
+      if (searchValue) {
+
+        const searchableText = [
+          sale.perfumeName,
+          sale.perfumeBrand,
+          sale.perfumeSize,
+          sale.perfumeCode,
+          sale.sellerName,
+          sale.sellerEmail,
+          sale.onlineOrderNumber,
+
+          sale.saleSource === "online"
+            ? "venta online pedido web sin comision"
+            : ""
+        ]
+          .filter(Boolean)
+          .join(" ")
           .toLowerCase();
 
 
-      const sellerValue =
-        sellerFilter?.value ||
-        "Todos";
+        if (
+          !searchableText.includes(
+            searchValue
+          )
+        ) {
+          return false;
+        }
+      }
 
 
-      const selectedDate =
-        dateFilter?.value ||
-        "";
+      /* ======================================
+         FILTRO VENDEDOR / VENTA ONLINE
+      ====================================== */
 
+      if (
+        sellerValue !==
+        "Todos"
+      ) {
 
-      return adminSales.filter(
-        (sale) => {
+        if (
+          sellerValue ===
+          "__ONLINE__"
+        ) {
 
-          c[
-  sale.perfumeName,
-  sale.perfumeBrand,
-  sale.perfumeSize,
-  sale.perfumeCode,
-  sale.sellerName,
-  sale.sellerEmail,
-  sale.onlineOrderNumber,
-  sale.saleSource ===
-    "online"
-      ? "venta online pedido web"
-      : ""
-]
-          
-            .join(" ")
-            .toLowerCase();
+          if (
+            sale.saleSource !==
+            "online"
+          ) {
+            return false;
+          }
+
+        } else {
+
+          const sellerIdentity =
+            sale.sellerId ||
+            sale.sellerEmail ||
+            sale.sellerName;
 
 
           if (
-            search &&
-            !haystack.includes(
-              search
+            String(
+              sellerIdentity || ""
+            ) !==
+            String(
+              sellerValue
             )
           ) {
             return false;
           }
-
-
-          if (
-  sellerValue !==
-  "Todos"
-) {
-
-  if (
-    sellerValue ===
-    "__ONLINE__"
-  ) {
-
-    if (
-      sale.saleSource !==
-      "online"
-    ) {
-      return false;
-    }
-
-  } else {
-
-    const sellerIdentity =
-      sale.sellerId ||
-      sale.sellerEmail ||
-      sale.sellerName;
-
-
-    if (
-      String(
-        sellerIdentity
-      ) !==
-      String(
-        sellerValue
-      )
-    ) {
-      return false;
-    }
-  }
-}
-
-
-          if (
-            selectedDate &&
-            getLocalDateKey(
-              sale.createdAt
-            ) !==
-            selectedDate
-          ) {
-            return false;
-          }
-
-
-          return true;
         }
-      );
-    }
+      }
 
+
+      /* ======================================
+         FILTRO FECHA
+      ====================================== */
+
+      if (dateValue) {
+
+        if (!sale.createdAt) {
+          return false;
+        }
+
+
+        const saleDate =
+          new Date(
+            sale.createdAt
+          );
+
+
+        if (
+          Number.isNaN(
+            saleDate.getTime()
+          )
+        ) {
+          return false;
+        }
+
+
+        const year =
+          saleDate.getFullYear();
+
+
+        const month =
+          String(
+            saleDate.getMonth() + 1
+          ).padStart(
+            2,
+            "0"
+          );
+
+
+        const day =
+          String(
+            saleDate.getDate()
+          ).padStart(
+            2,
+            "0"
+          );
+
+
+        const normalizedDate =
+          `${year}-${month}-${day}`;
+
+
+        if (
+          normalizedDate !==
+          dateValue
+        ) {
+          return false;
+        }
+      }
+
+
+      return true;
+    }
+  );
+}
 
     /* ======================================
        RENDER VENTAS

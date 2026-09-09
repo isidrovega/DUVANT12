@@ -3526,114 +3526,120 @@ initializeSalesPage =
 
     function populateSalesSellerFilter() {
 
-      if (!sellerFilter) {
+  if (!sellerFilter) {
+    return;
+  }
+
+
+  const currentValue =
+    sellerFilter.value ||
+    "Todos";
+
+
+  const sellers =
+    new Map();
+
+
+  adminSales.forEach(
+    (sale) => {
+
+      if (
+        sale.saleSource === "online" ||
+        !sale.sellerId
+      ) {
         return;
       }
 
 
-      const currentValue =
-        sellerFilter.value ||
-        "Todos";
+      const key =
+        String(
+          sale.sellerId
+        );
 
 
-      const sellers =
-        new Map();
+      if (
+        !sellers.has(key)
+      ) {
+        sellers.set(
+          key,
+          {
+            id:
+              sale.sellerId,
 
+            name:
+              sale.sellerName ||
+              "Vendedor",
 
-      adminSales.forEach(
-        (sale) => {
-
-          const key =
-            String(
-              sale.sellerId ||
+            email:
               sale.sellerEmail ||
-              sale.sellerName
-            );
-
-
-          if (
-            !sellers.has(key)
-          ) {
-            sellers.set(
-              key,
-              {
-                id:
-                  sale.sellerId ||
-                  "",
-
-                name:
-                  sale.sellerName ||
-                  "Vendedor",
-
-                email:
-                  sale.sellerEmail ||
-                  ""
-              }
-            );
+              ""
           }
-        }
+        );
+      }
+    }
+  );
+
+
+  const options =
+    [...sellers.values()]
+      .sort(
+        (a, b) =>
+          String(
+            a.name
+          ).localeCompare(
+            String(
+              b.name
+            ),
+            "es",
+            {
+              sensitivity:
+                "base"
+            }
+          )
+      )
+      .map(
+        (seller) => `
+          <option
+            value="${escapeHTML(
+              seller.id
+            )}"
+          >
+            ${escapeHTML(
+              seller.name
+            )}
+          </option>
+        `
+      )
+      .join("");
+
+
+  sellerFilter.innerHTML = `
+    <option value="Todos">
+      Todas las ventas
+    </option>
+
+    <option value="__ONLINE__">
+      Venta Online
+    </option>
+
+    ${options}
+  `;
+
+
+  const optionExists =
+    [...sellerFilter.options]
+      .some(
+        (option) =>
+          option.value ===
+          currentValue
       );
 
 
-      const options =
-        [...sellers.values()]
-          .sort(
-            (a, b) =>
-              String(
-                a.name
-              ).localeCompare(
-                String(
-                  b.name
-                ),
-                "es",
-                {
-                  sensitivity:
-                    "base"
-                }
-              )
-          )
-          .map(
-            (seller) => `
-              <option
-                value="${escapeHTML(
-                  seller.id ||
-                  seller.email ||
-                  seller.name
-                )}"
-              >
-                ${escapeHTML(
-                  seller.name
-                )}
-              </option>
-            `
-          )
-          .join("");
-
-
-      sellerFilter.innerHTML = `
-  <option value="Todos">
-    Todas las ventas
-  </option>
-
-  <option value="__ONLINE__">
-    Venta Online
-  </option>
-`;
-
-      const optionExists =
-        [...sellerFilter.options]
-          .some(
-            (option) =>
-              option.value ===
-              currentValue
-          );
-
-
-      sellerFilter.value =
-        optionExists
-          ? currentValue
-          : "Todos";
-    }
+  sellerFilter.value =
+    optionExists
+      ? currentValue
+      : "Todos";
+}
 
 
     /* ======================================

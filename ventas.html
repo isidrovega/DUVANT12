@@ -3110,15 +3110,38 @@
 ========================================== */
 
 mapSaleFromDB = function mapSaleWithSource(sale) {
+  const saleSource =
+    sale.sale_source ||
+    "inventory";
+
+  const isOnline =
+    saleSource ===
+    "online";
+
+  const salePrice =
+    Number(
+      sale.sale_price
+    ) || 0;
+
+  const purchasePrice =
+    Number(
+      sale.purchase_price_at_sale
+    ) || 0;
+
   return {
-    id: sale.id,
-    perfumeId: sale.perfume_id,
+    id:
+      sale.id,
+
+    perfumeId:
+      sale.perfume_id,
 
     perfumeName:
-      sale.perfume_name || "",
+      sale.perfume_name ||
+      "",
 
     perfumeBrand:
-      sale.perfume_brand || "",
+      sale.perfume_brand ||
+      "",
 
     perfumeSize:
       formatPerfumeSize(
@@ -3128,34 +3151,62 @@ mapSaleFromDB = function mapSaleWithSource(sale) {
       "",
 
     perfumeCode:
-      sale.perfume_code || "",
+      sale.perfume_code ||
+      "",
 
-    salePrice:
-      Number(
-        sale.sale_price
-      ) || 0,
+    salePrice,
+
+    purchasePrice,
+
+    profit:
+      roundMoney(
+        salePrice -
+        purchasePrice
+      ),
 
     sellerId:
-      sale.seller_id,
+      sale.seller_id ||
+      null,
 
     sellerName:
-      sale.seller_name ||
-      "Vendedor",
+      isOnline
+        ? "Venta Online"
+        : (
+            sale.seller_name ||
+            "Vendedor"
+          ),
 
     sellerEmail:
-      sale.seller_email ||
-      "",
+      isOnline
+        ? ""
+        : (
+            sale.seller_email ||
+            ""
+          ),
 
     createdAt:
       sale.created_at,
 
-    saleSource:
-      sale.sale_source ||
-      "inventory",
+    saleSource,
 
     consignmentLotId:
       sale.consignment_lot_id ||
-      null
+      null,
+
+    onlineOrderId:
+      sale.online_order_id ||
+      null,
+
+    onlineOrderNumber:
+      sale.online_order_number ||
+      "",
+
+    onlineUnitNumber:
+      Number(
+        sale.online_unit_number
+      ) || null,
+
+    isOnline
   };
 };
 
@@ -3205,11 +3256,22 @@ initializeSalesPage =
 
 
     function sourceLabel(source) {
-      return source ===
-        "consignment"
-        ? "Consignación"
-        : "Inventario";
-    }
+  switch (
+    String(
+      source || ""
+    ).toLowerCase()
+  ) {
+    case "online":
+      return "Venta Online";
+
+    case "consignment":
+      return "Consignación";
+
+    case "inventory":
+    default:
+      return "Inventario";
+  }
+}
 
 
     /* ======================================
@@ -3549,12 +3611,14 @@ initializeSalesPage =
 
 
       sellerFilter.innerHTML = `
-        <option value="Todos">
-          Todos los vendedores
-        </option>
-        ${options}
-      `;
+  <option value="Todos">
+    Todas las ventas
+  </option>
 
+  <option value="__ONLINE__">
+    Venta Online
+  </option>
+`;
 
       const optionExists =
         [...sellerFilter.options]
@@ -3600,14 +3664,20 @@ initializeSalesPage =
       return adminSales.filter(
         (sale) => {
 
-          const haystack = [
-            sale.perfumeName,
-            sale.perfumeBrand,
-            sale.perfumeCode,
-            sale.perfumeSize,
-            sale.sellerName,
-            sale.sellerEmail
-          ]
+          c[
+  sale.perfumeName,
+  sale.perfumeBrand,
+  sale.perfumeSize,
+  sale.perfumeCode,
+  sale.sellerName,
+  sale.sellerEmail,
+  sale.onlineOrderNumber,
+  sale.saleSource ===
+    "online"
+      ? "venta online pedido web"
+      : ""
+]
+          
             .join(" ")
             .toLowerCase();
 
@@ -3623,27 +3693,42 @@ initializeSalesPage =
 
 
           if (
-            sellerValue !==
-            "Todos"
-          ) {
+  sellerValue !==
+  "Todos"
+) {
 
-            const sellerIdentity =
-              sale.sellerId ||
-              sale.sellerEmail ||
-              sale.sellerName;
+  if (
+    sellerValue ===
+    "__ONLINE__"
+  ) {
+
+    if (
+      sale.saleSource !==
+      "online"
+    ) {
+      return false;
+    }
+
+  } else {
+
+    const sellerIdentity =
+      sale.sellerId ||
+      sale.sellerEmail ||
+      sale.sellerName;
 
 
-            if (
-              String(
-                sellerIdentity
-              ) !==
-              String(
-                sellerValue
-              )
-            ) {
-              return false;
-            }
-          }
+    if (
+      String(
+        sellerIdentity
+      ) !==
+      String(
+        sellerValue
+      )
+    ) {
+      return false;
+    }
+  }
+}
 
 
           if (
@@ -3735,23 +3820,51 @@ initializeSalesPage =
             </td>
 
             <td>
-              <div class="sales-seller-cell">
+              <td>
+  <div class="sales-seller-cell">
 
-                <strong>
-                  ${escapeHTML(
-                    sale.sellerName ||
-                    "Vendedor"
-                  )}
-                </strong>
+    <strong>
+      ${escapeHTML(
+        sale.saleSource ===
+        "online"
+          ? "Venta Online"
+          : (
+              sale.sellerName ||
+              "Vendedor"
+            )
+      )}
+    </strong>
 
-                <span>
-                  ${escapeHTML(
-                    sale.sellerEmail ||
-                    ""
-                  )}
-                </span>
+    ${
+      sale.saleSource ===
+      "online"
+        ? `
+          <span>
+            ${
+              sale.onlineOrderNumber
+                ? `Pedido ${escapeHTML(
+                    sale.onlineOrderNumber
+                  )}`
+                : "Pedido online"
+            }
+          </span>
 
-              </div>
+          <small class="sales-online-no-commission">
+            Sin comisión
+          </small>
+        `
+        : `
+          <span>
+            ${escapeHTML(
+              sale.sellerEmail ||
+              ""
+            )}
+          </span>
+        `
+    }
+
+  </div>
+</td>
             </td>
 
             <td>
@@ -3777,15 +3890,32 @@ initializeSalesPage =
             </td>
 
             <td>
-              <button
-                class="sales-delete-button"
-                data-delete-sale-id="${escapeHTML(
-                  sale.id
-                )}"
-                type="button"
-              >
-                Eliminar
-              </button>
+  ${
+    sale.saleSource ===
+    "online"
+      ? `
+        <div class="sales-online-locked">
+          <span>
+            Venta Online
+          </span>
+
+          <small>
+            Sin comisión
+          </small>
+        </div>
+      `
+      : `
+        <button
+          class="sales-delete-button"
+          data-delete-sale-id="${escapeHTML(
+            sale.id
+          )}"
+          type="button"
+        >
+          Eliminar
+        </button>
+      `
+  }
             </td>
           `;
 

@@ -3421,103 +3421,135 @@ initializeSalesPage =
 
     function updateSalesStatistics() {
 
-      const now =
-        new Date();
+  const now =
+    new Date();
 
-      const todayKey =
-        getLocalDateKey(now);
+  const todayYear =
+    now.getFullYear();
 
-      const currentYear =
-        now.getFullYear();
+  const todayMonth =
+    now.getMonth();
 
-      const currentMonth =
-        now.getMonth();
+  const todayDay =
+    now.getDate();
 
 
-      const todaySales =
-        adminSales.filter(
-          (sale) =>
-            getLocalDateKey(
-              sale.createdAt
-            ) === todayKey
+  let salesTodayCount = 0;
+  let revenueTodayTotal = 0;
+
+  let salesMonthCount = 0;
+  let revenueMonthTotal = 0;
+
+
+  adminSales.forEach(
+    (sale) => {
+
+      const rawDate =
+        sale.createdAt ||
+        sale.created_at ||
+        null;
+
+
+      if (!rawDate) {
+        return;
+      }
+
+
+      const saleDate =
+        new Date(
+          rawDate
         );
 
 
-      const monthSales =
-        adminSales.filter(
-          (sale) => {
-
-            const date =
-              new Date(
-                sale.createdAt
-              );
-
-            return (
-              date.getFullYear() ===
-                currentYear &&
-              date.getMonth() ===
-                currentMonth
-            );
-          }
-        );
-
-
-      const todayRevenue =
-        todaySales.reduce(
-          (
-            total,
-            sale
-          ) =>
-            total +
-            (
-              Number(
-                sale.salePrice
-              ) || 0
-            ),
-          0
-        );
-
-
-      const monthRevenue =
-        monthSales.reduce(
-          (
-            total,
-            sale
-          ) =>
-            total +
-            (
-              Number(
-                sale.salePrice
-              ) || 0
-            ),
-          0
-        );
-
-
-      safeText(
-        "salesToday",
-        todaySales.length
-      );
-
-      safeText(
-        "revenueToday",
-        formatCurrency(
-          todayRevenue
+      if (
+        Number.isNaN(
+          saleDate.getTime()
         )
-      );
+      ) {
+        return;
+      }
 
-      safeText(
-        "salesMonth",
-        monthSales.length
-      );
 
-      safeText(
-        "revenueMonth",
-        formatCurrency(
-          monthRevenue
-        )
-      );
+      const salePrice =
+        Number(
+          sale.salePrice ??
+          sale.sale_price ??
+          0
+        ) || 0;
+
+
+      /* ======================================
+         MES ACTUAL
+      ====================================== */
+
+      const isCurrentMonth =
+        saleDate.getFullYear() ===
+          todayYear &&
+        saleDate.getMonth() ===
+          todayMonth;
+
+
+      if (isCurrentMonth) {
+
+        salesMonthCount += 1;
+
+        revenueMonthTotal +=
+          salePrice;
+      }
+
+
+      /* ======================================
+         HOY
+      ====================================== */
+
+      const isToday =
+        isCurrentMonth &&
+        saleDate.getDate() ===
+          todayDay;
+
+
+      if (isToday) {
+
+        salesTodayCount += 1;
+
+        revenueTodayTotal +=
+          salePrice;
+      }
     }
+  );
+
+
+  safeText(
+    "salesToday",
+    String(
+      salesTodayCount
+    )
+  );
+
+
+  safeText(
+    "revenueToday",
+    formatCurrency(
+      revenueTodayTotal
+    )
+  );
+
+
+  safeText(
+    "salesMonth",
+    String(
+      salesMonthCount
+    )
+  );
+
+
+  safeText(
+    "revenueMonth",
+    formatCurrency(
+      revenueMonthTotal
+    )
+  );
+}
 
 
     /* ======================================

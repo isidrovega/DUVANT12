@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Duvant 12 | Pedidos Online</title>
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <script>
+    try {
+      const cachedProfile =
+        JSON.parse(
+          sessionStorage.getItem(
+            "duvant12_profile"
+          )
+        );
+
+      if (cachedProfile?.role) {
+        document.documentElement.dataset.role =
+          cachedProfile.role;
+      }
+    } catch (error) {
+      console.error(
+        "No se pudo leer el perfil almacenado:",
+        error
+      );
+    }
+  </script>
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="pedidos.css"
+  >
+</head>
+
+<body data-page="admin">
+
+  <div class="app">
+
+    <!-- =====================================
+         SIDEBAR
+    ====================================== -->
+
+    <aside class="sidebar">
+
+      <div class="brand">
+
+        <img
+          src="logo.png"
+          alt="Logo Duvant 12"
+          class="brand-logo"
+        >
+
+        <div class="brand-text">
+          <strong>Duvant 12</strong>
+          <span>Fragrances House</span>
+        </div>
+
+      </div>
+
+
+      <nav class="sidebar-nav">
+
+        <a
+          href="index.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Dashboard</span>
+        </a>
+
+        <a
+          href="inventario.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">▣</span>
+          <span>Inventario</span>
+        </a>
+
+        <a
+          href="vendedores.html"
+          class="nav-link"
+        >
+          <span class="nav-icon">◇</span>
+          <span>Catálogo</span>
+        </a>
+
+        <a
+          href="ventas.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">$</span>
+          <span>Ventas</span>
+        </a>
+
+        <a
+          href="pedidos.html"
+          class="nav-link active admin-only"
+        >
+          <span class="nav-icon">□</span>
+          <span>Pedidos Online</span>
+        </a>
+
+        <a
+          href="usuarios.html"
+          class="nav-link admin-only"
+        >
+          <span class="nav-icon">♙</span>
+          <span>Usuarios</span>
+        </a>
+
+      </nav>
+
+
+      <div class="sidebar-bottom">
+
+        <div class="quote-card">
+
+          <strong data-current-user>
+            Administrador
+          </strong>
+
+          <span data-current-role>
+            Administrador
+          </span>
+
+          <div class="quote-divider"></div>
+
+          <button
+            class="logout-button"
+            data-logout
+            type="button"
+          >
+            Cerrar sesión
+          </button>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =====================================
+         CONTENIDO
+    ====================================== -->
+
+    <main class="main-content">
+
+      <header class="topbar">
+
+        <div>
+
+          <span class="topbar-label">
+            Tienda online
+          </span>
+
+          <h1>
+            Pedidos Online
+          </h1>
+
+          <p>
+            Preparación, envío y seguimiento de pedidos pagados.
+          </p>
+
+        </div>
+
+
+        <div class="admin-profile">
+
+          <div class="admin-logo">
+            D12
+          </div>
+
+          <div class="admin-info">
+
+            <strong data-current-user>
+              Administrador
+            </strong>
+
+            <span>
+              Duvant 12
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+
+      <!-- =====================================
+           RESUMEN
+      ====================================== -->
+
+      <section class="orders-stats">
+
+        <article class="orders-stat-card">
+          <span>Pendientes</span>
+          <strong id="ordersPendingCount">0</strong>
+          <small>Esperando preparación</small>
+        </article>
+
+        <article class="orders-stat-card">
+          <span>Preparando</span>
+          <strong id="ordersPreparingCount">0</strong>
+          <small>En proceso</small>
+        </article>
+
+        <article class="orders-stat-card">
+          <span>Enviados</span>
+          <strong id="ordersShippedCount">0</strong>
+          <small>En camino</small>
+        </article>
+
+        <article class="orders-stat-card">
+          <span>Entregados</span>
+          <strong id="ordersDeliveredCount">0</strong>
+          <small>Completados</small>
+        </article>
+
+      </section>
+
+
+      <!-- =====================================
+           PEDIDOS
+      ====================================== -->
+
+      <section class="panel orders-panel">
+
+        <div class="orders-toolbar">
+
+          <div class="orders-search">
+
+            <span>⌕</span>
+
+            <input
+              id="ordersSearchInput"
+              type="search"
+              placeholder="Buscar pedido, cliente, email..."
+              autocomplete="off"
+            >
+
+          </div>
+
+
+          <div class="orders-toolbar-actions">
+
+            <select
+              id="ordersStatusFilter"
+              class="orders-filter"
+            >
+              <option value="">
+                Todos los estados
+              </option>
+
+              <option value="pending">
+                Pendientes
+              </option>
+
+              <option value="preparing">
+                Preparando
+              </option>
+
+              <option value="shipped">
+                Enviados
+              </option>
+
+              <option value="delivered">
+                Entregados
+              </option>
+            </select>
+
+
+            <button
+              id="refreshOrdersButton"
+              class="secondary-button"
+              type="button"
+            >
+              Actualizar
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="orders-table-wrap">
+
+          <table class="orders-table">
+
+            <thead>
+              <tr>
+                <th>Pedido</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Pago</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody id="ordersTableBody">
+
+              <tr>
+                <td colspan="7">
+
+                  <div class="orders-loading">
+                    Cargando pedidos online...
+                  </div>
+
+                </td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <div
+          id="ordersEmptyState"
+          class="orders-empty"
+          hidden
+        >
+          <div class="orders-empty-mark">
+            D12
+          </div>
+
+          <h3>
+            No hay pedidos
+          </h3>
+
+          <p>
+            No encontramos pedidos para los filtros seleccionados.
+          </p>
+        </div>
+
+      </section>
+
+
+      <!-- =====================================
+           CIERRE DE SESIÓN MÓVIL
+      ====================================== -->
+
+      <div class="mobile-logout">
+
+        <div class="mobile-user-info">
+
+          <strong data-current-user>
+            Administrador
+          </strong>
+
+          <span data-current-role>
+            Administrador
+          </span>
+
+        </div>
+
+        <button
+          class="logout-button mobile-logout-button"
+          data-logout
+          type="button"
+        >
+          Cerrar sesión
+        </button>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================
+       MODAL PEDIDO
+  ====================================== -->
+
+  <div
+    id="orderModal"
+    class="order-modal"
+    hidden
+  >
+
+    <div
+      class="order-modal-backdrop"
+      data-close-order-modal
+    ></div>
+
+
+    <section
+      class="order-modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="orderModalTitle"
+    >
+
+      <header class="order-modal-header">
+
+        <div>
+
+          <span class="order-modal-eyebrow">
+            Pedido online
+          </span>
+
+          <h2 id="orderModalTitle">
+            Pedido
+          </h2>
+
+          <p id="orderModalDate">
+            —
+          </p>
+
+        </div>
+
+
+        <button
+          class="order-modal-close"
+          type="button"
+          data-close-order-modal
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+
+      </header>
+
+
+      <div
+        id="orderModalLoading"
+        class="order-detail-loading"
+      >
+        Cargando información del pedido...
+      </div>
+
+
+      <div
+        id="orderModalContent"
+        class="order-modal-content"
+        hidden
+      >
+
+        <!-- RESUMEN -->
+
+        <div class="order-detail-summary">
+
+          <div>
+            <span>Total</span>
+            <strong id="orderDetailTotal">
+              $0.00
+            </strong>
+          </div>
+
+          <div>
+            <span>Pago</span>
+            <strong
+              id="orderDetailPayment"
+              class="order-payment-confirmed"
+            >
+              Confirmado
+            </strong>
+          </div>
+
+          <div>
+            <span>Estado</span>
+            <strong id="orderDetailStatus">
+              Pendiente
+            </strong>
+          </div>
+
+        </div>
+
+
+        <!-- CLIENTE -->
+
+        <section class="order-detail-section">
+
+          <div class="order-detail-section-heading">
+            <span>Cliente</span>
+            <h3>Información de contacto</h3>
+          </div>
+
+          <div class="order-detail-grid">
+
+            <div>
+              <span>Nombre</span>
+              <strong id="orderCustomerName">—</strong>
+            </div>
+
+            <div>
+              <span>Teléfono</span>
+              <strong id="orderCustomerPhone">—</strong>
+            </div>
+
+            <div class="order-detail-wide">
+              <span>Email</span>
+              <strong id="orderCustomerEmail">—</strong>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- DIRECCIÓN -->
+
+        <section class="order-detail-section">
+
+          <div class="order-detail-section-heading">
+            <span>Entrega</span>
+            <h3>Dirección de envío</h3>
+          </div>
+
+          <div
+            id="orderShippingAddress"
+            class="order-address"
+          >
+            —
+          </div>
+
+        </section>
+
+
+        <!-- PRODUCTOS -->
+
+        <section class="order-detail-section">
+
+          <div class="order-detail-section-heading">
+            <span>Productos</span>
+            <h3>Contenido del pedido</h3>
+          </div>
+
+          <div
+            id="orderProducts"
+            class="order-products"
+          ></div>
+
+        </section>
+
+
+        <!-- NOTAS -->
+
+        <section
+          id="orderNotesSection"
+          class="order-detail-section"
+          hidden
+        >
+
+          <div class="order-detail-section-heading">
+            <span>Notas</span>
+            <h3>Indicaciones del cliente</h3>
+          </div>
+
+          <p
+            id="orderCustomerNotes"
+            class="order-notes"
+          ></p>
+
+        </section>
+
+
+        <!-- ENVÍO -->
+
+        <section class="order-detail-section">
+
+          <div class="order-detail-section-heading">
+            <span>Logística</span>
+            <h3>Seguimiento del envío</h3>
+          </div>
+
+
+          <div class="order-shipping-fields">
+
+            <label>
+              <span>Paquetería</span>
+
+              <input
+                id="shippingCarrierInput"
+                type="text"
+                placeholder="Ej. DHL, FedEx, Estafeta"
+                maxlength="100"
+              >
+            </label>
+
+
+            <label>
+              <span>Número de rastreo</span>
+
+              <input
+                id="trackingNumberInput"
+                type="text"
+                placeholder="Número de guía"
+                maxlength="150"
+              >
+            </label>
+
+          </div>
+
+        </section>
+
+
+        <!-- FLUJO -->
+
+        <section class="order-detail-section">
+
+          <div class="order-detail-section-heading">
+            <span>Proceso</span>
+            <h3>Estado del pedido</h3>
+          </div>
+
+
+          <div
+            id="orderProgress"
+            class="order-progress"
+          ></div>
+
+
+          <div
+            id="orderNextAction"
+            class="order-next-action"
+          ></div>
+
+        </section>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- =====================================
+       TOAST
+  ====================================== -->
+
+  <div
+    id="toast"
+    class="toast"
+  >
+    <span id="toastMessage"></span>
+  </div>
+
+
+  <!-- =====================================
+       SCRIPTS
+  ====================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script src="supabase-config.js"></script>
+  <script src="script.js"></script>
+  <script src="pedidos.js"></script>
+
+</body>
+</html>

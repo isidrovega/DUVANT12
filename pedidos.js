@@ -1354,26 +1354,36 @@ function renderShippingInformation(
 
 
   if (downloadButton) {
-    downloadButton.hidden =
-      !labelAvailable;
+  downloadButton.hidden =
+    !labelAvailable;
 
-    downloadButton.disabled =
-      false;
+  downloadButton.style.display =
+    labelAvailable
+      ? ""
+      : "none";
 
-    downloadButton.textContent =
-      "Descargar guía PDF";
-  }
+  downloadButton.disabled =
+    false;
+
+  downloadButton.textContent =
+    "Descargar guía PDF";
+}
 
 
-  if (labelUnavailable) {
-    labelUnavailable.hidden =
-      labelAvailable;
+if (labelUnavailable) {
+  labelUnavailable.hidden =
+    labelAvailable;
 
-    labelUnavailable.textContent =
-      guideId
-        ? "La guía existe, pero el PDF todavía no está disponible."
-        : "La guía todavía no ha sido generada.";
-  }
+  labelUnavailable.style.display =
+    labelAvailable
+      ? "none"
+      : "";
+
+  labelUnavailable.textContent =
+    guideId
+      ? "La guía existe, pero el PDF todavía no está disponible."
+      : "La guía todavía no ha sido generada.";
+}
 }
 
 

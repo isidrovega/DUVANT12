@@ -119,7 +119,6 @@
         </a>
 
         <a
-
           href="pedidos.html"
           class="nav-link active admin-only"
         >
@@ -263,7 +262,7 @@
             <input
               id="ordersSearchInput"
               type="search"
-              placeholder="Buscar pedido, cliente, email..."
+              placeholder="Buscar pedido, cliente, email, guía..."
               autocomplete="off"
             >
 
@@ -468,7 +467,9 @@
         hidden
       >
 
-        <!-- RESUMEN -->
+        <!-- =================================
+             RESUMEN
+        ================================== -->
 
         <div class="order-detail-summary">
 
@@ -481,6 +482,7 @@
 
           <div>
             <span>Pago</span>
+
             <strong
               id="orderDetailPayment"
               class="order-payment-confirmed"
@@ -491,6 +493,7 @@
 
           <div>
             <span>Estado</span>
+
             <strong id="orderDetailStatus">
               Pendiente
             </strong>
@@ -499,7 +502,9 @@
         </div>
 
 
-        <!-- CLIENTE -->
+        <!-- =================================
+             CLIENTE
+        ================================== -->
 
         <section class="order-detail-section">
 
@@ -507,6 +512,7 @@
             <span>Cliente</span>
             <h3>Información de contacto</h3>
           </div>
+
 
           <div class="order-detail-grid">
 
@@ -530,7 +536,9 @@
         </section>
 
 
-        <!-- DIRECCIÓN -->
+        <!-- =================================
+             DIRECCIÓN
+        ================================== -->
 
         <section class="order-detail-section">
 
@@ -538,6 +546,7 @@
             <span>Entrega</span>
             <h3>Dirección de envío</h3>
           </div>
+
 
           <div
             id="orderShippingAddress"
@@ -549,7 +558,9 @@
         </section>
 
 
-        <!-- PRODUCTOS -->
+        <!-- =================================
+             PRODUCTOS
+        ================================== -->
 
         <section class="order-detail-section">
 
@@ -557,6 +568,7 @@
             <span>Productos</span>
             <h3>Contenido del pedido</h3>
           </div>
+
 
           <div
             id="orderProducts"
@@ -566,7 +578,9 @@
         </section>
 
 
-        <!-- NOTAS -->
+        <!-- =================================
+             NOTAS
+        ================================== -->
 
         <section
           id="orderNotesSection"
@@ -579,6 +593,7 @@
             <h3>Indicaciones del cliente</h3>
           </div>
 
+
           <p
             id="orderCustomerNotes"
             class="order-notes"
@@ -587,38 +602,218 @@
         </section>
 
 
-        <!-- ENVÍO -->
+        <!-- =================================
+             LOGÍSTICA AUTOMÁTICA
+        ================================== -->
 
         <section class="order-detail-section">
 
           <div class="order-detail-section-heading">
             <span>Logística</span>
-            <h3>Seguimiento del envío</h3>
+            <h3>Información del envío</h3>
           </div>
+
+
+          <div class="order-detail-grid">
+
+            <div>
+              <span>Paquetería</span>
+
+              <strong id="shippingProviderValue">
+                —
+              </strong>
+            </div>
+
+
+            <div>
+              <span>Servicio</span>
+
+              <strong id="shippingServiceValue">
+                —
+              </strong>
+            </div>
+
+
+            <div>
+              <span>Transporte</span>
+
+              <strong id="shippingTransportValue">
+                —
+              </strong>
+            </div>
+
+
+            <div>
+              <span>Modalidad</span>
+
+              <strong id="shippingDeliveryModeValue">
+                —
+              </strong>
+            </div>
+
+
+            <div class="order-detail-wide">
+              <span>Fecha estimada</span>
+
+              <strong id="shippingEstimatedDateValue">
+                —
+              </strong>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================
+             GUÍA Y TRACKING
+        ================================== -->
+
+        <section class="order-detail-section">
+
+          <div class="order-detail-section-heading">
+            <span>EnviaTodo</span>
+            <h3>Guía y seguimiento</h3>
+          </div>
+
+
+          <div class="order-detail-grid">
+
+            <div>
+              <span>Número de guía</span>
+
+              <strong id="shippingGuideValue">
+                —
+              </strong>
+            </div>
+
+
+            <div>
+              <span>Número de rastreo</span>
+
+              <strong id="shippingTrackingValue">
+                —
+              </strong>
+            </div>
+
+
+            <div>
+              <span>Estado</span>
+
+              <strong id="shippingStatusValue">
+                —
+              </strong>
+            </div>
+
+
+            <div>
+              <span>Código de estado</span>
+
+              <strong id="shippingStatusCodeValue">
+                —
+              </strong>
+            </div>
+
+
+            <div class="order-detail-wide">
+              <span>Generación de guía</span>
+
+              <strong id="shippingGenerationValue">
+                —
+              </strong>
+            </div>
+
+          </div>
+
+
+          <div
+            class="order-next-action"
+            style="margin-top: 18px;"
+          >
+
+            <button
+              id="downloadShippingLabelButton"
+              class="secondary-button"
+              type="button"
+              hidden
+            >
+              Descargar guía PDF
+            </button>
+
+
+            <span
+              id="shippingLabelUnavailable"
+              class="order-completed-label"
+            >
+              La guía todavía no está disponible.
+            </span>
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================
+             FALLBACK MANUAL
+        ================================== -->
+
+        <section
+          id="manualShippingFallback"
+          class="order-detail-section"
+          hidden
+        >
+
+          <div class="order-detail-section-heading">
+
+            <span>Envío manual</span>
+
+            <h3>
+              Datos faltantes
+            </h3>
+
+          </div>
+
+
+          <p class="order-notes">
+            Este pedido no contiene todos los datos automáticos
+            de EnviaTodo. Captura únicamente la información faltante.
+          </p>
 
 
           <div class="order-shipping-fields">
 
-            <label>
-              <span>Paquetería</span>
+            <label
+              id="shippingCarrierFallbackLabel"
+              hidden
+            >
+              <span>
+                Paquetería
+              </span>
 
               <input
                 id="shippingCarrierInput"
                 type="text"
                 placeholder="Ej. DHL, FedEx, Estafeta"
                 maxlength="100"
+                autocomplete="off"
               >
             </label>
 
 
-            <label>
-              <span>Número de rastreo</span>
+            <label
+              id="trackingFallbackLabel"
+              hidden
+            >
+              <span>
+                Número de rastreo
+              </span>
 
               <input
                 id="trackingNumberInput"
                 type="text"
-                placeholder="Número de guía"
+                placeholder="Número de guía o rastreo"
                 maxlength="150"
+                autocomplete="off"
               >
             </label>
 
@@ -627,7 +822,9 @@
         </section>
 
 
-        <!-- FLUJO -->
+        <!-- =================================
+             FLUJO
+        ================================== -->
 
         <section class="order-detail-section">
 
